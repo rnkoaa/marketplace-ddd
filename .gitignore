@@ -1,6 +1,11 @@
+.classpath
 .gradle/
 .project
 .settings/
 .idea/
+marketplace.iml
+marketplace.ipr
+marketplace.iws
+out/
 bin/
 build/
