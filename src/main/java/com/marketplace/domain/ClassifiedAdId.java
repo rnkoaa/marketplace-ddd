@@ -18,4 +18,5 @@ public record ClassifiedAdId(UUID id) {
         var id = UUID.fromString(uuid);
         return new ClassifiedAdId(id);
     }
+
 }

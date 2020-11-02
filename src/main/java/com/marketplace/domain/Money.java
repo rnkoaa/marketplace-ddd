@@ -1,11 +1,11 @@
 package com.marketplace.domain;
 
-import com.marketplace.CurrencyMismatchException;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 public record Money(BigDecimal amount, String currencyCode, CurrencyLookup currencyLookup) {
+    private static final int DEFAULT_DECIMAL_PLACES = 2;
 
     public Money {
         if (currencyLookup == null) {
@@ -26,12 +26,36 @@ public record Money(BigDecimal amount, String currencyCode, CurrencyLookup curre
         }
     }
 
+    public static Money fromDecimal(double amount, String currencyCode, CurrencyLookup currencyLookup) {
+        var amt = BigDecimal.valueOf(amount)
+                .setScale(DEFAULT_DECIMAL_PLACES, RoundingMode.CEILING);
+        return new Money(amt, currencyCode, currencyLookup);
+    }
+
     public Money(String amount, String currency) {
         this(new BigDecimal(amount), currency, new DefaultCurrencyLookup());
     }
 
     public Money(BigDecimal amount, String currency) {
         this(amount, currency, new DefaultCurrencyLookup());
+    }
+
+    public static Money fromString(String amount, String currencyCode, CurrencyLookup currencyLookup) {
+        return new Money(new BigDecimal(amount), currencyCode, currencyLookup);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Money money = (Money) o;
+        return Objects.equals(amount, money.amount) &&
+                Objects.equals(currencyCode, money.currencyCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, currencyCode);
     }
 
     @Override
