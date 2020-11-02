@@ -1,6 +1,5 @@
 package com.marketplace.domain;
 
-import com.marketplace.CurrencyMismatchException;
 import com.marketplace.fixtures.FakeCurrencyLookup;
 import org.junit.jupiter.api.Test;
 

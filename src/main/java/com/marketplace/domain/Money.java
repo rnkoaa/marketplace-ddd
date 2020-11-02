@@ -1,7 +1,5 @@
 package com.marketplace.domain;
 
-import com.marketplace.CurrencyMismatchException;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
