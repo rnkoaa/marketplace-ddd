@@ -1,8 +1,10 @@
 package com.marketplace.domain;
 
+import com.marketplace.framework.AggregateRoot;
 import com.marketplace.framework.events.*;
 import com.marketplace.framework.Entity;
 
+@AggregateRoot
 public class ClassifiedAd extends Entity<EventId> {
     private ClassifiedAdId id;
     private UserId ownerId;
@@ -61,18 +63,22 @@ public class ClassifiedAd extends Entity<EventId> {
     }
 
     @Override
-    public void when(Event event) {
-        this.id = new ClassifiedAdId(event.getId());
+    public void when(Object event) {
         if (event instanceof ClassifiedAdCreated e) {
+            this.id = new ClassifiedAdId(e.getId());
             this.ownerId = new UserId(e.getUserId());
             this.state = ClassifiedAdState.inactive;
         } else if (event instanceof ClassifiedAdTextUpdated e) {
+            this.id = new ClassifiedAdId(e.getId());
             this.text = new ClassifiedAdText(e.getAdText());
         } else if (event instanceof ClassifiedAdPriceUpdated e) {
+            this.id = new ClassifiedAdId(e.getId());
             this.price = new Price(new Money(e.getPrice(), e.getCurrencyCode()));
         } else if (event instanceof ClassifiedAdTitleChanged e) {
-            this.text = new ClassifiedAdText(e.getTitle());
+            this.id = new ClassifiedAdId(e.getId());
+            this.title = new ClassifiedAdTitle(e.getTitle());
         } else if (event instanceof ClassifiedAdSentForReview e) {
+            this.id = new ClassifiedAdId(e.getId());
             this.state = ClassifiedAdState.pendingReview;
         }
     }
