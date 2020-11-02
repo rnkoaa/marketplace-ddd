@@ -13,6 +13,7 @@ public abstract class Entity<T> {
     }
 
     public void apply(Object event) {
+        when(event);
         ensureValidState();
         events.add(event);
     }
@@ -27,5 +28,5 @@ public abstract class Entity<T> {
         return events;
     }
 
-    public abstract void when(Event event);
+    public abstract void when(Object event);
 }
