@@ -1,4 +1,4 @@
-package com.marketplace.framework.events;
+package com.marketplace.event;
 
 import java.util.UUID;
 

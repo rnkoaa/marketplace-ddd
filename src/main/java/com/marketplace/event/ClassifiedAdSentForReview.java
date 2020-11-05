@@ -1,9 +1,12 @@
-package com.marketplace.framework.events;
+package com.marketplace.event;
+
+import lombok.Value;
 
 import java.util.UUID;
 
-public final class ClassifiedAdSentForReview implements Event {
-    private final UUID id;
+@Value
+public class ClassifiedAdSentForReview implements Event {
+    UUID id;
 
     public ClassifiedAdSentForReview(UUID id) {
         this.id = id;
