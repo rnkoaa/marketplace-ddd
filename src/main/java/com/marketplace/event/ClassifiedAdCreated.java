@@ -1,10 +1,13 @@
-package com.marketplace.framework.events;
+package com.marketplace.event;
+
+import lombok.Value;
 
 import java.util.UUID;
 
-public final class ClassifiedAdCreated implements Event {
-    private final UUID id;
-    private final UUID userId;
+@Value
+public class ClassifiedAdCreated implements Event {
+    UUID id;
+    UUID userId;
 
     public ClassifiedAdCreated(UUID id, UUID userId) {
         this.id = id;

@@ -1,7 +1,5 @@
 package com.marketplace.framework;
 
-import com.marketplace.framework.events.Event;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,13 +1,16 @@
-package com.marketplace.framework.events;
+package com.marketplace.event;
+
+import lombok.Value;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public final class ClassifiedAdPriceUpdated implements Event {
-    private final UUID id;
-    private final BigDecimal price;
+@Value
+public class ClassifiedAdPriceUpdated implements Event {
+    UUID id;
+    BigDecimal price;
 
-    private final String currencyCode;
+    String currencyCode;
 
     public ClassifiedAdPriceUpdated(UUID id, BigDecimal price, String currencyCode) {
         this.id = id;

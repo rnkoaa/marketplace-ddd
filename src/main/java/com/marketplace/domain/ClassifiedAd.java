@@ -1,7 +1,7 @@
 package com.marketplace.domain;
 
+import com.marketplace.event.*;
 import com.marketplace.framework.AggregateRoot;
-import com.marketplace.framework.events.*;
 import com.marketplace.framework.Entity;
 
 @AggregateRoot
