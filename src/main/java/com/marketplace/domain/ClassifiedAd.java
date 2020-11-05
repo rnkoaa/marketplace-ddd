@@ -3,8 +3,12 @@ package com.marketplace.domain;
 import com.marketplace.event.*;
 import com.marketplace.framework.AggregateRoot;
 import com.marketplace.framework.Entity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @AggregateRoot
+@Data()
+@EqualsAndHashCode(callSuper = false)
 public class ClassifiedAd extends Entity<EventId> {
     private ClassifiedAdId id;
     private UserId ownerId;

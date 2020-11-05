@@ -9,6 +9,8 @@ import java.util.UUID;
 public class CreateClassifiedAd implements Command {
     UUID userId;
     Instant createdAt;
+    String title;
+    String text;
 
     @Override
     public Instant createdAt() {
