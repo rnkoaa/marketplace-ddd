@@ -31,8 +31,8 @@ public class ClassifiedAdTest {
 
     @Test
     void can_publish_a_valid_ad() {
-        classifiedAd.setTitle(new ClassifiedAdTitle("Test ad"));
-        classifiedAd.setText(new ClassifiedAdText("Please buy my stuff"));
+        classifiedAd.updateTitle(new ClassifiedAdTitle("Test ad"));
+        classifiedAd.updateText(new ClassifiedAdText("Please buy my stuff"));
         classifiedAd.updatePrice(new Price(Money.fromDecimal(100, "EUR", new FakeCurrencyLookup())));
 
         classifiedAd.requestToPublish();
@@ -44,8 +44,8 @@ public class ClassifiedAdTest {
     @Test
     void cannot_publish_without_price() {
         assertThatThrownBy(() -> {
-            classifiedAd.setTitle(new ClassifiedAdTitle("Test ad"));
-            classifiedAd.setText(new ClassifiedAdText("Please buy my stuff"));
+            classifiedAd.updateTitle(new ClassifiedAdTitle("Test ad"));
+            classifiedAd.updateText(new ClassifiedAdText("Please buy my stuff"));
 
             classifiedAd.requestToPublish();
         }).isInstanceOf(InvalidStateException.class);
@@ -54,7 +54,7 @@ public class ClassifiedAdTest {
     @Test
     void cannot_publish_without_text() {
         assertThatThrownBy(() -> {
-            classifiedAd.setTitle(new ClassifiedAdTitle("Test ad"));
+            classifiedAd.updateTitle(new ClassifiedAdTitle("Test ad"));
             classifiedAd.updatePrice(new Price(Money.fromDecimal(100, "EUR", new FakeCurrencyLookup())));
 
             classifiedAd.requestToPublish();
@@ -64,7 +64,7 @@ public class ClassifiedAdTest {
     @Test
     void cannot_publish_without_title() {
         assertThatThrownBy(() -> {
-            classifiedAd.setText(new ClassifiedAdText("Please buy my stuff"));
+            classifiedAd.updateText(new ClassifiedAdText("Please buy my stuff"));
             classifiedAd.updatePrice(new Price(Money.fromDecimal(100, "EUR", new FakeCurrencyLookup())));
 
             classifiedAd.requestToPublish();
@@ -75,8 +75,8 @@ public class ClassifiedAdTest {
     void cannot_publish_with_zero_price() {
         assertThatThrownBy(() -> {
 
-            classifiedAd.setTitle(new ClassifiedAdTitle("Test ad"));
-            classifiedAd.setText(new ClassifiedAdText("Please buy my stuff"));
+            classifiedAd.updateTitle(new ClassifiedAdTitle("Test ad"));
+            classifiedAd.updateText(new ClassifiedAdText("Please buy my stuff"));
             classifiedAd.updatePrice(new Price(Money.fromDecimal(0, "EUR", new FakeCurrencyLookup())));
 
             classifiedAd.requestToPublish();

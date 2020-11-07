@@ -3,11 +3,13 @@ package com.marketplace.domain;
 import com.marketplace.event.*;
 import com.marketplace.framework.AggregateRoot;
 import com.marketplace.framework.Entity;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 @AggregateRoot
-@Data()
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = false)
 public class ClassifiedAd extends Entity<EventId> {
     private ClassifiedAdId id;
@@ -22,12 +24,20 @@ public class ClassifiedAd extends Entity<EventId> {
         apply(new ClassifiedAdCreated(id.id(), ownerId.id()));
     }
 
-    public void setTitle(ClassifiedAdTitle title) {
+    public void updateTitle(ClassifiedAdTitle title) {
         apply(new ClassifiedAdTitleChanged(id.id(), title.toString()));
     }
 
-    public void setText(ClassifiedAdText text) {
+    public void updateOwner(UserId userId) {
+        this.ownerId = userId;
+    }
+
+    public void updateText(ClassifiedAdText text) {
         apply(new ClassifiedAdTextUpdated(id.id(), text.toString()));
+    }
+
+    public void approve(UserId approvedBy) {
+        apply(new ClassifiedApproved(id.id(), approvedBy));
     }
 
     public void updatePrice(Price price) {
@@ -36,34 +46,6 @@ public class ClassifiedAd extends Entity<EventId> {
 
     public void requestToPublish() {
         apply(new ClassifiedAdSentForReview(id.id()));
-    }
-
-    public ClassifiedAdId getId() {
-        return id;
-    }
-
-    public UserId getOwnerId() {
-        return ownerId;
-    }
-
-    public ClassifiedAdTitle getTitle() {
-        return title;
-    }
-
-    public ClassifiedAdText getText() {
-        return text;
-    }
-
-    public Price getPrice() {
-        return price;
-    }
-
-    public UserId getApprovedBy() {
-        return approvedBy;
-    }
-
-    public ClassifiedAdState getState() {
-        return state;
     }
 
     @Override
@@ -101,4 +83,5 @@ public class ClassifiedAd extends Entity<EventId> {
             throw new InvalidStateException("post checks failed in state");
         }
     }
+
 }

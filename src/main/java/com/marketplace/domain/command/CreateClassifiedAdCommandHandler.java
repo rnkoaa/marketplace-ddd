@@ -21,11 +21,11 @@ public class CreateClassifiedAdCommandHandler implements CommandHandler<CreateCl
         var classifiedAd = new ClassifiedAd(classifiedAdId, ownerId);
 
         if (!Strings.isNullOrEmpty(command.getTitle())) {
-            classifiedAd.setTitle(new ClassifiedAdTitle(command.getTitle()));
+            classifiedAd.updateTitle(new ClassifiedAdTitle(command.getTitle()));
         }
 
         if (!Strings.isNullOrEmpty(command.getText())) {
-            classifiedAd.setText(new ClassifiedAdText(command.getText()));
+            classifiedAd.updateText(new ClassifiedAdText(command.getText()));
         }
 
         classifiedAdRepository.save(classifiedAd);

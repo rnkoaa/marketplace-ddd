@@ -1,5 +1,7 @@
 package com.marketplace.domain;
 
+import com.marketplace.context.CurrencyLookupContext;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
@@ -26,6 +28,12 @@ public record Money(BigDecimal amount, String currencyCode, CurrencyLookup curre
         }
     }
 
+    public static Money fromDecimal(double amount, String currencyCode) {
+        var amt = BigDecimal.valueOf(amount)
+                .setScale(DEFAULT_DECIMAL_PLACES, RoundingMode.CEILING);
+        return new Money(amt, currencyCode, CurrencyLookupContext.defaultCurrencyLookup());
+    }
+
     public static Money fromDecimal(double amount, String currencyCode, CurrencyLookup currencyLookup) {
         var amt = BigDecimal.valueOf(amount)
                 .setScale(DEFAULT_DECIMAL_PLACES, RoundingMode.CEILING);
@@ -33,7 +41,7 @@ public record Money(BigDecimal amount, String currencyCode, CurrencyLookup curre
     }
 
     public Money(String amount, String currency) {
-        this(new BigDecimal(amount), currency, new DefaultCurrencyLookup());
+        this(new BigDecimal(amount), currency, CurrencyLookupContext.defaultCurrencyLookup());
     }
 
     public Money(BigDecimal amount, String currency) {
