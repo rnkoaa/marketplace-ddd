@@ -32,6 +32,7 @@ public class SparkServer {
             response.header("Location", String.format("/classified_add/%s", createAdResponse.getId().toString()));
             return res;
         });
+
         Spark.put("/classified_ad/:classifiedAdId", "application/json", (request, response) -> {
             String classifiedAdId = request.params(":classifiedAdId");
             response.type("application/json");
@@ -47,6 +48,7 @@ public class SparkServer {
             }
             return request.body();
         });
+
         System.out.println("Spark Server is running on port :" + Spark.port());
     }
 }
