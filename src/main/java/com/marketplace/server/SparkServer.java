@@ -6,6 +6,8 @@ import com.marketplace.command.UpdateClassifiedAd;
 import com.marketplace.controller.*;
 import spark.Spark;
 
+import java.util.UUID;
+
 public class SparkServer {
     private final ObjectMapper objectMapper;
     private final ClassifiedAdController classifiedAdController;
@@ -36,7 +38,9 @@ public class SparkServer {
             try {
                 byte[] body = request.bodyAsBytes();
                 var updateDto = objectMapper.readValue(body, UpdateAdDto.class);
+                updateDto.setId(UUID.fromString(classifiedAdId));
                 var updateClassifiedAdResponse = classifiedAdController.updateClassifiedAd(updateDto);
+                updateClassifiedAdResponse.setId(UUID.fromString(classifiedAdId));
                 return objectMapper.writeValueAsString(updateClassifiedAdResponse);
             } catch (JsonMappingException ex) {
                 response.status(502);
