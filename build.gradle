@@ -30,6 +30,8 @@ configurations {
 
 
 dependencies {
+    implementation("com.sparkjava:spark-core:2.9.3")
+
     compileOnly('org.projectlombok:lombok:1.18.16')
     annotationProcessor('org.projectlombok:lombok:1.18.16')
 

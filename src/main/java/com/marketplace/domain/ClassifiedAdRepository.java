@@ -1,5 +1,7 @@
 package com.marketplace.domain;
 
+import java.util.Optional;
+
 public interface ClassifiedAdRepository {
     /**
      * @param id
@@ -11,7 +13,7 @@ public interface ClassifiedAdRepository {
      * @param id
      * @return
      */
-    ClassifiedAd load(ClassifiedAdId id);
+    Optional<ClassifiedAd> load(ClassifiedAdId id);
 
     /**
      * @param entity

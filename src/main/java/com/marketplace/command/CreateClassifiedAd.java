@@ -1,5 +1,6 @@
 package com.marketplace.command;
 
+import com.marketplace.controller.CreateAdDto;
 import lombok.Value;
 
 import java.time.Instant;
@@ -11,6 +12,11 @@ public class CreateClassifiedAd implements Command {
     Instant createdAt;
     String title;
     String text;
+
+    public static CreateClassifiedAd from(CreateAdDto createAdDto) {
+        return new CreateClassifiedAd(createAdDto.getOwnerId(), Instant.now(),
+                createAdDto.getTitle(), createAdDto.getText());
+    }
 
     @Override
     public Instant createdAt() {

@@ -26,7 +26,7 @@ public class ClassifiedAd extends Entity<EventId> {
         apply(new ClassifiedAdTitleChanged(id.id(), title.toString()));
     }
 
-    public void updateText(ClassifiedAdText text) {
+    public void setText(ClassifiedAdText text) {
         apply(new ClassifiedAdTextUpdated(id.id(), text.toString()));
     }
 

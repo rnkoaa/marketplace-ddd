@@ -9,9 +9,13 @@ public record ClassifiedAdId(UUID id) {
         }
     }
 
+    public ClassifiedAdId() {
+        this(UUID.randomUUID());
+    }
+
     @Override
     public String toString() {
-       return id.toString();
+        return id.toString();
     }
 
     static ClassifiedAdId fromString(String uuid) {
