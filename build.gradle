@@ -30,9 +30,10 @@ configurations {
 
 
 dependencies {
+    implementation("com.sparkjava:spark-core:2.9.3")
+
     compileOnly('org.projectlombok:lombok:1.18.16')
     annotationProcessor('org.projectlombok:lombok:1.18.16')
-
 
     // 2.11.3
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
@@ -40,10 +41,12 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
-
-    testImplementation(platform('org.junit:junit-bom:5.7.0'))
+    testImplementation(platform("org.junit:junit-bom:${junitVersion}"))
     testImplementation('org.junit.jupiter:junit-jupiter')
-    testImplementation('org.assertj:assertj-core:3.18.0')
+    testImplementation("org.assertj:assertj-core:${assertjVersion}")
+    testCompile("org.mockito:mockito-core:${mockitoVersion}")
+    testCompile("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
+
 }
 
 test {
