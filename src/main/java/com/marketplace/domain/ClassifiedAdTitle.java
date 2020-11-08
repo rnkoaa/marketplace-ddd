@@ -8,6 +8,11 @@ public record ClassifiedAdTitle(String value) {
         }
     }
 
+    @Override
+    public String toString() {
+        return value;
+    }
+
     public ClassifiedAdText fromHtmlString(String htmlString) {
 //        var supportedTagsReplaced = htmlTitle
 //                .Replace("<i>", "*")

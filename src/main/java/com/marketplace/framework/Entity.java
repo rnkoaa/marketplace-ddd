@@ -1,30 +1,21 @@
 package com.marketplace.framework;
 
-import java.util.ArrayList;
-import java.util.List;
+public abstract class Entity<T, U> implements InternalEventHandler<U> {
+    private final EventApplier<U> applier;
 
-public abstract class Entity<T> {
-    private final List<Object> events;
-
-    public Entity() {
-        events = new ArrayList<>();
+    public Entity(EventApplier<U> applier) {
+        this.applier = applier;
     }
 
-    public void apply(Object event) {
+    public void apply(U event) {
         when(event);
-        ensureValidState();
-        events.add(event);
+        this.applier.apply(event);
     }
 
-    public abstract void ensureValidState();
+    public abstract void when(U event);
 
-    public void clearChanges() {
-        events.clear();
+    @Override
+    public void handle(U event) {
+        when(event);
     }
-
-    public List<Object> getChanges() {
-        return events;
-    }
-
-    public abstract void when(Object event);
 }

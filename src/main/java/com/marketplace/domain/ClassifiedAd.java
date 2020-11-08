@@ -1,17 +1,20 @@
 package com.marketplace.domain;
 
+import com.marketplace.domain.events.ClassifiedAdPictureResized;
+import com.marketplace.domain.events.PictureAddedToAClassifiedAd;
 import com.marketplace.event.*;
 import com.marketplace.framework.AggregateRoot;
-import com.marketplace.framework.Entity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-@AggregateRoot
+import java.util.*;
+
 @Getter
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class ClassifiedAd extends Entity<EventId> {
+public class ClassifiedAd extends AggregateRoot<EventId, Event> {
+    private final List<Picture> pictures;
     private ClassifiedAdId id;
     private UserId ownerId;
     private ClassifiedAdTitle title;
@@ -21,6 +24,7 @@ public class ClassifiedAd extends Entity<EventId> {
     private ClassifiedAdState state;
 
     public ClassifiedAd(ClassifiedAdId id, UserId ownerId) {
+        this.pictures = new ArrayList<>();
         apply(new ClassifiedAdCreated(id.id(), ownerId.id()));
     }
 
@@ -37,7 +41,7 @@ public class ClassifiedAd extends Entity<EventId> {
     }
 
     public void approve(UserId approvedBy) {
-        apply(new ClassifiedApproved(id.id(), approvedBy));
+        apply(new ClassifiedApproved(id.id(), approvedBy.id()));
     }
 
     public void updatePrice(Price price) {
@@ -48,8 +52,30 @@ public class ClassifiedAd extends Entity<EventId> {
         apply(new ClassifiedAdSentForReview(id.id()));
     }
 
+    public void addPicture(String uri, PictureSize size) {
+        int newPictureOrder = (pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1;
+        apply(new PictureAddedToAClassifiedAd(
+                this.id.id(), UUID.randomUUID(), uri, size.height(), size.width(), newPictureOrder
+        ));
+    }
+
+    public void resizePicture(PictureId pictureId, PictureSize newSize) {
+        var picture = findPicture(pictureId);
+        var p = picture
+                .orElseThrow(() -> new IllegalArgumentException("cannot resize a picture that I don't have"));
+        p.resize(newSize);
+    }
+
+    private Optional<Picture> findPicture(PictureId pictureId) {
+        return this.pictures.stream().filter(p -> p.getId() == pictureId).findFirst();
+    }
+
+    private Optional<Picture> first() {
+        return this.pictures.stream().min(Comparator.comparingInt(Picture::getOrder));
+    }
+
     @Override
-    public void when(Object event) {
+    public void when(Event event) {
         if (event instanceof ClassifiedAdCreated e) {
             this.id = new ClassifiedAdId(e.getId());
             this.ownerId = new UserId(e.getUserId());
@@ -66,6 +92,24 @@ public class ClassifiedAd extends Entity<EventId> {
         } else if (event instanceof ClassifiedAdSentForReview e) {
             this.id = new ClassifiedAdId(e.getId());
             this.state = ClassifiedAdState.pendingReview;
+        } else if (event instanceof PictureAddedToAClassifiedAd e) {
+
+//            new Picture(apply(e))
+//            new Picture(new EventApplier<>() {
+//                @Override
+//                public void apply(Event event) {
+//                    if (event instanceof PictureAddedToAClassifiedAd pictureAddedToAClassifiedAd) {
+//
+//                    }
+//                }
+//            });
+//            this.id = new ClassifiedAdId(e.getId());
+//            this.state = ClassifiedAdState.pendingReview;
+        } else if (event instanceof ClassifiedAdPictureResized e) {
+            var optionalPicture = findPicture(new PictureId(e.getPictureId()));
+            optionalPicture.ifPresent(picture -> {
+                applyToEntity(picture, e);
+            });
         }
     }
 
