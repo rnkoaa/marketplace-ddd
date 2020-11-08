@@ -1,4 +1,4 @@
-package com.marketplace.domain;
+package com.marketplace.domain.events;
 
 import com.marketplace.event.Event;
 import lombok.AllArgsConstructor;

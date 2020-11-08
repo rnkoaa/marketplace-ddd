@@ -1,5 +1,6 @@
-package com.marketplace.command;
+package com.marketplace.domain.command;
 
+import com.marketplace.command.Command;
 import com.marketplace.controller.UpdateAdDto;
 import com.marketplace.domain.ClassifiedAdState;
 import com.marketplace.domain.DefaultCurrencyLookup;

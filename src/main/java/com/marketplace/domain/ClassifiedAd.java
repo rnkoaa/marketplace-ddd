@@ -1,7 +1,6 @@
 package com.marketplace.domain;
 
-import com.marketplace.domain.events.ClassifiedAdPictureResized;
-import com.marketplace.domain.events.PictureAddedToAClassifiedAd;
+import com.marketplace.domain.events.*;
 import com.marketplace.event.*;
 import com.marketplace.framework.AggregateRoot;
 import lombok.EqualsAndHashCode;

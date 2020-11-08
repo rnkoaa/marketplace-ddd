@@ -1,11 +1,10 @@
 package com.marketplace.fixtures;
 
-import com.marketplace.command.CreateClassifiedAd;
+import com.marketplace.domain.command.CreateClassifiedAd;
 import com.marketplace.context.ObjectMapperModule;
 import com.marketplace.controller.CreateAdDto;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 public class LoadCreateAdEvent {
 

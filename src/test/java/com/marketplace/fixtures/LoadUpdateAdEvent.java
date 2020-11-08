@@ -1,6 +1,5 @@
 package com.marketplace.fixtures;
 
-import com.marketplace.command.CreateClassifiedAd;
 import com.marketplace.context.ObjectMapperModule;
 import com.marketplace.controller.UpdateAdDto;
 

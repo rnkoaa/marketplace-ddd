@@ -1,7 +1,6 @@
 package com.marketplace.domain.command;
 
 import com.marketplace.command.CommandHandler;
-import com.marketplace.command.CreateClassifiedAd;
 import com.marketplace.controller.CreateAdResponse;
 import com.marketplace.domain.*;
 import com.marketplace.framework.Strings;

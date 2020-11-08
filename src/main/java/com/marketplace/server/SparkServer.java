@@ -2,7 +2,6 @@ package com.marketplace.server;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.command.UpdateClassifiedAd;
 import com.marketplace.controller.*;
 import spark.Spark;
 

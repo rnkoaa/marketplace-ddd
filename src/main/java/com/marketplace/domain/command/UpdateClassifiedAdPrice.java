@@ -1,4 +1,4 @@
-package com.marketplace.command;
+package com.marketplace.domain.command;
 
 import com.marketplace.domain.Currency;
 import lombok.Value;

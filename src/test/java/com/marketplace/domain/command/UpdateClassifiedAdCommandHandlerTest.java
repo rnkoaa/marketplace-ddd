@@ -1,6 +1,5 @@
 package com.marketplace.domain.command;
 
-import com.marketplace.command.UpdateClassifiedAd;
 import com.marketplace.domain.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

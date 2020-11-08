@@ -1,5 +1,6 @@
-package com.marketplace.command;
+package com.marketplace.domain.command;
 
+import com.marketplace.command.Command;
 import com.marketplace.controller.CreateAdDto;
 import lombok.Value;
 
