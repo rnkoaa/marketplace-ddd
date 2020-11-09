@@ -16,7 +16,6 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 public class ResizePictureOfClassifiedAdTest {
-    //
     @Test
     void classifiedAdCanBeCreatedAndAPictureCanBeAdded() throws IOException {
         CreateAdDto createAdDto = LoadCreateAdEvent.loadCreateAdDto();
