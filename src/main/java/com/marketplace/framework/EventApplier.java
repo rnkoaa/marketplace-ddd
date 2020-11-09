@@ -1,13 +1,9 @@
 package com.marketplace.framework;
 
-import java.util.function.Consumer;
+import com.marketplace.event.Event;
 
-public abstract class EventApplier<Object> implements Consumer<Object> {
+@FunctionalInterface
+public interface EventApplier {
 
-    public abstract void apply(Object event);
-
-    @Override
-    public void accept(Object object) {
-        apply(object);
-    }
+    void apply(Event event);
 }

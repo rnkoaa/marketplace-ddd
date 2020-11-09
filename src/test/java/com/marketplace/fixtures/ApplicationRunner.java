@@ -1,5 +1,6 @@
 package com.marketplace.fixtures;
 
+import com.marketplace.controller.ClassifiedAdCommandHandler;
 import com.marketplace.controller.ClassifiedAdController;
 import com.marketplace.domain.ClassifiedAdRepository;
 import com.marketplace.domain.ClassifiedAdRepositoryImpl;
@@ -67,12 +68,24 @@ public class ApplicationRunner {
         return commandHandler;
     }
 
+    static ClassifiedAdCommandHandler classifiedAdCommandHandler() {
+        Object o = beanInitializers.get(ClassifiedAdCommandHandler.class.getSimpleName());
+        if (o != null) {
+            return (ClassifiedAdCommandHandler) o;
+        }
+        var commandHandler = new ClassifiedAdCommandHandler(classifiedAdRepository());
+        beanInitializers.put(ClassifiedAdCommandHandler.class.getSimpleName(), commandHandler);
+        return commandHandler;
+    }
+
     static ClassifiedAdController classifiedAdController() {
         Object o = beanInitializers.get(ClassifiedAdController.class.getSimpleName());
         if (o != null) {
             return (ClassifiedAdController) o;
         }
-        var controller = new ClassifiedAdController(createClassifiedAdCommandHandler(), updateClassifiedAdCommandHandler());
+        var controller = new ClassifiedAdController(createClassifiedAdCommandHandler(),
+                updateClassifiedAdCommandHandler(),
+                classifiedAdCommandHandler());
         beanInitializers.put(ClassifiedAdController.class.getSimpleName(), controller);
         return controller;
     }

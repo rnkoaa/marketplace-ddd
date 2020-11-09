@@ -5,7 +5,7 @@ import com.marketplace.event.Event;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AggregateRoot<T, U extends Event> implements InternalEventHandler<U> {
+public abstract class AggregateRoot<T, U extends Event> implements InternalEventHandler<U>, EventApplier{
     private final List<Event> changes;
 
     protected AggregateRoot() {
@@ -14,11 +14,11 @@ public abstract class AggregateRoot<T, U extends Event> implements InternalEvent
 
     public void apply(Event event) {
         when(event);
-        ensureValidState();
+        ensureValidState(event);
         changes.add(event);
     }
 
-    public abstract void ensureValidState();
+    public abstract void ensureValidState(Event event);
 
     public void clearChanges() {
         changes.clear();

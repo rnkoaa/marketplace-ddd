@@ -1,10 +1,12 @@
 package com.marketplace.framework;
 
-public abstract class Entity<T, U> implements InternalEventHandler<U> {
-    private final EventApplier<U> applier;
+import com.marketplace.event.Event;
 
-    public Entity(EventApplier<U> applier) {
-        this.applier = applier;
+public abstract class Entity<T, U extends Event> implements InternalEventHandler<U> {
+    private final EventApplier applier;
+
+    public Entity(EventApplier eventApplier) {
+        this.applier = eventApplier;
     }
 
     public void apply(U event) {

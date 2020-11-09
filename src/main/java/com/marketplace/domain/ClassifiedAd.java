@@ -3,6 +3,7 @@ package com.marketplace.domain;
 import com.marketplace.domain.events.*;
 import com.marketplace.event.*;
 import com.marketplace.framework.AggregateRoot;
+import com.marketplace.framework.EventApplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -51,22 +52,34 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
         apply(new ClassifiedAdSentForReview(id.id()));
     }
 
-    public void addPicture(String uri, PictureSize size) {
+    public PictureId addPicture(String uri, PictureSize size) {
         int newPictureOrder = (pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1;
+        var pictureId = UUID.randomUUID();
         apply(new PictureAddedToAClassifiedAd(
-                this.id.id(), UUID.randomUUID(), uri, size.height(), size.width(), newPictureOrder
+                this.id.id(), pictureId, uri, size.height(), size.width(), newPictureOrder
         ));
+        return new PictureId(pictureId);
     }
 
-    public void resizePicture(PictureId pictureId, PictureSize newSize) {
+    public Picture createPicture(PictureSize pictureSize) {
+        var pictureItem = new Picture(this);
+        var pictureId = addPicture("", pictureSize);
+        Optional<Picture> picture = findPicture(pictureId);
+        return picture.orElse(pictureItem);
+    }
+
+    public PictureId resizePicture(PictureId pictureId, PictureSize newSize) {
         var picture = findPicture(pictureId);
         var p = picture
                 .orElseThrow(() -> new IllegalArgumentException("cannot resize a picture that I don't have"));
         p.resize(newSize);
+        return pictureId;
     }
 
     private Optional<Picture> findPicture(PictureId pictureId) {
-        return this.pictures.stream().filter(p -> p.getId() == pictureId).findFirst();
+        return this.pictures.stream()
+                .filter(p -> p.getId().equals(pictureId))
+                .findFirst();
     }
 
     private Optional<Picture> first() {
@@ -92,38 +105,38 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
             this.id = new ClassifiedAdId(e.getId());
             this.state = ClassifiedAdState.pendingReview;
         } else if (event instanceof PictureAddedToAClassifiedAd e) {
-
-//            new Picture(apply(e))
-//            new Picture(new EventApplier<>() {
-//                @Override
-//                public void apply(Event event) {
-//                    if (event instanceof PictureAddedToAClassifiedAd pictureAddedToAClassifiedAd) {
-//
-//                    }
-//                }
-//            });
-//            this.id = new ClassifiedAdId(e.getId());
-//            this.state = ClassifiedAdState.pendingReview;
+            var picture = new Picture(this);
+            applyToEntity(picture, e);
+            this.pictures.add(picture);
         } else if (event instanceof ClassifiedAdPictureResized e) {
             var optionalPicture = findPicture(new PictureId(e.getPictureId()));
-            optionalPicture.ifPresent(picture -> {
-                applyToEntity(picture, e);
-            });
+            optionalPicture.ifPresent(picture -> applyToEntity(picture, e));
         }
     }
 
     @Override
-    public void ensureValidState() {
+    public void ensureValidState(Event event) {
         var valid = id != null && ownerId != null;
+
+        boolean foundBadPictures = /*pictures.size() == 0 ||*/ pictures.stream().anyMatch(p -> !p.hasCorrectSize());
+
         valid = valid && switch (this.state) {
-            case pendingReview -> title != null && text != null && price != null && price.money() != null && price.money().amount().doubleValue() > 0;
-            case inactive, markedAsSold -> true;
-            case active -> title != null && text != null &&
-                    price != null && price.money() != null &&
-                    price.money().amount().doubleValue() > 0 && approvedBy != null;
+            case pendingReview -> title != null && text != null
+                    && price != null
+                    && price.money() != null
+                    && price.money().amount().doubleValue() > 0
+                    && !foundBadPictures;
+            case inactive, markedAsSold -> !foundBadPictures;
+            case active -> title != null
+                    && text != null
+                    && price != null
+                    && price.money() != null
+                    && price.money().amount().doubleValue() > 0
+                    && approvedBy != null
+                    && !foundBadPictures;
         };
         if (!valid) {
-            throw new InvalidStateException("post checks failed in state");
+            throw new InvalidStateException("post checks failed in state while processing event " + event.name());
         }
     }
 
