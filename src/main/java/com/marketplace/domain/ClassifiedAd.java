@@ -1,9 +1,9 @@
 package com.marketplace.domain;
 
 import com.marketplace.domain.events.*;
-import com.marketplace.event.*;
+import com.marketplace.event.Event;
+import com.marketplace.event.EventId;
 import com.marketplace.framework.AggregateRoot;
-import com.marketplace.framework.EventApplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -23,6 +23,15 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
     private UserId approvedBy;
     private ClassifiedAdState state;
 
+
+    /**
+     * this is for jackson deserialization
+     */
+    private ClassifiedAd() {
+        pictures = new ArrayList<>();
+//        apply();
+    }
+
     public ClassifiedAd(ClassifiedAdId id, UserId ownerId) {
         this.pictures = new ArrayList<>();
         apply(new ClassifiedAdCreated(id.id(), ownerId.id()));
@@ -41,7 +50,10 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
     }
 
     public void approve(UserId approvedBy) {
-        apply(new ClassifiedApproved(id.id(), approvedBy.id()));
+        apply(ClassifiedApproved.builder()
+                .id(id.id())
+                .userId(approvedBy.id())
+                .build());
     }
 
     public void updatePrice(Price price) {
@@ -55,9 +67,14 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
     public PictureId addPicture(String uri, PictureSize size) {
         int newPictureOrder = (pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1;
         var pictureId = UUID.randomUUID();
-        apply(new PictureAddedToAClassifiedAd(
-                this.id.id(), pictureId, uri, size.height(), size.width(), newPictureOrder
-        ));
+        apply(PictureAddedToAClassifiedAd.builder()
+                .classifiedAdId(this.id.id())
+                .pictureId(pictureId)
+                .url(uri)
+                .height(size.height())
+                .width(size.width())
+                .order(newPictureOrder)
+                .build());
         return new PictureId(pictureId);
     }
 

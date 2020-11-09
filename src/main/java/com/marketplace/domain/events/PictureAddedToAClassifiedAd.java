@@ -1,11 +1,16 @@
 package com.marketplace.domain.events;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.marketplace.event.Event;
+import lombok.Builder;
 import lombok.Value;
 
 import java.util.UUID;
 
 @Value
+@Builder
+@JsonDeserialize(builder = PictureAddedToAClassifiedAd.PictureAddedToAClassifiedAdBuilder.class)
 public class PictureAddedToAClassifiedAd implements Event {
     UUID classifiedAdId;
     UUID pictureId;
@@ -17,5 +22,10 @@ public class PictureAddedToAClassifiedAd implements Event {
     @Override
     public UUID getId() {
         return classifiedAdId;
+    }
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class PictureAddedToAClassifiedAdBuilder {
+
     }
 }
