@@ -1,5 +1,6 @@
-package com.marketplace.event;
+package com.marketplace.domain.events;
 
+import com.marketplace.event.Event;
 import lombok.Value;
 
 import java.math.BigDecimal;

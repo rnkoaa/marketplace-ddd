@@ -2,6 +2,7 @@ package com.marketplace;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.context.ObjectMapperModule;
+import com.marketplace.controller.ClassifiedAdCommandHandler;
 import com.marketplace.controller.ClassifiedAdController;
 import com.marketplace.domain.ClassifiedAdRepositoryImpl;
 import com.marketplace.domain.command.CreateClassifiedAdCommandHandler;
@@ -19,7 +20,10 @@ public class MainApplication {
         var classifiedAdRepository = new ClassifiedAdRepositoryImpl();
         var updateClassifiedAdCommandHandler = new UpdateClassifiedAdCommandHandler(classifiedAdRepository);
         var createClassifiedAdCommandHandler = new CreateClassifiedAdCommandHandler(classifiedAdRepository);
-        ClassifiedAdController controller = new ClassifiedAdController(createClassifiedAdCommandHandler, updateClassifiedAdCommandHandler);
+        var classifiedAdCommandHandler = new ClassifiedAdCommandHandler(classifiedAdRepository);
+        ClassifiedAdController controller = new ClassifiedAdController(createClassifiedAdCommandHandler,
+                updateClassifiedAdCommandHandler,
+                classifiedAdCommandHandler);
         ObjectMapper objectMapper = ObjectMapperModule.objectMapper();
         new SparkServer(objectMapper, controller).run();
     }

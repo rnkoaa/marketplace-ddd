@@ -1,4 +1,4 @@
-package com.marketplace.command;
+package com.marketplace.domain.command;
 
 import lombok.Value;
 
