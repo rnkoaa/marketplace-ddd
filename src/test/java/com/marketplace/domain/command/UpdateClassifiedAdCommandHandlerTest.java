@@ -29,9 +29,9 @@ class UpdateClassifiedAdCommandHandlerTest {
     void canBeSaved() {
         var classifiedAd = new ClassifiedAd(new ClassifiedAdId(UUID.randomUUID()), new UserId(UUID.randomUUID()));
 
-        Mockito.when(classifiedAdRepository.save(classifiedAd)).thenReturn(classifiedAd);
+        Mockito.when(classifiedAdRepository.add(classifiedAd)).thenReturn(classifiedAd);
 
-        var saved = classifiedAdRepository.save(classifiedAd);
+        var saved = classifiedAdRepository.add(classifiedAd);
         assertThat(saved).isNotNull().isEqualTo(classifiedAd);
     }
 
@@ -48,7 +48,7 @@ class UpdateClassifiedAdCommandHandlerTest {
         expectedClassifiedAd.updateTitle(new ClassifiedAdTitle("test title"));
 
         Mockito.when(classifiedAdRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))).thenReturn(Optional.of(classifiedAd));
-        Mockito.when(classifiedAdRepository.save(classifiedAd)).thenReturn(expectedClassifiedAd);
+        Mockito.when(classifiedAdRepository.add(classifiedAd)).thenReturn(expectedClassifiedAd);
 
         var updateClassifiedAd = new UpdateClassifiedAd();
         updateClassifiedAd.setId(UUID.fromString(uuidString));
@@ -76,7 +76,7 @@ class UpdateClassifiedAdCommandHandlerTest {
         expectedClassifiedAd.updatePrice(new Price(Money.fromDecimal(10.0, "USD")));
 
         Mockito.when(classifiedAdRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))).thenReturn(Optional.of(classifiedAd));
-        Mockito.when(classifiedAdRepository.save(classifiedAd)).thenReturn(expectedClassifiedAd);
+        Mockito.when(classifiedAdRepository.add(classifiedAd)).thenReturn(expectedClassifiedAd);
 
         var updateClassifiedAd = new UpdateClassifiedAd();
         updateClassifiedAd.setId(UUID.fromString(uuidString));
@@ -102,7 +102,7 @@ class UpdateClassifiedAdCommandHandlerTest {
         expectedClassifiedAd.updateText(new ClassifiedAdText("test text"));
 
         Mockito.when(classifiedAdRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))).thenReturn(Optional.of(classifiedAd));
-        Mockito.when(classifiedAdRepository.save(classifiedAd)).thenReturn(expectedClassifiedAd);
+        Mockito.when(classifiedAdRepository.add(classifiedAd)).thenReturn(expectedClassifiedAd);
 
         var updateClassifiedAd = new UpdateClassifiedAd();
         updateClassifiedAd.setId(UUID.fromString(uuidString));

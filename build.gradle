@@ -41,7 +41,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
-    implementation("io.lettuce:lettuce-core:6.0.0.RELEASE")
+    implementation("io.lettuce:lettuce-core:6.0.1.RELEASE")
 
     testImplementation(platform("org.junit:junit-bom:${junitVersion}"))
     testImplementation('org.junit.jupiter:junit-jupiter')

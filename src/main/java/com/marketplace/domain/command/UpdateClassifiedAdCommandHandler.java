@@ -35,7 +35,7 @@ public class UpdateClassifiedAdCommandHandler implements CommandHandler<UpdateCl
                 classifiedAd.approve(new UserId(command.getApprovedBy()));
             }
 
-            return classifiedAdRepository.save(classifiedAd);
+            return classifiedAdRepository.add(classifiedAd);
         }).map(classifiedAd -> {
             var updateResponse = new UpdateClassifiedAdResponse();
             return new CommandHandlerResult<>(updateResponse, true, "");

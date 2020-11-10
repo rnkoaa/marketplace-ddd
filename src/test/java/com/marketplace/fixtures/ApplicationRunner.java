@@ -1,9 +1,9 @@
 package com.marketplace.fixtures;
 
-import com.marketplace.controller.ClassifiedAdCommandHandler;
 import com.marketplace.controller.ClassifiedAdController;
 import com.marketplace.domain.ClassifiedAdRepository;
 import com.marketplace.domain.ClassifiedAdRepositoryImpl;
+import com.marketplace.domain.ClassifiedAdService;
 import com.marketplace.domain.command.CreateClassifiedAdCommandHandler;
 import com.marketplace.domain.command.UpdateClassifiedAdCommandHandler;
 
@@ -68,14 +68,16 @@ public class ApplicationRunner {
         return commandHandler;
     }
 
-    static ClassifiedAdCommandHandler classifiedAdCommandHandler() {
-        Object o = beanInitializers.get(ClassifiedAdCommandHandler.class.getSimpleName());
+    static ClassifiedAdService classifiedAdService() {
+        Object o = beanInitializers.get(ClassifiedAdService.class.getSimpleName());
         if (o != null) {
-            return (ClassifiedAdCommandHandler) o;
+            return (ClassifiedAdService) o;
         }
-        var commandHandler = new ClassifiedAdCommandHandler(classifiedAdRepository());
-        beanInitializers.put(ClassifiedAdCommandHandler.class.getSimpleName(), commandHandler);
-        return commandHandler;
+        var service = new ClassifiedAdService(classifiedAdRepository(),
+                createClassifiedAdCommandHandler(),
+                updateClassifiedAdCommandHandler());
+        beanInitializers.put(ClassifiedAdService.class.getSimpleName(), service);
+        return service;
     }
 
     static ClassifiedAdController classifiedAdController() {
@@ -83,9 +85,7 @@ public class ApplicationRunner {
         if (o != null) {
             return (ClassifiedAdController) o;
         }
-        var controller = new ClassifiedAdController(createClassifiedAdCommandHandler(),
-                updateClassifiedAdCommandHandler(),
-                classifiedAdCommandHandler());
+        var controller = new ClassifiedAdController(classifiedAdService());
         beanInitializers.put(ClassifiedAdController.class.getSimpleName(), controller);
         return controller;
     }

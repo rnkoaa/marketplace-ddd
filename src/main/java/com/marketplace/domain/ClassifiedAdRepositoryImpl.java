@@ -16,7 +16,7 @@ public class ClassifiedAdRepositoryImpl implements ClassifiedAdRepository {
     }
 
     @Override
-    public ClassifiedAd save(ClassifiedAd entity) {
+    public ClassifiedAd add(ClassifiedAd entity) {
         Objects.requireNonNull(entity, "entity cannot be null");
         ClassifiedAdId id = entity.getId();
         if (id == null) {
