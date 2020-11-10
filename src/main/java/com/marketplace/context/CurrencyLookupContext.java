@@ -1,7 +1,7 @@
 package com.marketplace.context;
 
-import com.marketplace.domain.CurrencyLookup;
-import com.marketplace.domain.DefaultCurrencyLookup;
+import com.marketplace.domain.classifiedad.CurrencyLookup;
+import com.marketplace.domain.classifiedad.DefaultCurrencyLookup;
 
 public class CurrencyLookupContext {
     static CurrencyLookup currencyLookup;

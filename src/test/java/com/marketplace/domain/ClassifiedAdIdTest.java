@@ -1,5 +1,6 @@
 package com.marketplace.domain;
 
+import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

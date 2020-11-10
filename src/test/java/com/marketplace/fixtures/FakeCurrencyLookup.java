@@ -1,7 +1,7 @@
 package com.marketplace.fixtures;
 
-import com.marketplace.domain.Currency;
-import com.marketplace.domain.CurrencyLookup;
+import com.marketplace.domain.classifiedad.Currency;
+import com.marketplace.domain.classifiedad.CurrencyLookup;
 
 import java.util.List;
 

@@ -1,7 +1,8 @@
 package com.marketplace.domain;
 
-import com.marketplace.event.Event;
-import com.marketplace.framework.EventApplier;
+import com.marketplace.domain.classifiedad.ClassifiedAd;
+import com.marketplace.domain.classifiedad.ClassifiedAdId;
+import com.marketplace.domain.classifiedad.Picture;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

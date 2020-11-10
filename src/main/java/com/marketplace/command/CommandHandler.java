@@ -1,6 +1,6 @@
 package com.marketplace.command;
 
-import com.marketplace.domain.CommandHandlerResult;
+import com.marketplace.domain.classifiedad.CommandHandlerResult;
 
 public interface CommandHandler<T extends Command> {
 

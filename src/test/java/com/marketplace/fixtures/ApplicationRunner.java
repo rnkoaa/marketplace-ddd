@@ -1,11 +1,11 @@
 package com.marketplace.fixtures;
 
 import com.marketplace.controller.ClassifiedAdController;
-import com.marketplace.domain.ClassifiedAdRepository;
-import com.marketplace.domain.ClassifiedAdRepositoryImpl;
-import com.marketplace.domain.ClassifiedAdService;
-import com.marketplace.domain.command.CreateClassifiedAdCommandHandler;
-import com.marketplace.domain.command.UpdateClassifiedAdCommandHandler;
+import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
+import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepositoryImpl;
+import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
+import com.marketplace.domain.classifiedad.command.CreateClassifiedAdCommandHandler;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdCommandHandler;
 
 import java.util.HashMap;
 import java.util.Map;

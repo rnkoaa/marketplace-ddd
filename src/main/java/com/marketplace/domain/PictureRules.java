@@ -1,5 +1,7 @@
 package com.marketplace.domain;
 
+import com.marketplace.domain.classifiedad.Picture;
+
 public class PictureRules {
     public static boolean hasCorrectSize(Picture picture) {
         return picture != null

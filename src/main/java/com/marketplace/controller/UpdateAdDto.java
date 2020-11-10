@@ -1,6 +1,6 @@
 package com.marketplace.controller;
 
-import com.marketplace.domain.*;
+import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

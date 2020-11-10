@@ -2,7 +2,6 @@ package com.marketplace.fixtures;
 
 import com.marketplace.context.ObjectMapperModule;
 import com.marketplace.controller.AddPictureDto;
-import com.marketplace.domain.command.CreateClassifiedAd;
 
 import java.io.IOException;
 
