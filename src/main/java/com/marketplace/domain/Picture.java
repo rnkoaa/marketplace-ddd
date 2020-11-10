@@ -34,7 +34,12 @@ public class Picture extends Entity<EventId, Event> {
     }
 
     public void resize(PictureSize newSize) {
-        apply(new ClassifiedAdPictureResized(this.id.id(), this.parentId.id(), newSize.height(), newSize.width()));
+        apply(ClassifiedAdPictureResized.builder()
+                .classifiedAdId(this.parentId.id())
+                .pictureId(this.id.id())
+                .height(newSize.height())
+                .width(newSize.width())
+                .build());
     }
 
     public boolean hasCorrectSize() {

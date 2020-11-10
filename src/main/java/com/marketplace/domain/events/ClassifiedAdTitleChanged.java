@@ -1,11 +1,17 @@
 package com.marketplace.domain.events;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.marketplace.event.Event;
+import lombok.Builder;
 import lombok.Value;
 
 import java.util.UUID;
 
 @Value
+@Builder
+@JsonDeserialize(builder = ClassifiedAdTitleChanged.ClassifiedAdTitleChangedBuilder.class)
 public class ClassifiedAdTitleChanged implements Event {
     UUID id;
     String title;
@@ -22,5 +28,10 @@ public class ClassifiedAdTitleChanged implements Event {
 
     public String getTitle() {
         return title;
+    }
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class ClassifiedAdTitleChangedBuilder {
+
     }
 }

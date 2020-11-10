@@ -1,13 +1,18 @@
 package com.marketplace.domain.events;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.marketplace.event.Event;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Value;
 
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
+@Value
+@Builder
+@JsonDeserialize(builder = ClassifiedApproved.ClassifiedApprovedBuilder.class)
 public class ClassifiedApproved implements Event {
     UUID id;
     UUID userId;
@@ -16,22 +21,9 @@ public class ClassifiedApproved implements Event {
     public UUID getId() {
         return null;
     }
-}
-/*
-public record ClassifiedApproved(UUID id, UserId value) {
-    public ClassifiedApproved {
-        if (value == null) {
-            throw new IllegalArgumentException("value cannot be null");
-        }
-    }
 
-    public static ClassifiedApproved fromString(ClassifiedAdId id, String value) {
-        return new ClassifiedApproved(id.id(), UserId.fromString(value));
-    }
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class ClassifiedApprovedBuilder {
 
-    @Override
-    public String toString() {
-        return value.toString();
     }
 }
-*/

@@ -19,5 +19,9 @@ public interface ClassifiedAdRepository {
      * @param entity
      * @return
      */
-    ClassifiedAd save(ClassifiedAd entity);
+    ClassifiedAd add(ClassifiedAd entity);
+
+    default String entityId(ClassifiedAdId id) {
+        return String.format("ClassifiedAd:%s", id.toString());
+    }
 }

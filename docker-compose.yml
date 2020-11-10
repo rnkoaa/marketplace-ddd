@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  redis:
+    container_name: redis
+    command: [ "redis-server", "--appendonly", "yes" ]
+    image: redis:6-alpine
+    hostname: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - redis-network
+    volumes:
+      - redis-data:/data
+
+  redis-insight:
+    container_name: redis-insight
+    image: redislabs/redisinsight:1.7.1
+    depends_on:
+      - redis
+    networks:
+      - redis-network
+    ports:
+      - "8002:8001"
+networks:
+  redis-network:
+
+volumes:
+  redis-data:
