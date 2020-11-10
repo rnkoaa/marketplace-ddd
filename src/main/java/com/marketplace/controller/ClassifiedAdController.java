@@ -1,8 +1,8 @@
 package com.marketplace.controller;
 
-import com.marketplace.domain.ClassifiedAdService;
-import com.marketplace.domain.command.CreateClassifiedAd;
-import com.marketplace.domain.command.UpdateClassifiedAd;
+import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
+import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 
 public class ClassifiedAdController {
 

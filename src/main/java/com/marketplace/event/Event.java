@@ -2,7 +2,7 @@ package com.marketplace.event;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.marketplace.domain.events.*;
+import com.marketplace.domain.classifiedad.events.*;
 
 import java.util.UUID;
 
