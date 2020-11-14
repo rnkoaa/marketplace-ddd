@@ -1,4 +1,4 @@
-package com.marketplace.domain;
+package com.marketplace.domain.shared;
 
 import java.util.UUID;
 

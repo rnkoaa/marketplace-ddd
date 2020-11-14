@@ -1,8 +1,8 @@
 package com.marketplace.domain.classifiedad.command;
 
-import com.marketplace.domain.*;
 import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
+import com.marketplace.domain.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

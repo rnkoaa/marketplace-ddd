@@ -1,6 +1,7 @@
 package com.marketplace.domain;
 
 import com.marketplace.domain.classifiedad.*;
+import com.marketplace.domain.shared.UserId;
 import com.marketplace.fixtures.FakeCurrencyLookup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

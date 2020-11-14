@@ -1,9 +1,9 @@
 package com.marketplace.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.context.ObjectMapperModule;
+import com.marketplace.domain.shared.UserId;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

@@ -2,6 +2,7 @@ package com.marketplace.domain.classifiedad;
 
 import com.marketplace.domain.*;
 import com.marketplace.domain.classifiedad.events.*;
+import com.marketplace.domain.shared.UserId;
 import com.marketplace.event.Event;
 import com.marketplace.event.EventId;
 import com.marketplace.framework.AggregateRoot;

@@ -2,9 +2,9 @@ package com.marketplace.domain.classifiedad.command;
 
 import com.marketplace.command.CommandHandler;
 import com.marketplace.controller.UpdateClassifiedAdResponse;
-import com.marketplace.domain.*;
 import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
+import com.marketplace.domain.shared.UserId;
 import com.marketplace.framework.Strings;
 
 import java.util.Optional;

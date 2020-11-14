@@ -3,7 +3,7 @@ package com.marketplace.context;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.marketplace.domain.UserId;
+import com.marketplace.domain.shared.UserId;
 
 import java.io.IOException;
 

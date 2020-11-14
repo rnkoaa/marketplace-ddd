@@ -3,6 +3,7 @@ package com.marketplace.domain;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import com.marketplace.domain.classifiedad.Picture;
+import com.marketplace.domain.shared.UserId;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
