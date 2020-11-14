@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.marketplace.domain.UserId;
+import com.marketplace.domain.shared.UserId;
 
 public class ObjectMapperModule {
     public static ObjectMapper objectMapper() {
