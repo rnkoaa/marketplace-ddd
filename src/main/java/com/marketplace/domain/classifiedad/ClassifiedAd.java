@@ -9,6 +9,7 @@ import com.marketplace.framework.AggregateRoot;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 
 import javax.persistence.Id;
 import java.util.*;
@@ -19,19 +20,26 @@ import java.util.*;
 public class ClassifiedAd extends AggregateRoot<EventId, Event> {
     @Id
     private ClassifiedAdId id;
+
+    @BsonIgnore
     private final List<Picture> pictures;
     private UserId ownerId;
+
+    @BsonIgnore
     private ClassifiedAdTitle title;
+    @BsonIgnore
     private ClassifiedAdText text;
+    @BsonIgnore
     private Price price;
     private UserId approvedBy;
+    @BsonIgnore
     private ClassifiedAdState state;
 
 
     /**
      * this is for jackson deserialization
      */
-    private ClassifiedAd() {
+    public ClassifiedAd() {
         pictures = new ArrayList<>();
 //        apply();
     }

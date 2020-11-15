@@ -1,6 +1,10 @@
 package com.marketplace.domain.classifiedad;
 
-public record ClassifiedAdText(String value) {
+import com.marketplace.mongo.MongoStringValue;
+import com.marketplace.mongo.MongoStringValueCodec;
+
+@MongoStringValueCodec
+public record ClassifiedAdText(@MongoStringValue String value) {
     public ClassifiedAdText {
         if (value == null || value.isEmpty()) {
             throw new IllegalArgumentException("value cannot be empty or null");

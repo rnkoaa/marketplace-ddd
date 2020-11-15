@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class ServerConfig {
-    private int port;
+    private int port = 8080;
 
 }

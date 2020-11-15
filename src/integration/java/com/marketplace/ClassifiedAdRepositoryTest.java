@@ -9,15 +9,21 @@ import com.marketplace.domain.shared.UserId;
 import com.marketplace.fixtures.LoadCreateAdEvent;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.UUID;
 
+import static com.mongodb.client.model.Filters.eq;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
+
+    String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
     MongoConfig mongoConfig;
     MongoClient mongoClient;
     MongoCollection<ClassifiedAd> classifiedAdCollection;
@@ -32,20 +38,65 @@ public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
                 .getCollection("classified_ad", ClassifiedAd.class);
     }
 
+    @AfterEach
+    public void cleanup() {
+        DeleteResult deleteResult = classifiedAdCollection.deleteOne(eq("_id", insertId));
+        if (deleteResult.wasAcknowledged()) {
+            System.out.println("delete was acknowledged.");
+        }
+        System.out.println("Number of records deleted: " + deleteResult.getDeletedCount());
+
+    }
+
     @Test
-    void validateCollectionConnects() throws IOException {
-//        ApplicationRunner.
+    void insertedItemCanBeShownToExist() throws IOException {
         CreateAdDto createAdDto = LoadCreateAdEvent.loadCreateAdDto();
 
         assertThat(createAdDto).isNotNull();
         assertThat(createAdDto.getOwnerId()).isNotNull();
-        var classifiedAd = new ClassifiedAd(ClassifiedAdId.newClassifedAdId(),
+        var classifiedAd = new ClassifiedAd(ClassifiedAdId.fromString(insertId),
                 new UserId(createAdDto.getOwnerId()));
-
 
         InsertOneResult insertOneResult = classifiedAdCollection.insertOne(classifiedAd);
 
         assertThat(insertOneResult.wasAcknowledged()).isTrue();
+        assertThat(insertOneResult.getInsertedId()).isNotNull();
+        assertThat(insertOneResult.getInsertedId().asString())
+                .isNotNull();
+
+        assertThat(insertOneResult.getInsertedId().asString().getValue())
+                .isNotBlank()
+                .isEqualTo(insertId);
+
+        ClassifiedAd savedClassifiedAd = classifiedAdCollection.find(eq("_id", insertId)).first();
+        assertThat(savedClassifiedAd).isNotNull();
+        System.out.println(savedClassifiedAd.toString());
+
+        assertThat(savedClassifiedAd.getId()).isNotNull();
+        assertThat(savedClassifiedAd.getId().id()).isNotNull()
+                .isEqualByComparingTo(UUID.fromString(insertId));
+    }
+
+    @Test
+    void validateCollectionConnects() throws IOException {
+        String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
+        CreateAdDto createAdDto = LoadCreateAdEvent.loadCreateAdDto();
+
+        assertThat(createAdDto).isNotNull();
+        assertThat(createAdDto.getOwnerId()).isNotNull();
+        var classifiedAd = new ClassifiedAd(ClassifiedAdId.fromString(insertId),
+                new UserId(createAdDto.getOwnerId()));
+
+        InsertOneResult insertOneResult = classifiedAdCollection.insertOne(classifiedAd);
+
+        assertThat(insertOneResult.wasAcknowledged()).isTrue();
+        assertThat(insertOneResult.getInsertedId()).isNotNull();
+        assertThat(insertOneResult.getInsertedId().asString())
+                .isNotNull();
+
+        assertThat(insertOneResult.getInsertedId().asString().getValue())
+                .isNotBlank()
+                .isEqualTo(insertId);
 
 //        var repository = ApplicationRunner.getBean(ClassifiedAdRepository.class);
 //        var controller = ApplicationRunner.getBean(ClassifiedAdController.class);

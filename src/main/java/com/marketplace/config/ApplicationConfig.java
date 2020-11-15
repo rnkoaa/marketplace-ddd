@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class ApplicationConfig {
-    private ServerConfig server;
-    private MongoConfig mongoConfig;
+    private ServerConfig server = new ServerConfig();
+    private MongoConfig mongoConfig = new MongoConfig();
 }
 

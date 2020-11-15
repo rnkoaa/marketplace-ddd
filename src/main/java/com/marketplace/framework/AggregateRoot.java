@@ -1,11 +1,13 @@
 package com.marketplace.framework;
 
 import com.marketplace.event.Event;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AggregateRoot<T, U extends Event> implements InternalEventHandler<U>, EventApplier{
+    @BsonIgnore
     private final List<Event> changes;
 
     protected AggregateRoot() {

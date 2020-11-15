@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MongoConfig {
-    String hosts;
-    String database;
-    int port;
+    private String hosts = "localhost";
+    private String database = "test_db";
+    int port = 27017;
 
     public String getConnectionString(){
         return String.format("mongodb://%s:%d", hosts, port);

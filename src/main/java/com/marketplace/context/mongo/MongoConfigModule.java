@@ -55,7 +55,7 @@ public class MongoConfigModule {
     @Provides
     @Singleton
     public static MongoDatabase provideMongoDatabase(MongoClient mongoClient, MongoConfig mongoConfig) {
-        return mongoClient.getDatabase(mongoConfig.database);
+        return mongoClient.getDatabase(mongoConfig.getDatabase());
     }
 
 }

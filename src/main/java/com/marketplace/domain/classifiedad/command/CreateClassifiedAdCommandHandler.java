@@ -32,7 +32,10 @@ public class CreateClassifiedAdCommandHandler implements CommandHandler<CreateCl
             classifiedAd.updateText(new ClassifiedAdText(command.getText()));
         }
 
-        classifiedAdRepository.add(classifiedAd);
+        var saved = classifiedAdRepository.add(classifiedAd);
+        if(saved == null){
+            return new CommandHandlerResult<>(null, false, "failed to save classifiedAd");
+        }
         var classifiedAdResponse = new CreateAdResponse(command.getUserId(), classifiedAdId.id());
 
         return new CommandHandlerResult<>(classifiedAdResponse, true, "");
