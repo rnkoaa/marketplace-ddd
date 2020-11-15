@@ -8,6 +8,6 @@ import java.io.IOException;
 public class LoadUpdateAdEvent {
     public static UpdateAdDto load() throws IOException {
         var resourceAsStream = LoadUpdateAdEvent.class.getClassLoader().getResourceAsStream("fixtures/update_ad.json");
-        return ObjectMapperModule.objectMapper().readValue(resourceAsStream, UpdateAdDto.class);
+        return ObjectMapperModule.provideObjectMapper().readValue(resourceAsStream, UpdateAdDto.class);
     }
 }

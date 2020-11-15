@@ -41,7 +41,7 @@ public class CreateClassifiedAdTest {
         ClassifiedAd classifiedAd = load.get();
         assertThat(classifiedAd.getChanges()).isNotNull().hasSize(3);
 
-        String classifiedAdJson = ObjectMapperModule.objectMapper().writeValueAsString(classifiedAd);
+        String classifiedAdJson = ObjectMapperModule.provideObjectMapper().writeValueAsString(classifiedAd);
         System.out.println(classifiedAdJson);
 
     }
@@ -66,9 +66,9 @@ public class CreateClassifiedAdTest {
 
         ClassifiedAd classifiedAd = load.get();
 
-        String classifiedAdJson = ObjectMapperModule.objectMapper().writeValueAsString(classifiedAd);
+        String classifiedAdJson = ObjectMapperModule.provideObjectMapper().writeValueAsString(classifiedAd);
 
-        var deserializedClassifiedAd = ObjectMapperModule.objectMapper().readValue(classifiedAdJson, ClassifiedAd.class);
+        var deserializedClassifiedAd = ObjectMapperModule.provideObjectMapper().readValue(classifiedAdJson, ClassifiedAd.class);
         assertThat(deserializedClassifiedAd).isNotNull();
         assertThat(deserializedClassifiedAd.getChanges()).hasSize(3);
         deserializedClassifiedAd.getChanges().forEach(System.out::println);

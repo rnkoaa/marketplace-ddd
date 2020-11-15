@@ -10,14 +10,16 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import javax.persistence.Id;
 import java.util.*;
 
 @Getter
 @ToString
 @EqualsAndHashCode(callSuper = false)
 public class ClassifiedAd extends AggregateRoot<EventId, Event> {
-    private final List<Picture> pictures;
+    @Id
     private ClassifiedAdId id;
+    private final List<Picture> pictures;
     private UserId ownerId;
     private ClassifiedAdTitle title;
     private ClassifiedAdText text;

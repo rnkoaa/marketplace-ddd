@@ -7,10 +7,13 @@ import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.framework.Strings;
 
+import javax.inject.Inject;
+
 public class CreateClassifiedAdCommandHandler implements CommandHandler<CreateClassifiedAd> {
 
     private final ClassifiedAdRepository classifiedAdRepository;
 
+    @Inject
     public CreateClassifiedAdCommandHandler(ClassifiedAdRepository classifiedAdRepository) {
         this.classifiedAdRepository = classifiedAdRepository;
     }

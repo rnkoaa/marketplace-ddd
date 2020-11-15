@@ -14,7 +14,7 @@ public record UserId(UUID id) {
        return id.toString();
     }
 
-    static UserId fromString(String uuid) {
+    public static UserId fromString(String uuid) {
         var id = UUID.fromString(uuid);
         return new UserId(id);
     }

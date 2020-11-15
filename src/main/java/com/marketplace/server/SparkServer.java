@@ -2,19 +2,25 @@ package com.marketplace.server;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.controller.*;
+import com.marketplace.controller.ClassifiedAdController;
+import com.marketplace.controller.CreateAdDto;
+import com.marketplace.controller.CreateAdResponse;
+import com.marketplace.controller.UpdateAdDto;
 import spark.Spark;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.UUID;
 
 public class SparkServer {
     private final ObjectMapper objectMapper;
     private final ClassifiedAdController classifiedAdController;
 
-    public SparkServer(ObjectMapper objectMapper, ClassifiedAdController classifiedAdController) {
-        Spark.port(8000);
+    @Inject
+    public SparkServer(@Named("server.port") int port, ObjectMapper objectMapper, ClassifiedAdController controller) {
+        Spark.port(port);
         this.objectMapper = objectMapper;
-        this.classifiedAdController = classifiedAdController;
+        this.classifiedAdController = controller;
     }
 
     public void run() {

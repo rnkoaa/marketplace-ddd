@@ -22,14 +22,30 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    integration {
+        java.srcDir "$projectDir/src/integration/groovy"
+        resources.srcDir "$projectDir/src/integration/resources"
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
+    }
+    integrationImplementation {
+        extendsFrom testImplementation
+    }
+    integrationRuntime {
+        extendsFrom testRuntime
     }
 }
 
 
 dependencies {
+    compile project(":config")
     implementation("com.sparkjava:spark-core:2.9.3")
 
     compileOnly('org.projectlombok:lombok:1.18.16')
@@ -38,16 +54,26 @@ dependencies {
     // 2.11.3
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
-    implementation("io.lettuce:lettuce-core:6.0.1.RELEASE")
+//    implementation("io.lettuce:lettuce-core:6.0.1.RELEASE")
+    implementation("javax.inject:javax.inject:1")
+    implementation("javax.persistence:javax.persistence-api:2.2")
+
+    implementation("com.google.dagger:dagger:2.29.1")
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.29.1'
+
+    implementation("org.mongodb:mongodb-driver-sync:4.1.1")
 
     testImplementation(platform("org.junit:junit-bom:${junitVersion}"))
     testImplementation('org.junit.jupiter:junit-jupiter')
     testImplementation("org.assertj:assertj-core:${assertjVersion}")
-    testCompile("org.mockito:mockito-core:${mockitoVersion}")
-    testCompile("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
+    testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+    testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
+    testImplementation("org.testcontainers:junit-jupiter:1.15.0")
+    testImplementation("org.testcontainers:mongodb:1.15.0")
 
 }
 
@@ -67,3 +93,10 @@ tasks.withType(Test) {
 tasks.withType(JavaExec) {
     jvmArgs += "--enable-preview"
 }
+
+task integrationTest(type: Test) {
+    testClassesDirs = sourceSets.integration.output.classesDirs
+    classpath = sourceSets.integration.runtimeClasspath
+}
+
+check.dependsOn integrationTest

@@ -4,9 +4,13 @@ import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 
+import javax.inject.Inject;
+
 public class ClassifiedAdController {
 
     private final ClassifiedAdService classifiedAdService;
+
+    @Inject
     public ClassifiedAdController(ClassifiedAdService classifiedAdService) {
         this.classifiedAdService = classifiedAdService;
     }

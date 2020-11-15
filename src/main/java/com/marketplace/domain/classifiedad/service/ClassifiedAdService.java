@@ -12,6 +12,7 @@ import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdCommandHandler;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 
+import javax.inject.Inject;
 import java.util.Optional;
 
 public class ClassifiedAdService {
@@ -19,6 +20,7 @@ public class ClassifiedAdService {
     private final CreateClassifiedAdCommandHandler createCommandHandler;
     private final UpdateClassifiedAdCommandHandler updateCommandHandler;
 
+    @Inject
     public ClassifiedAdService(ClassifiedAdRepository classifiedAdRepository,
                                CreateClassifiedAdCommandHandler createCommandHandler,
                                UpdateClassifiedAdCommandHandler updateCommandHandler) {
@@ -45,12 +47,10 @@ public class ClassifiedAdService {
 
             var savedClassifiedAd = classifiedAdRepository.add(classifiedAd);
 
-            return new SavedResponse(savedClassifiedAd, pictureId);
-        }).map(savedResponse -> {
-            var response = new AddPictureResponse();
-            response.setId(savedResponse.pictureId.id());
-            response.setClassifiedAdId(savedResponse.classifiedAd.getId().id());
-            return response;
+            return AddPictureResponse.builder()
+                    .id(pictureId.id())
+                    .classifiedAdId(savedClassifiedAd.getId().id())
+                    .build();
         }).orElse(new AddPictureResponse());
     }
 
@@ -64,15 +64,11 @@ public class ClassifiedAdService {
 
             var savedClassifiedAd = classifiedAdRepository.add(classifiedAd);
 
-            return new SavedResponse(savedClassifiedAd, pictureId);
-        }).map(savedResponse -> {
-            var response = new ResizePictureResponse();
-            response.setId(savedResponse.pictureId.id());
-            response.setClassifiedAdId(savedResponse.classifiedAd.getId().id());
-            return response;
+            return ResizePictureResponse.builder()
+                    .classifiedAdId(savedClassifiedAd.getId().id())
+                    .id(pictureId.id())
+                    .build();
         }).orElse(new ResizePictureResponse());
     }
 
-    record SavedResponse(ClassifiedAd classifiedAd, PictureId pictureId) {
-    }
 }

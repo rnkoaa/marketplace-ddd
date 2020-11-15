@@ -8,6 +8,6 @@ import java.io.IOException;
 public class LoadAddPicture {
     public static AddPictureDto load() throws IOException {
         var resourceAsStream = LoadCreateAdEvent.class.getClassLoader().getResourceAsStream("fixtures/add_picture_to_ad.json");
-        return ObjectMapperModule.objectMapper().readValue(resourceAsStream, AddPictureDto.class);
+        return ObjectMapperModule.provideObjectMapper().readValue(resourceAsStream, AddPictureDto.class);
     }
 }
