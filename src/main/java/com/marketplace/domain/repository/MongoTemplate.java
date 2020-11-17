@@ -6,6 +6,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.InsertOneResult;
+import org.bson.Document;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -43,7 +44,10 @@ public class MongoTemplate {
     public <T, U> Optional<T> findById(U id, Class<T> clzz) {
         String collectionName = clzz.getSimpleName().toLowerCase();
         MongoCollection<T> collection = mongoDatabase.getCollection(collectionName, clzz);
-        T result = collection.find(eq("id", id)).first();
+//        Document first = mongoDatabase.getCollection("classifiedad")
+//                .find(eq("_id", id))
+//                .first();
+        T result = collection.find(eq("_id", id)).first();
         return Optional.ofNullable(result);
     }
 }

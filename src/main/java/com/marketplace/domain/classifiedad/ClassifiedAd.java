@@ -8,12 +8,14 @@ import com.marketplace.event.EventId;
 import com.marketplace.framework.AggregateRoot;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
 import javax.persistence.Id;
 import java.util.*;
 
+@Setter
 @Getter
 @ToString
 @EqualsAndHashCode(callSuper = false)
@@ -25,14 +27,11 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
     private final List<Picture> pictures;
     private UserId ownerId;
 
-    @BsonIgnore
     private ClassifiedAdTitle title;
-    @BsonIgnore
     private ClassifiedAdText text;
     @BsonIgnore
     private Price price;
     private UserId approvedBy;
-    @BsonIgnore
     private ClassifiedAdState state;
 
 

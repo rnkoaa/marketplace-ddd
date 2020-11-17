@@ -71,4 +71,7 @@ public class ClassifiedAdService {
         }).orElse(new ResizePictureResponse());
     }
 
+    public Optional<ClassifiedAd> findById(ClassifiedAdId classifiedAdId) {
+        return classifiedAdRepository.load(classifiedAdId);
+    }
 }

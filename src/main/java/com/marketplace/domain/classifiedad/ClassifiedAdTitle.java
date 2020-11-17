@@ -1,5 +1,8 @@
 package com.marketplace.domain.classifiedad;
 
+import com.marketplace.annotations.MongoSingleRecordValue;
+
+@MongoSingleRecordValue
 public record ClassifiedAdTitle(String value) {
 
     public ClassifiedAdTitle {

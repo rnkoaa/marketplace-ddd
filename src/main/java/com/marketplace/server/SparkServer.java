@@ -1,15 +1,22 @@
 package com.marketplace.server;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.controller.ClassifiedAdController;
 import com.marketplace.controller.CreateAdDto;
 import com.marketplace.controller.CreateAdResponse;
 import com.marketplace.controller.UpdateAdDto;
+import com.marketplace.domain.classifiedad.ClassifiedAd;
+import com.marketplace.domain.classifiedad.ClassifiedAdId;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 import spark.Spark;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Optional;
 import java.util.UUID;
 
 public class SparkServer {
@@ -38,6 +45,38 @@ public class SparkServer {
             return res;
         });
 
+//        Spark.get("/classified_ad/:classifiedAdId", "application/json", (request, response) -> {
+//            String classifiedAdId = request.params(":classifiedAdId");
+//            response.type("application/json");
+//            Optional<ClassifiedAd> mayBe = classifiedAdController.findClassifiedAdById(ClassifiedAdId.fromString(classifiedAdId));
+//                mayBe.ifPresentOrElse(classifiedAd -> {
+//                    try {
+//                    return objectMapper.writeValueAsString(classifiedAd);
+//                    } catch (JsonProcessingException e) {
+//                        e.printStackTrace();
+//                    }
+//                }, () -> {
+//                    response.status(502);
+//                });
+//        });
+        Spark.get("/classified_ad/:classifiedAdId", (request, response) -> {
+            String classifiedAdId = request.params(":classifiedAdId");
+            Optional<ClassifiedAd> mayBe = classifiedAdController
+                    .findClassifiedAdById(ClassifiedAdId.fromString(classifiedAdId));
+            return mayBe.map(classifiedAd -> {
+                String result = null;
+                try {
+                    result = objectMapper.writeValueAsString(classifiedAd);
+                    response.status(200);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+                return result;
+            }).orElseGet(() -> {
+                response.status(404);
+                return null;
+            });
+        });
         Spark.put("/classified_ad/:classifiedAdId", "application/json", (request, response) -> {
             String classifiedAdId = request.params(":classifiedAdId");
             response.type("application/json");

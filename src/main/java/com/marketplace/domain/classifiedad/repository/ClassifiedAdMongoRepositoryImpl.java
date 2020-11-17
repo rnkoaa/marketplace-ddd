@@ -18,15 +18,16 @@ public class ClassifiedAdMongoRepositoryImpl implements ClassifiedAdRepository {
 
     @Override
     public boolean exists(ClassifiedAdId id) {
-        String idStr = id.toString();
-        Optional<ClassifiedAd> byId = mongoTemplate.findById(idStr, ClassifiedAd.class);
-        return byId.isPresent();
+//        String idStr = id.toString();
+//        Optional<ClassifiedAd> byId = mongoTemplate.findById(idStr, ClassifiedAd.class);
+//        return byId.isPresent();
+        return load(id).isPresent();
     }
 
     @Override
     public Optional<ClassifiedAd> load(ClassifiedAdId id) {
-//        return redisTemplate.get(myId(id), ClassifiedAd.class);
-        return Optional.empty();
+        String idStr = id.toString();
+        return mongoTemplate.findById(idStr, ClassifiedAd.class);
     }
 
     @Override

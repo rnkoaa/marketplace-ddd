@@ -15,18 +15,6 @@ public class MainApplication {
     AtomicBoolean enabled = new AtomicBoolean(true);
 
     public static void main(String[] args) throws InterruptedException, IOException {
-//        ObjectMapper objectMapper = ObjectMapperModule.objectMapper();
-//        RedisClient redisClient = RedisClient.create("redis://localhost:6379");
-//        RedisConverter redisConverter = new RedisConverter(objectMapper);
-//        RedisTemplate redisTemplate = new RedisTemplate(redisClient, redisConverter);
-//        var classifiedAdRepository = new ClassifiedAdRedisRepositoryImpl(redisTemplate);
-//        var updateClassifiedAdCommandHandler = new UpdateClassifiedAdCommandHandler(classifiedAdRepository);
-//        var createClassifiedAdCommandHandler = new CreateClassifiedAdCommandHandler(classifiedAdRepository);
-//
-//        ClassifiedAdService classifiedAdService = new ClassifiedAdService(classifiedAdRepository, createClassifiedAdCommandHandler,
-//                updateClassifiedAdCommandHandler);
-//        ClassifiedAdController controller = new ClassifiedAdController(classifiedAdService);
-//        new SparkServer(objectMapper, controller).run();
         new MainApplication().start();
     }
 

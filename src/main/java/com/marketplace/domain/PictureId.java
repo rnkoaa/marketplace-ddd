@@ -1,7 +1,10 @@
 package com.marketplace.domain;
 
+import com.marketplace.annotations.MongoSingleRecordValue;
+
 import java.util.UUID;
 
+@MongoSingleRecordValue
 public record PictureId(UUID id) {
     public PictureId {
         if (id == null) {

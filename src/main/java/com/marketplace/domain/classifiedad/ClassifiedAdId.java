@@ -1,7 +1,10 @@
 package com.marketplace.domain.classifiedad;
 
+import com.marketplace.annotations.MongoSingleRecordValue;
+
 import java.util.UUID;
 
+@MongoSingleRecordValue
 public record ClassifiedAdId(UUID id) {
     public ClassifiedAdId {
         if (id == null) {

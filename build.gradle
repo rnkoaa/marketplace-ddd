@@ -23,6 +23,9 @@ repositories {
 }
 
 sourceSets {
+    main {
+        java.srcDirs += "$buildDir/generated/sources/annotationProcessor/java"
+    }
     integration {
         java.srcDir "$projectDir/src/integration/groovy"
         resources.srcDir "$projectDir/src/integration/resources"
@@ -46,6 +49,11 @@ configurations {
 
 dependencies {
     compile project(":config")
+
+    compile project(":annotations")
+    compile project(":annotations-compiler")
+    annotationProcessor project(":annotations-compiler")
+
     implementation("com.sparkjava:spark-core:2.9.3")
 
     compileOnly('org.projectlombok:lombok:1.18.16')
@@ -94,9 +102,30 @@ tasks.withType(JavaExec) {
     jvmArgs += "--enable-preview"
 }
 
+//allprojects {
+//    tasks.withType(JavaCompile) {
+//        options.compilerArgs += "--enable-preview"
+//    }
+//    tasks.withType(Test) {
+//        jvmArgs += "--enable-preview"
+//    }
+//    tasks.withType(JavaExec) {
+//        jvmArgs += "--enable-preview"
+//    }
+//}
+
 task integrationTest(type: Test) {
     testClassesDirs = sourceSets.integration.output.classesDirs
     classpath = sourceSets.integration.runtimeClasspath
 }
 
 check.dependsOn integrationTest
+
+subprojects {
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+}

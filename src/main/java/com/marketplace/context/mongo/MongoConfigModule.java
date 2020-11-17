@@ -1,8 +1,12 @@
 package com.marketplace.context.mongo;
 
 import com.marketplace.config.ApplicationConfig;
-import com.marketplace.context.mongo.codec.ClassifiedAdIdCodecProvider;
-import com.marketplace.context.mongo.codec.UserIdCodecProvider;
+import com.marketplace.domain.PictureIdCodecProvider;
+import com.marketplace.domain.classifiedad.ClassifiedAdIdCodecProvider;
+import com.marketplace.domain.classifiedad.ClassifiedAdText;
+import com.marketplace.domain.classifiedad.ClassifiedAdTextCodecProvider;
+import com.marketplace.domain.classifiedad.ClassifiedAdTitleCodecProvider;
+import com.marketplace.domain.shared.UserIdCodecProvider;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -47,9 +51,13 @@ public class MongoConfigModule {
                 fromProviders(PojoCodecProvider.builder().automatic(true).build()),
                 fromProviders(new UuidCodecProvider(UuidRepresentation.STANDARD),
                         new ClassifiedAdIdCodecProvider(),
-                        new UserIdCodecProvider()),
-                MongoClientSettings.getDefaultCodecRegistry()
-        );
+                        new UserIdCodecProvider(),
+                        new PictureIdCodecProvider(),
+                        new UserIdCodecProvider(),
+                        new ClassifiedAdTextCodecProvider(),
+                        new ClassifiedAdTitleCodecProvider()),
+                        MongoClientSettings.getDefaultCodecRegistry()
+                );
     }
 
     @Provides
