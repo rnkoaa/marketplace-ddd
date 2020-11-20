@@ -81,6 +81,11 @@ public class ClassifiedAdCodec implements Codec<ClassifiedAd> {
             document.put("approvedBy", value.getApprovedBy().toString());
         }
 
+        List<Picture> pictures = value.getPictures();
+        List<Document> pictureDocuments = pictures.stream().map(picture -> pictureConverter.serialize(picture))
+                .collect(Collectors.toList());
+        document.put("pictures", pictureDocuments);
+
         documentCodec.encode(writer, document, encoderContext);
     }
 
