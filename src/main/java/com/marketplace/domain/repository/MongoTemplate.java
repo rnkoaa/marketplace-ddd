@@ -44,9 +44,6 @@ public class MongoTemplate {
     public <T, U> Optional<T> findById(U id, Class<T> clzz) {
         String collectionName = clzz.getSimpleName().toLowerCase();
         MongoCollection<T> collection = mongoDatabase.getCollection(collectionName, clzz);
-//        Document first = mongoDatabase.getCollection("classifiedad")
-//                .find(eq("_id", id))
-//                .first();
         T result = collection.find(eq("_id", id)).first();
         return Optional.ofNullable(result);
     }

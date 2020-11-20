@@ -43,7 +43,7 @@ public class ClassifiedAdService {
         return load.map(classifiedAd -> {
 
             PictureSize pictureSize = new PictureSize(addPictureDto.getWidth(), addPictureDto.getHeight());
-            var pictureId = classifiedAd.addPicture(addPictureDto.getUri(), pictureSize);
+            var pictureId = classifiedAd.addPicture(addPictureDto.getUri(), pictureSize, 0);
 
             var savedClassifiedAd = classifiedAdRepository.add(classifiedAd);
 

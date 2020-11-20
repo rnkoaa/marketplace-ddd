@@ -1,9 +1,7 @@
 package com.marketplace.domain.userprofile;
 
-import com.marketplace.annotations.MongoRecordValue;
 import com.marketplace.framework.Strings;
 
-@MongoRecordValue
 public record FullName(String firstName, String middleName, String lastName) {
     public FullName {
         if (Strings.isNullOrEmpty(firstName)) {

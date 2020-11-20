@@ -50,10 +50,6 @@ configurations {
 dependencies {
     compile project(":config")
 
-    compile project(":annotations")
-    compile project(":annotations-compiler")
-    annotationProcessor project(":annotations-compiler")
-
     implementation("com.sparkjava:spark-core:2.9.3")
 
     compileOnly('org.projectlombok:lombok:1.18.16')
@@ -117,6 +113,17 @@ tasks.withType(JavaExec) {
 task integrationTest(type: Test) {
     testClassesDirs = sourceSets.integration.output.classesDirs
     classpath = sourceSets.integration.runtimeClasspath
+}
+
+//tasks.withType(integrationTest) {
+//    jvmArgs += "--enable-preview"
+//}
+
+integrationTest {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 check.dependsOn integrationTest

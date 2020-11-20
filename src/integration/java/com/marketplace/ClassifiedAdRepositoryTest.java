@@ -1,10 +1,15 @@
 package com.marketplace;
 
+import com.marketplace.config.ApplicationConfig;
+import com.marketplace.config.ConfigLoader;
+import com.marketplace.context.ApplicationContext;
+import com.marketplace.context.DaggerApplicationContext;
 import com.marketplace.context.mongo.MongoConfig;
 import com.marketplace.context.mongo.MongoConfigModule;
 import com.marketplace.controller.CreateAdDto;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
+import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.fixtures.LoadCreateAdEvent;
 import com.mongodb.client.MongoClient;
@@ -16,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -27,15 +33,27 @@ public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
     MongoConfig mongoConfig;
     MongoClient mongoClient;
     MongoCollection<ClassifiedAd> classifiedAdCollection;
+    ApplicationContext context;
+    ClassifiedAdRepository classifiedAdRepository;
 
     @BeforeEach
-    void setup() {
+    void setup() throws IOException {
+        ApplicationConfig config = ConfigLoader.loadClasspathResource("application.yml", ApplicationConfig.class);
+
+        context = DaggerApplicationContext.
+                builder()
+                .config(config)
+                .build();
+
+//        context.
         String hosts = mongoDBContainer.getHost();
         int port = mongoDBContainer.getMappedPort(27017);
         mongoConfig = new MongoConfig(hosts, "test_db", port);
+        config.setMongoConfig(mongoConfig);
         mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
         classifiedAdCollection = MongoConfigModule.provideMongoDatabase(mongoClient, mongoConfig)
-                .getCollection("classified_ad", ClassifiedAd.class);
+                .getCollection(ClassifiedAd.class.getSimpleName().toLowerCase(), ClassifiedAd.class);
+        classifiedAdRepository = context.getClassifiedAdRepository();
     }
 
     @AfterEach
@@ -75,6 +93,10 @@ public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
         assertThat(savedClassifiedAd.getId()).isNotNull();
         assertThat(savedClassifiedAd.getId().id()).isNotNull()
                 .isEqualByComparingTo(UUID.fromString(insertId));
+
+        Optional<ClassifiedAd> load = classifiedAdRepository.load(ClassifiedAdId.fromString(insertId));
+
+        assertThat(load).isPresent();
     }
 
     @Test
@@ -97,6 +119,7 @@ public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
         assertThat(insertOneResult.getInsertedId().asString().getValue())
                 .isNotBlank()
                 .isEqualTo(insertId);
+
 
 //        var repository = ApplicationRunner.getBean(ClassifiedAdRepository.class);
 //        var controller = ApplicationRunner.getBean(ClassifiedAdController.class);
