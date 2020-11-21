@@ -1,7 +1,8 @@
 package com.marketplace.context.mongo;
 
 import com.marketplace.config.ApplicationConfig;
-import com.marketplace.context.mongo.codec.CodeProviderImpl;
+import com.marketplace.context.mongo.codec.PriceCodecProviderImpl;
+import com.marketplace.context.mongo.codec.PriceConverter;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -45,14 +46,9 @@ public class MongoConfigModule {
                 MongoClientSettings.getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder().automatic(true).build()),
                 fromProviders(new UuidCodecProvider(UuidRepresentation.STANDARD),
-                        new CodeProviderImpl()),
-//                        new ClassifiedAdIdCodecProvider(),
-//                        new PictureIdCodecProvider(),
-//                        new UserIdCodecProvider(),
-//                        new ClassifiedAdTextCodecProvider(),
-//                        new ClassifiedAdTitleCodecProvider()),
-                        MongoClientSettings.getDefaultCodecRegistry()
-                );
+                        new PriceCodecProviderImpl(new PriceConverter())),
+                MongoClientSettings.getDefaultCodecRegistry()
+        );
     }
 
     @Provides

@@ -4,6 +4,9 @@ import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import com.marketplace.domain.repository.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface ClassifiedAdRepository extends Repository<ClassifiedAd, ClassifiedAdId> {
 //    /**
 //     * @param id
@@ -27,4 +30,7 @@ public interface ClassifiedAdRepository extends Repository<ClassifiedAd, Classif
 //        return String.format("ClassifiedAd:%s", id.toString());
 //        return en
 //    }
+    default List<ClassifiedAd> findAll() {
+        return new ArrayList<>();
+    }
 }

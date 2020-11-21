@@ -1,6 +1,8 @@
 package com.marketplace.domain.classifiedad;
 
-import com.marketplace.domain.*;
+import com.marketplace.domain.InvalidStateException;
+import com.marketplace.domain.PictureId;
+import com.marketplace.domain.PictureSize;
 import com.marketplace.domain.classifiedad.events.*;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.event.Event;
@@ -10,9 +12,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
 
-import javax.persistence.Id;
+
 import java.util.*;
 
 @Setter
@@ -20,16 +21,14 @@ import java.util.*;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 public class ClassifiedAd extends AggregateRoot<EventId, Event> {
-    @Id
+//    @Id
     private ClassifiedAdId id;
 
-    @BsonIgnore
+//    @BsonIgnore
     private final List<Picture> pictures;
     private UserId ownerId;
-
     private ClassifiedAdTitle title;
     private ClassifiedAdText text;
-    @BsonIgnore
     private Price price;
     private UserId approvedBy;
     private ClassifiedAdState state;

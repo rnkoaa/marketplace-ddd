@@ -9,11 +9,14 @@ public class PictureConverter implements DocumentConverter<Picture> {
     private static final String ID = "id";
     private static final String URI = "uri";
     private static final String ORDER = "order";
-    private static final String HEIGHT = "height";
-    private static final String WIDTH = "width";
-    private final ClassifiedAd classifiedAd;
+    protected static final String HEIGHT = "height";
+    protected static final String WIDTH = "width";
+    private ClassifiedAd classifiedAd;
 
-    public PictureConverter(ClassifiedAd classifiedAd) {
+    public PictureConverter() {
+    }
+
+    public void setClassifiedAd(ClassifiedAd classifiedAd){
         this.classifiedAd = classifiedAd;
     }
 

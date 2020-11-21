@@ -20,6 +20,9 @@ public class Picture extends Entity<EventId, Event> {
     private String uri;
     private int order;
 
+//    public Picture(){
+//        super(null);
+//    }
     public Picture(EventApplier eventApplier) {
         super(eventApplier);
     }

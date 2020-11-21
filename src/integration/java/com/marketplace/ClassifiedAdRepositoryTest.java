@@ -7,8 +7,8 @@ import com.marketplace.context.DaggerApplicationContext;
 import com.marketplace.context.mongo.MongoConfig;
 import com.marketplace.context.mongo.MongoConfigModule;
 import com.marketplace.controller.CreateAdDto;
-import com.marketplace.domain.classifiedad.ClassifiedAd;
-import com.marketplace.domain.classifiedad.ClassifiedAdId;
+import com.marketplace.domain.PictureSize;
+import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.fixtures.LoadCreateAdEvent;
@@ -45,7 +45,6 @@ public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
                 .config(config)
                 .build();
 
-//        context.
         String hosts = mongoDBContainer.getHost();
         int port = mongoDBContainer.getMappedPort(27017);
         mongoConfig = new MongoConfig(hosts, "test_db", port);
@@ -63,7 +62,6 @@ public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
             System.out.println("delete was acknowledged.");
         }
         System.out.println("Number of records deleted: " + deleteResult.getDeletedCount());
-
     }
 
     @Test
@@ -74,21 +72,13 @@ public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
         assertThat(createAdDto.getOwnerId()).isNotNull();
         var classifiedAd = new ClassifiedAd(ClassifiedAdId.fromString(insertId),
                 new UserId(createAdDto.getOwnerId()));
+        classifiedAd.updateTitle(new ClassifiedAdTitle("Snow Blower for sale"));
+        classifiedAd.updateText(new ClassifiedAdText("Snow Blower for sale for Cheap"));
+        classifiedAd.updatePrice(new Price(Money.fromDecimal(4.59, "USD")));
+        classifiedAd.addPicture("uri", new PictureSize(800, 600), 0);
+        classifiedAd.setState(ClassifiedAdState.active);
 
-        InsertOneResult insertOneResult = classifiedAdCollection.insertOne(classifiedAd);
-
-        assertThat(insertOneResult.wasAcknowledged()).isTrue();
-        assertThat(insertOneResult.getInsertedId()).isNotNull();
-        assertThat(insertOneResult.getInsertedId().asString())
-                .isNotNull();
-
-        assertThat(insertOneResult.getInsertedId().asString().getValue())
-                .isNotBlank()
-                .isEqualTo(insertId);
-
-        ClassifiedAd savedClassifiedAd = classifiedAdCollection.find(eq("_id", insertId)).first();
-        assertThat(savedClassifiedAd).isNotNull();
-        System.out.println(savedClassifiedAd.toString());
+        ClassifiedAd savedClassifiedAd = classifiedAdRepository.add(classifiedAd);
 
         assertThat(savedClassifiedAd.getId()).isNotNull();
         assertThat(savedClassifiedAd.getId().id()).isNotNull()
@@ -97,6 +87,14 @@ public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
         Optional<ClassifiedAd> load = classifiedAdRepository.load(ClassifiedAdId.fromString(insertId));
 
         assertThat(load).isPresent();
+        ClassifiedAd found = load.get();
+        assertThat(found.getId()).isEqualTo(ClassifiedAdId.fromString(insertId));
+        assertThat(found.getOwnerId()).isEqualTo(new UserId(createAdDto.getOwnerId()));
+        assertThat(found.getText()).isEqualTo(new ClassifiedAdText("Snow Blower for sale for Cheap"));
+        assertThat(found.getTitle()).isEqualTo(new ClassifiedAdTitle("Snow Blower for sale"));
+        assertThat(found.getPrice()).isEqualTo(new Price(Money.fromDecimal(4.59, "USD")));
+        assertThat(found.getPictures()).hasSize(1);
+        assertThat(found.getChanges()).hasSameSizeAs(classifiedAd.getChanges());
     }
 
     @Test
@@ -119,27 +117,6 @@ public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
         assertThat(insertOneResult.getInsertedId().asString().getValue())
                 .isNotBlank()
                 .isEqualTo(insertId);
-
-
-//        var repository = ApplicationRunner.getBean(ClassifiedAdRepository.class);
-//        var controller = ApplicationRunner.getBean(ClassifiedAdController.class);
-//        assert controller != null;
-//        CreateAdResponse ad = controller.createAd(createAdDto);
-
-//        AssertionsForClassTypes.assertThat(ad).isNotNull();
-//        assertThat(ad.getId()).isNotNull();
-//        assertThat(ad.getOwnerId()).isNotNull().isEqualByComparingTo(createAdDto.getOwnerId());
-//
-//        assert repository != null;
-//        Optional<ClassifiedAd> load = repository.load(new ClassifiedAdId(ad.getId()));
-//        AssertionsForClassTypes.assertThat(load).isPresent();
-//
-//        ClassifiedAd classifiedAd = load.get();
-//        assertThat(classifiedAd.getChanges()).isNotNull().hasSize(3);
-//
-//        String classifiedAdJson = ObjectMapperModule.objectMapper().writeValueAsString(classifiedAd);
-//        System.out.println(classifiedAdJson);
-//        assertThat(classifiedAdCollection != null).isNotNull();
     }
 
 }

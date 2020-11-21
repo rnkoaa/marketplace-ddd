@@ -15,76 +15,96 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ClassifiedAdCodec implements Codec<ClassifiedAd> {
+    private static final String STATE = "state";
+    private static final String OWNER_ID = "ownerId";
+    private static final String ID = "_id";
+    private static final String TITLE = "title";
+    private static final String TEXT = "text";
+    private static final String PICTURES = "pictures";
+    private static final String APPROVED_BY = "approvedBy";
+    private static final String PRICE = "price";
+
     private final CodecRegistry codecRegistry;
-    private PictureConverter pictureConverter;
+    private final PictureConverter pictureConverter;
+    private final PriceConverter priceConverter;
 
     public ClassifiedAdCodec(CodecRegistry registry) {
         this.codecRegistry = registry;
+        this.pictureConverter = new PictureConverter();
+        this.priceConverter = new PriceConverter();
     }
 
     @Override
     public ClassifiedAd decode(BsonReader reader, DecoderContext decoderContext) {
         Codec<Document> documentCodec = codecRegistry.get(Document.class);
         Document document = documentCodec.decode(reader, decoderContext);
-        String id = document.getString("_id");
+        String id = document.getString(ID);
         ClassifiedAdId classifiedAdId = ClassifiedAdId.fromString(id);
 
-        String ownerIdStr = document.getString("ownerId");
+        String ownerIdStr = document.getString(OWNER_ID);
+        String stateStr = document.getString(STATE);
         UserId ownerId = UserId.fromString(ownerIdStr);
         ClassifiedAd classifiedAd = new ClassifiedAd(classifiedAdId, ownerId);
+        classifiedAd.setState(ClassifiedAdState.valueOf(stateStr));
+        this.pictureConverter.setClassifiedAd(classifiedAd);
 
-        this.pictureConverter = new PictureConverter(classifiedAd);
-
-        String title = document.getString("title");
+        String title = document.getString(TITLE);
         if (!Strings.isNullOrEmpty(title)) {
             ClassifiedAdTitle classifiedAdTitle = ClassifiedAdTitle.fromString(title);
             classifiedAd.setTitle(classifiedAdTitle);
         }
-        String text = document.getString("text");
+        String text = document.getString(TEXT);
         if (!Strings.isNullOrEmpty(text)) {
             ClassifiedAdText classifiedAdText = ClassifiedAdText.fromString(text);
             classifiedAd.setText(classifiedAdText);
         }
 
-        List<Document> pictureDocuments = document.getList("pictures", Document.class);
+        List<Document> pictureDocuments = document.getList(PICTURES, Document.class);
         if (pictureDocuments != null && pictureDocuments.size() > 0) {
-
-            long count = pictureDocuments.stream()
-                    .map(doc -> pictureConverter.deserialize(doc))
-                    .count();
-
-            System.out.println("processed ");
+            pictureDocuments.forEach(pictureConverter::deserialize);
         }
 
+        Document priceDocument = document.get(PRICE, Document.class);
+        if (priceDocument != null) {
+            Price price = priceConverter.deserialize(priceDocument);
+            classifiedAd.setPrice(price);
+        }
 
-        return null;
+        return classifiedAd;
     }
 
     @Override
     public void encode(BsonWriter writer, ClassifiedAd value, EncoderContext encoderContext) {
         Codec<Document> documentCodec = codecRegistry.get(Document.class);
         Document document = new Document();
-        document.put("_id", value.getId().toString());
-        document.put("ownerId", value.getId().toString());
+        document.put(ID, value.getId().toString());
+        document.put(OWNER_ID, value.getId().toString());
+        document.put(STATE, value.getState().name());
+
+        if (value.getPrice() != null) {
+            var priceDocument = priceConverter.serialize(value.getPrice());
+            document.put(PRICE, priceDocument);
+        }
         if (value.getTitle() != null) {
-            document.put("title", value.getTitle().toString());
+            document.put(TITLE, value.getTitle().toString());
         }
         if (value.getText() != null) {
-            document.put("text", value.getText().toString());
+            document.put(TEXT, value.getText().toString());
         }
 
         if (value.getState() != null) {
-            document.put("state", value.getState().name());
+            document.put(STATE, value.getState().name());
         }
 
         if (value.getApprovedBy() != null) {
-            document.put("approvedBy", value.getApprovedBy().toString());
+            document.put(APPROVED_BY, value.getApprovedBy().toString());
         }
 
-        List<Picture> pictures = value.getPictures();
-        List<Document> pictureDocuments = pictures.stream().map(picture -> pictureConverter.serialize(picture))
+        List<Document> pictureDocuments = value.getPictures()
+                .stream()
+                .map(pictureConverter::serialize)
                 .collect(Collectors.toList());
-        document.put("pictures", pictureDocuments);
+        document.put(PICTURES, pictureDocuments);
 
         documentCodec.encode(writer, document, encoderContext);
     }
