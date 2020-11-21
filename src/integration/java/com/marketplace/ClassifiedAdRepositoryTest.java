@@ -96,27 +96,4 @@ public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
         assertThat(found.getPictures()).hasSize(1);
         assertThat(found.getChanges()).hasSameSizeAs(classifiedAd.getChanges());
     }
-
-    @Test
-    void validateCollectionConnects() throws IOException {
-        String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
-        CreateAdDto createAdDto = LoadCreateAdEvent.loadCreateAdDto();
-
-        assertThat(createAdDto).isNotNull();
-        assertThat(createAdDto.getOwnerId()).isNotNull();
-        var classifiedAd = new ClassifiedAd(ClassifiedAdId.fromString(insertId),
-                new UserId(createAdDto.getOwnerId()));
-
-        InsertOneResult insertOneResult = classifiedAdCollection.insertOne(classifiedAd);
-
-        assertThat(insertOneResult.wasAcknowledged()).isTrue();
-        assertThat(insertOneResult.getInsertedId()).isNotNull();
-        assertThat(insertOneResult.getInsertedId().asString())
-                .isNotNull();
-
-        assertThat(insertOneResult.getInsertedId().asString().getValue())
-                .isNotBlank()
-                .isEqualTo(insertId);
-    }
-
 }

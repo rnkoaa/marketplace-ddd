@@ -1,6 +1,7 @@
 package com.marketplace.domain.repository;
 
 import com.marketplace.context.mongo.MongoConfig;
+import com.marketplace.mongo.entity.MongoEntity;
 import com.mongodb.client.*;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.Document;
@@ -21,13 +22,11 @@ public class MongoTemplate {
         this.mongoDatabase = mongoClient.getDatabase(mongoConfig.getDatabase());
     }
 
-    public <T> T save(T object, Class<T> clzz) {
-        String collectionName = clzz.getSimpleName().toLowerCase();
+    public <T extends MongoEntity> T save(T object, String collectionName, Class<T> clzz) {
         MongoCollection<T> collection = mongoDatabase.getCollection(collectionName, clzz);
         try {
             InsertOneResult insertOneResult = collection.insertOne(object);
             if (insertOneResult.wasAcknowledged()) {
-                String insertedId = insertOneResult.getInsertedId().toString();
                 return object;
             }
         }catch (Exception ex){
@@ -37,15 +36,13 @@ public class MongoTemplate {
         return null;
     }
 
-    public <T, U> Optional<T> findById(U id, Class<T> clzz) {
-        String collectionName = clzz.getSimpleName().toLowerCase();
+    public <T extends MongoEntity, U> Optional<T> findById(U id, String collectionName, Class<T> clzz) {
         MongoCollection<T> collection = mongoDatabase.getCollection(collectionName, clzz);
         T result = collection.find(eq("_id", id), clzz).first();
         return Optional.ofNullable(result);
     }
 
-    public <T> List<T> findAll(Class<T> clzz) {
-        String collectionName = clzz.getSimpleName().toLowerCase();
+    public <T extends MongoEntity> List<T> findAll(String collectionName, Class<T> clzz) {
         MongoCollection<T> collection = mongoDatabase.getCollection(collectionName, clzz);
         MongoCursor<T> iterator = collection.find().iterator();
         List<T> results = new ArrayList<>();

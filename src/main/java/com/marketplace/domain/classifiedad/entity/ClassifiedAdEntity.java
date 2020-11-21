@@ -4,6 +4,7 @@ import com.marketplace.domain.PictureId;
 import com.marketplace.domain.PictureSize;
 import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.shared.UserId;
+import com.marketplace.mongo.entity.MongoEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClassifiedAdEntity {
+public class ClassifiedAdEntity implements MongoEntity {
     @Id
     private UUID id;
     private UUID owner;
@@ -30,7 +31,6 @@ public class ClassifiedAdEntity {
     private List<PictureEntity> pictures;
     private Price price;
     private ClassifiedAdState state;
-
 
     public ClassifiedAdEntity(ClassifiedAd classifiedAd) {
         this.id = classifiedAd.getId().id();
@@ -74,5 +74,10 @@ public class ClassifiedAdEntity {
             classifiedAd.approve(new UserId(approvedBy));
         }
         return classifiedAd;
+    }
+
+    @Override
+    public String getCollection() {
+        return ClassifiedAd.class.getSimpleName().toLowerCase();
     }
 }

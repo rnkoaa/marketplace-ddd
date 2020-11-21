@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 public class ClassifiedAdMongoRepositoryImpl implements ClassifiedAdRepository {
     private final MongoTemplate mongoTemplate;
+    private final String collectionName = ClassifiedAd.class.getSimpleName().toLowerCase();
 
     @Inject
     public ClassifiedAdMongoRepositoryImpl(MongoTemplate mongoTemplate) {
@@ -26,14 +27,15 @@ public class ClassifiedAdMongoRepositoryImpl implements ClassifiedAdRepository {
 
     @Override
     public Optional<ClassifiedAd> load(ClassifiedAdId id) {
-        Optional<ClassifiedAdEntity> found = mongoTemplate.findById(id.id(), ClassifiedAdEntity.class);
+        String collectionName = ClassifiedAd.class.getSimpleName().toLowerCase();
+        Optional<ClassifiedAdEntity> found = mongoTemplate.findById(id.id(), collectionName, ClassifiedAdEntity.class);
         return found.map(ClassifiedAdEntity::toClassifiedAd);
     }
 
     @Override
     public ClassifiedAd add(ClassifiedAd entity) {
         var classifiedAdEntity = new ClassifiedAdEntity(entity);
-        ClassifiedAdEntity save = mongoTemplate.save(classifiedAdEntity, ClassifiedAdEntity.class);
+        ClassifiedAdEntity save = mongoTemplate.save(classifiedAdEntity, collectionName, ClassifiedAdEntity.class);
         if (save != null) {
             return entity;
         }
@@ -42,12 +44,7 @@ public class ClassifiedAdMongoRepositoryImpl implements ClassifiedAdRepository {
 
     @Override
     public List<ClassifiedAd> findAll() {
-        List<ClassifiedAdEntity> all = mongoTemplate.findAll(ClassifiedAdEntity.class);
+        List<ClassifiedAdEntity> all = mongoTemplate.findAll(collectionName, ClassifiedAdEntity.class);
         return all.stream().map(ClassifiedAdEntity::toClassifiedAd).collect(Collectors.toList());
     }
-
-    private String myId(ClassifiedAdId id) {
-        return entityId(id, ClassifiedAd.class);
-    }
-
 }
