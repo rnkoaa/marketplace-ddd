@@ -1,7 +1,7 @@
 package com.marketplace.fixtures;
 
 import com.marketplace.context.ObjectMapperModule;
-import com.marketplace.controller.ResizePictureDto;
+import com.marketplace.controller.classifiedad.ResizePictureDto;
 
 import java.io.IOException;
 

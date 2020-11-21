@@ -1,6 +1,6 @@
-package com.marketplace.domain.classifiedad.service;
+package com.marketplace.domain.userprofile.service;
 
-import com.marketplace.controller.*;
+import com.marketplace.controller.classifiedad.*;
 import com.marketplace.domain.PictureId;
 import com.marketplace.domain.PictureSize;
 import com.marketplace.domain.classifiedad.ClassifiedAd;

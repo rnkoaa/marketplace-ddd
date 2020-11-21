@@ -56,3 +56,67 @@ public class MainApplication {
         }
     }
 }
+
+// publishedClassifiedAds
+// publicClassifiedAds
+// byOwner
+
+// Read
+// ClassifiedAdDetails
+//  public Guid ClassifiedAdId { get; set; }
+//               public string Title { get; set; }
+//               public decimal Price { get; set; }
+//               public string CurrencyCode { get; set; }
+//               public string Description { get; set; }
+//    public string SellersDisplayName { get; set; }
+//    public string[] PhotoUrls { get; set; }
+
+// public class ClassifiedAdListItem{
+//public Guid ClassifiedAdId { get; set; }
+//public string Title { get; set; }
+//public decimal Price { get; set; }
+//public string CurrencyCode { get; set; }
+//public string PhotoUrl { get; set; }
+
+// Task<IEnumerable<ClassifiedAdListItem>> Query(GetPublishedClassifiedAds query);
+// Task<ClassifiedAdDetails> Query(GetPublicClassifiedAd query);
+// Task<IEnumerable<ClassifiedAdListItem>> Query(GetOwnersClassifiedAds query);
+
+// public class GetPublishedClassifiedAds
+//           {
+//               public int Page { get; set; }
+//               public int PageSize { get; set; }
+//           }
+//           public class GetOwnersClassifiedAd
+//           {
+//               public Guid OwnerId { get; set; }
+//               public int Page { get; set; }
+//               public int PageSize { get; set; }
+//}
+//           public class GetPublicClassifiedAd
+//           {
+//               public Guid ClassifiedAdId { get; set; }
+//           }
+//
+
+// [HttpGet]
+//[Route("list")]
+//public Task<IActionResult> Get(QueryModels.GetPublishedClassifiedAds request) {
+//}
+//[HttpGet]
+//[Route("myads")]
+//public Task<IActionResult> Get(QueryModels.GetOwnersClassifiedAd request) {
+//}
+//[HttpGet]
+//[ProducesResponseType((int) HttpStatusCode.OK)] [ProducesResponseType((int) HttpStatusCode.NotFound)] public Task<IActionResult> Get(QueryModels.GetPublicClassifiedAd request)
+//{
+//}
+
+// this IAsyncDocumentSession session, QueryModels.GetPublishedClassifiedAds query) => session.Query<Domain.ClassifiedAd.ClassifiedAd>()
+//.Where(x => x.State == ClassifiedAdState.Active) .Select(x => new PublicClassifiedAdListItem
+//ClassifiedAdId = x.Id.Value,
+//Price = x.Price.Amount,
+//Title = x.Title.Value,
+//CurrencyCode = x.Price.Currency.CurrencyCode
+//})
+//.Skip(query.Page * query.PageSize) .Take(query.PageSize) .ToListAsyn

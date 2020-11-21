@@ -1,4 +1,4 @@
-package com.marketplace.controller;
+package com.marketplace.controller.classifiedad;
 
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import lombok.AllArgsConstructor;

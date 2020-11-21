@@ -1,7 +1,7 @@
 package com.marketplace.domain.classifiedad.command;
 
 import com.marketplace.command.Command;
-import com.marketplace.controller.UpdateAdDto;
+import com.marketplace.controller.classifiedad.UpdateAdDto;
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import com.marketplace.domain.classifiedad.DefaultCurrencyLookup;
 import com.marketplace.domain.classifiedad.Money;

@@ -10,6 +10,14 @@ public record UserId(UUID id) {
         }
     }
 
+    public static UserId newId() {
+        return new UserId(UUID.randomUUID());
+    }
+
+    public static UserId from(UUID id) {
+        return new UserId(id);
+    }
+
     @Override
     public String toString() {
         return id.toString();

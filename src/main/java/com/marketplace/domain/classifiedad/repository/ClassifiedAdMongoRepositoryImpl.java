@@ -7,10 +7,14 @@ import com.marketplace.domain.repository.MongoTemplate;
 import com.marketplace.domain.repository.RedisTemplate;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Named
+@Singleton
 public class ClassifiedAdMongoRepositoryImpl implements ClassifiedAdRepository {
     private final MongoTemplate mongoTemplate;
     private final String collectionName = ClassifiedAd.class.getSimpleName().toLowerCase();

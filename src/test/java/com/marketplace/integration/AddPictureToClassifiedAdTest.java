@@ -1,9 +1,9 @@
 package com.marketplace.integration;
 
-import com.marketplace.controller.AddPictureDto;
-import com.marketplace.controller.ClassifiedAdController;
-import com.marketplace.controller.CreateAdDto;
-import com.marketplace.controller.CreateAdResponse;
+import com.marketplace.controller.classifiedad.AddPictureDto;
+import com.marketplace.controller.classifiedad.ClassifiedAdController;
+import com.marketplace.controller.classifiedad.CreateAdDto;
+import com.marketplace.controller.classifiedad.CreateAdResponse;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;

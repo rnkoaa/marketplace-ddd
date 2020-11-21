@@ -1,8 +1,8 @@
-package com.marketplace.controller;
+package com.marketplace.controller.classifiedad;
 
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
-import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
+import com.marketplace.domain.userprofile.service.ClassifiedAdService;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 
