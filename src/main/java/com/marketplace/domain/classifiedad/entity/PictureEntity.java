@@ -1,9 +1,5 @@
 package com.marketplace.domain.classifiedad.entity;
 
-import com.marketplace.domain.PictureId;
-import com.marketplace.domain.PictureSize;
-import com.marketplace.domain.classifiedad.ClassifiedAd;
-import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import com.marketplace.domain.classifiedad.Picture;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,8 +30,4 @@ public class PictureEntity {
                 .order(picture.getOrder())
                 .build();
     }
-
-//    public void load(ClassifiedAd classifiedAd) {
-//        classifiedAd.addPicture(new PictureId(id), uri, new PictureSize(width, height), order);
-//    }
 }

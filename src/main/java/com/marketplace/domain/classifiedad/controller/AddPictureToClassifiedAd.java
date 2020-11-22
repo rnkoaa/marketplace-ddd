@@ -1,4 +1,4 @@
-package com.marketplace.domain.classifiedad.command;
+package com.marketplace.domain.classifiedad.controller;
 
 import com.marketplace.command.Command;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,10 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateClassifiedAdText implements Command {
+public class AddPictureToClassifiedAd implements Command {
     private UUID id;
-    private String text;
+    private String uri;
+    private int height;
+    private int width;
+    private int order;
 }

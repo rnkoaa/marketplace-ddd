@@ -37,13 +37,13 @@ public class ClassifiedAdService {
         return updateCommandHandler.handle(updateClassifiedAd);
     }
 
-    public AddPictureResponse handleAddPicture(AddPictureDto addPictureDto) {
-        Optional<ClassifiedAd> load = classifiedAdRepository.load(new ClassifiedAdId(addPictureDto.getClassifiedAdId()));
+    public AddPictureResponse handleAddPicture(AddPictureToClassifiedAd addPictureToClassifiedAd) {
+        Optional<ClassifiedAd> load = classifiedAdRepository.load(new ClassifiedAdId(addPictureToClassifiedAd.getId()));
 
         return load.map(classifiedAd -> {
 
-            PictureSize pictureSize = new PictureSize(addPictureDto.getWidth(), addPictureDto.getHeight());
-            var pictureId = classifiedAd.addPicture(addPictureDto.getUri(), pictureSize, 0);
+            PictureSize pictureSize = new PictureSize(addPictureToClassifiedAd.getWidth(), addPictureToClassifiedAd.getHeight());
+            var pictureId = classifiedAd.addPicture(addPictureToClassifiedAd.getUri(), pictureSize, 0);
 
             var savedClassifiedAd = classifiedAdRepository.add(classifiedAd);
 
@@ -54,7 +54,7 @@ public class ClassifiedAdService {
         }).orElse(new AddPictureResponse());
     }
 
-    public ResizePictureResponse handleResizePicture(ResizePictureDto pictureDto) {
+    public ResizePictureResponse handleResizePicture(ResizeClassifiedAdPicture pictureDto) {
         Optional<ClassifiedAd> load = classifiedAdRepository.load(new ClassifiedAdId(pictureDto.getClassifiedAdId()));
 
         return load.map(classifiedAd -> {

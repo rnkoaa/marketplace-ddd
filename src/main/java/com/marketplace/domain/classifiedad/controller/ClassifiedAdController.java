@@ -18,28 +18,26 @@ public class ClassifiedAdController {
         this.classifiedAdService = classifiedAdService;
     }
 
-    public CreateAdResponse createAd(CreateAdDto createAdDto) {
-        CreateClassifiedAd createClassifiedAd = CreateClassifiedAd.from(createAdDto);
+    public CreateAdResponse createAd(CreateClassifiedAd createClassifiedAd) {
 
         var commandHandlerResult = classifiedAdService.handleCreate(createClassifiedAd);
 
         return commandHandlerResult.result;
     }
 
-    public UpdateClassifiedAdResponse updateClassifiedAd(UpdateAdDto updateAdDto) {
-        UpdateClassifiedAd updateClassifiedAd = UpdateClassifiedAd.from(updateAdDto);
+    public UpdateClassifiedAdResponse updateClassifiedAd(UpdateClassifiedAd updateClassifiedAd) {
 
         var commandHandlerResult = classifiedAdService.handleUpdate(updateClassifiedAd);
 
         return commandHandlerResult.result;
     }
 
-    public AddPictureResponse addPicture(AddPictureDto addPictureDto) {
-        return classifiedAdService.handleAddPicture(addPictureDto);
+    public AddPictureResponse addPicture(AddPictureToClassifiedAd addPictureToClassifiedAd) {
+        return classifiedAdService.handleAddPicture(addPictureToClassifiedAd);
     }
 
-    public ResizePictureResponse resizePicture(ResizePictureDto resizePictureDto) {
-        return classifiedAdService.handleResizePicture(resizePictureDto);
+    public ResizePictureResponse resizePicture(ResizeClassifiedAdPicture resizeClassifiedAdPicture) {
+        return classifiedAdService.handleResizePicture(resizeClassifiedAdPicture);
     }
 
     public Optional<ClassifiedAd> findClassifiedAdById(ClassifiedAdId classifiedAdId) {

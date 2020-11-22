@@ -6,9 +6,9 @@ import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
 import com.marketplace.context.mongo.MongoConfig;
 import com.marketplace.context.mongo.MongoConfigModule;
-import com.marketplace.domain.classifiedad.controller.CreateAdDto;
 import com.marketplace.domain.PictureSize;
 import com.marketplace.domain.classifiedad.*;
+import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.fixtures.LoadCreateAdEvent;
@@ -65,7 +65,7 @@ public class ClassifiedAdRepositoryTest extends AbstractContainerInitializer {
 
     @Test
     void insertedItemCanBeShownToExist() throws IOException {
-        CreateAdDto createAdDto = LoadCreateAdEvent.loadCreateAdDto();
+        CreateClassifiedAd createAdDto = LoadCreateAdEvent.loadCreateAdDto();
 
         assertThat(createAdDto).isNotNull();
         assertThat(createAdDto.getOwnerId()).isNotNull();

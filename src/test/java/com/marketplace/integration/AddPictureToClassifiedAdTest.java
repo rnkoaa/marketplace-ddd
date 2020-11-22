@@ -1,8 +1,8 @@
 package com.marketplace.integration;
 
-import com.marketplace.domain.classifiedad.controller.AddPictureDto;
+import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
+import com.marketplace.domain.classifiedad.controller.AddPictureToClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
-import com.marketplace.domain.classifiedad.controller.CreateAdDto;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
@@ -21,7 +21,7 @@ public class AddPictureToClassifiedAdTest {
     //
     @Test
     void classifiedAdCanBeCreatedAndAPictureCanBeAdded() throws IOException {
-        CreateAdDto createAdDto = LoadCreateAdEvent.loadCreateAdDto();
+        CreateClassifiedAd createAdDto = LoadCreateAdEvent.loadCreateAdDto();
 
         assertThat(createAdDto).isNotNull();
         assertThat(createAdDto.getOwnerId()).isNotNull();
@@ -35,9 +35,9 @@ public class AddPictureToClassifiedAdTest {
         assertThat(ad.getId()).isNotNull();
         assertThat(ad.getOwnerId()).isNotNull().isEqualByComparingTo(createAdDto.getOwnerId());
 
-        AddPictureDto addPictureDto = LoadAddPicture.load();
-        addPictureDto.setClassifiedAdId(ad.getId());
-        controller.addPicture(addPictureDto);
+        AddPictureToClassifiedAd addPictureToClassifiedAd = LoadAddPicture.load();
+        addPictureToClassifiedAd.setId(ad.getId());
+        controller.addPicture(addPictureToClassifiedAd);
 
         assert repository != null;
         Optional<ClassifiedAd> load = repository.load(new ClassifiedAdId(ad.getId()));

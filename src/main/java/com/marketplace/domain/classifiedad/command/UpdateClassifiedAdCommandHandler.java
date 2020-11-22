@@ -32,7 +32,9 @@ public class UpdateClassifiedAdCommandHandler implements CommandHandler<UpdateCl
                 classifiedAd.updateText(new ClassifiedAdText(command.getText()));
             }
             if (command.getPrice() != null) {
-                classifiedAd.updatePrice(command.getPrice());
+                var money = new Money(command.getPrice().getBigDecimal(), command.getPrice().getCurrencyCode(), new DefaultCurrencyLookup());
+                var price = new Price(money);
+                classifiedAd.updatePrice(price);
             }
 
             if (command.getApprovedBy() != null) {

@@ -21,7 +21,7 @@ public class CreateClassifiedAdCommandHandler implements CommandHandler<CreateCl
     @Override
     public CommandHandlerResult<CreateAdResponse> handle(CreateClassifiedAd command) {
         var classifiedAdId = new ClassifiedAdId();
-        var ownerId = new UserId(command.getUserId());
+        var ownerId = new UserId(command.getOwnerId());
         var classifiedAd = new ClassifiedAd(classifiedAdId, ownerId);
 
         if (!Strings.isNullOrEmpty(command.getTitle())) {
@@ -36,7 +36,7 @@ public class CreateClassifiedAdCommandHandler implements CommandHandler<CreateCl
         if(saved == null){
             return new CommandHandlerResult<>(null, false, "failed to save classifiedAd");
         }
-        var classifiedAdResponse = new CreateAdResponse(command.getUserId(), classifiedAdId.id());
+        var classifiedAdResponse = new CreateAdResponse(command.getOwnerId(), classifiedAdId.id());
 
         return new CommandHandlerResult<>(classifiedAdResponse, true, "");
     }

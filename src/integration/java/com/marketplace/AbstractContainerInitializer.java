@@ -10,7 +10,7 @@ public class AbstractContainerInitializer {
 
     static final MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"))
             .withExposedPorts(27017);
-    //    static MongoDBContainer mongo = new MongoDBContainer()
+    
     @BeforeAll
     static void setupAll() {
         mongoDBContainer.start();

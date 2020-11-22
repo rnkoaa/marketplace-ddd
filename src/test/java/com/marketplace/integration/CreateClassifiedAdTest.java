@@ -1,8 +1,8 @@
 package com.marketplace.integration;
 
 import com.marketplace.context.ObjectMapperModule;
+import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
-import com.marketplace.domain.classifiedad.controller.CreateAdDto;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
@@ -20,7 +20,7 @@ public class CreateClassifiedAdTest {
     //
     @Test
     void classifiedAdCanBeCreated() throws IOException {
-        CreateAdDto createAdDto = LoadCreateAdEvent.loadCreateAdDto();
+        CreateClassifiedAd createAdDto = LoadCreateAdEvent.loadCreateAdDto();
 
         assertThat(createAdDto).isNotNull();
         assertThat(createAdDto.getOwnerId()).isNotNull();
@@ -42,14 +42,12 @@ public class CreateClassifiedAdTest {
         assertThat(classifiedAd.getChanges()).isNotNull().hasSize(3);
 
         String classifiedAdJson = ObjectMapperModule.provideObjectMapper().writeValueAsString(classifiedAd);
-        System.out.println(classifiedAdJson);
-
     }
 
     //
     @Test
     void classifiedAdCanBeSerializedAndDeserializedIntoJson() throws IOException {
-        CreateAdDto createAdDto = LoadCreateAdEvent.loadCreateAdDto();
+        CreateClassifiedAd createAdDto = LoadCreateAdEvent.loadCreateAdDto();
 
         assertThat(createAdDto).isNotNull();
         assertThat(createAdDto.getOwnerId()).isNotNull();
@@ -72,6 +70,5 @@ public class CreateClassifiedAdTest {
         assertThat(deserializedClassifiedAd).isNotNull();
         assertThat(deserializedClassifiedAd.getChanges()).hasSize(3);
         deserializedClassifiedAd.getChanges().forEach(System.out::println);
-
     }
 }

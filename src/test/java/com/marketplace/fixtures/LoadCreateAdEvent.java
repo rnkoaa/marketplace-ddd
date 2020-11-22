@@ -2,7 +2,6 @@ package com.marketplace.fixtures;
 
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.context.ObjectMapperModule;
-import com.marketplace.domain.classifiedad.controller.CreateAdDto;
 
 import java.io.IOException;
 
@@ -14,8 +13,8 @@ public class LoadCreateAdEvent {
         return ObjectMapperModule.provideObjectMapper().readValue(resourceAsStream, CreateClassifiedAd.class);
     }
 
-    public static CreateAdDto loadCreateAdDto() throws IOException {
+    public static CreateClassifiedAd loadCreateAdDto() throws IOException {
         var resourceAsStream = LoadCreateAdEvent.class.getClassLoader().getResourceAsStream("fixtures/create_ad.json");
-        return ObjectMapperModule.provideObjectMapper().readValue(resourceAsStream, CreateAdDto.class);
+        return ObjectMapperModule.provideObjectMapper().readValue(resourceAsStream, CreateClassifiedAd.class);
     }
 }

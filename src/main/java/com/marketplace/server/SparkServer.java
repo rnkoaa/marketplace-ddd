@@ -3,10 +3,10 @@ package com.marketplace.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
-import com.marketplace.domain.classifiedad.controller.CreateAdDto;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
-import com.marketplace.domain.classifiedad.controller.UpdateAdDto;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import spark.Spark;
@@ -32,7 +32,7 @@ public class SparkServer {
 
         Spark.post("/classified_ad", "application/json", (request, response) -> {
             byte[] body = request.bodyAsBytes();
-            CreateAdDto createAdDto = objectMapper.readValue(body, CreateAdDto.class);
+            CreateClassifiedAd createAdDto = objectMapper.readValue(body, CreateClassifiedAd.class);
             CreateAdResponse createAdResponse = classifiedAdController.createAd(createAdDto);
             String res = objectMapper.writeValueAsString(createAdResponse);
             response.header("Content-Type", "application/json");
@@ -79,7 +79,7 @@ public class SparkServer {
             response.type("application/json");
             try {
                 byte[] body = request.bodyAsBytes();
-                var updateDto = objectMapper.readValue(body, UpdateAdDto.class);
+                var updateDto = objectMapper.readValue(body, UpdateClassifiedAd.class);
                 updateDto.setId(UUID.fromString(classifiedAdId));
                 var updateClassifiedAdResponse = classifiedAdController.updateClassifiedAd(updateDto);
                 updateClassifiedAdResponse.setId(UUID.fromString(classifiedAdId));

@@ -71,8 +71,10 @@ public class UserProfileEntity implements MongoEntity {
                 .build();
     }
 
+    // TODO use compile time error to validate that BsonIgnore is required here
+    @BsonIgnore
     @Override
     public String getCollection() {
-        return getClass().getSimpleName().toLowerCase();
+        return UserProfile.class.getSimpleName().toLowerCase();
     }
 }
