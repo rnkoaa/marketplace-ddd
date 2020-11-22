@@ -2,6 +2,7 @@ package com.marketplace.domain.classifiedad.controller;
 
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
+import com.marketplace.domain.classifiedad.CommandHandlerResult;
 import com.marketplace.domain.userprofile.service.ClassifiedAdService;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
@@ -18,18 +19,12 @@ public class ClassifiedAdController {
         this.classifiedAdService = classifiedAdService;
     }
 
-    public CreateAdResponse createAd(CreateClassifiedAd createClassifiedAd) {
-
-        var commandHandlerResult = classifiedAdService.handleCreate(createClassifiedAd);
-
-        return commandHandlerResult.result;
+    public CommandHandlerResult<CreateAdResponse> createAd(CreateClassifiedAd createClassifiedAd) {
+        return classifiedAdService.handleCreate(createClassifiedAd);
     }
 
-    public UpdateClassifiedAdResponse updateClassifiedAd(UpdateClassifiedAd updateClassifiedAd) {
-
-        var commandHandlerResult = classifiedAdService.handleUpdate(updateClassifiedAd);
-
-        return commandHandlerResult.result;
+    public CommandHandlerResult<UpdateClassifiedAdResponse> updateClassifiedAd(UpdateClassifiedAd updateClassifiedAd) {
+        return classifiedAdService.handleUpdate(updateClassifiedAd);
     }
 
     public AddPictureResponse addPicture(AddPictureToClassifiedAd addPictureToClassifiedAd) {
@@ -41,6 +36,6 @@ public class ClassifiedAdController {
     }
 
     public Optional<ClassifiedAd> findClassifiedAdById(ClassifiedAdId classifiedAdId) {
-       return classifiedAdService.findById(classifiedAdId);
+        return classifiedAdService.findById(classifiedAdId);
     }
 }

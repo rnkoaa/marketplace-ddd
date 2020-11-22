@@ -30,7 +30,6 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
     String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
     MongoConfig mongoConfig;
     MongoClient mongoClient;
-    MongoCollection<UserProfileEntity> classifiedAdCollection;
     ApplicationContext context;
     UserProfileRepository userProfileRepository;
 

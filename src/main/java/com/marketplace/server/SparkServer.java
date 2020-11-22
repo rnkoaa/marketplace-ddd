@@ -17,78 +17,45 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class SparkServer {
-    private final ObjectMapper objectMapper;
-    private final ClassifiedAdController classifiedAdController;
+    public static final String MEDIA_APPLICATION_JSON = "application/json";
+    private final ClassifiedAdSparkRoutes classifiedAdSparkRoutes;
 
     @Inject
-    public SparkServer(@Named("server.port") int port, ObjectMapper objectMapper, ClassifiedAdController controller) {
+    public SparkServer(@Named("server.port") int port, ClassifiedAdSparkRoutes classifiedAdSparkRoutes) {
         Spark.port(port);
-        this.objectMapper = objectMapper;
-        this.classifiedAdController = controller;
+        this.classifiedAdSparkRoutes = classifiedAdSparkRoutes;
     }
 
     public void run() {
         Spark.get("/health", (req, res) -> "ok");
 
-        Spark.post("/classified_ad", "application/json", (request, response) -> {
-            byte[] body = request.bodyAsBytes();
-            CreateClassifiedAd createAdDto = objectMapper.readValue(body, CreateClassifiedAd.class);
-            CreateAdResponse createAdResponse = classifiedAdController.createAd(createAdDto);
-            String res = objectMapper.writeValueAsString(createAdResponse);
-            response.header("Content-Type", "application/json");
-            response.type("application/json");
-            response.status(201);
-            response.header("Location", String.format("/classified_add/%s", createAdResponse.getId().toString()));
-            return res;
-        });
+        Spark.post("/classified_ad", MEDIA_APPLICATION_JSON, classifiedAdSparkRoutes.createClassifiedAdRoute());
 
-//        Spark.get("/classified_ad/:classifiedAdId", "application/json", (request, response) -> {
-//            String classifiedAdId = request.params(":classifiedAdId");
-//            response.type("application/json");
-//            Optional<ClassifiedAd> mayBe = classifiedAdController.findClassifiedAdById(ClassifiedAdId.fromString(classifiedAdId));
-//                mayBe.ifPresentOrElse(classifiedAd -> {
-//                    try {
-//                    return objectMapper.writeValueAsString(classifiedAd);
-//                    } catch (JsonProcessingException e) {
-//                        e.printStackTrace();
-//                    }
-//                }, () -> {
-//                    response.status(502);
-//                });
-//        });
-        Spark.get("/classified_ad/:classifiedAdId", (request, response) -> {
-            String classifiedAdId = request.params(":classifiedAdId");
-            Optional<ClassifiedAd> mayBe = classifiedAdController
-                    .findClassifiedAdById(ClassifiedAdId.fromString(classifiedAdId));
-            return mayBe.map(classifiedAd -> {
-                String result = null;
-                try {
-                    result = objectMapper.writeValueAsString(classifiedAd);
-                    response.status(200);
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-                return result;
-            }).orElseGet(() -> {
-                response.status(404);
-                return null;
-            });
-        });
-        Spark.put("/classified_ad/:classifiedAdId", "application/json", (request, response) -> {
-            String classifiedAdId = request.params(":classifiedAdId");
-            response.type("application/json");
-            try {
-                byte[] body = request.bodyAsBytes();
-                var updateDto = objectMapper.readValue(body, UpdateClassifiedAd.class);
-                updateDto.setId(UUID.fromString(classifiedAdId));
-                var updateClassifiedAdResponse = classifiedAdController.updateClassifiedAd(updateDto);
-                updateClassifiedAdResponse.setId(UUID.fromString(classifiedAdId));
-                return objectMapper.writeValueAsString(updateClassifiedAdResponse);
-            } catch (JsonMappingException ex) {
-                response.status(502);
-            }
-            return request.body();
-        });
+        Spark.get("/classified_ad/:classifiedAdId", classifiedAdSparkRoutes.findClassifiedAdById());
+
+        Spark.put("/classified_ad/:classifiedAdId",
+                MEDIA_APPLICATION_JSON,
+                classifiedAdSparkRoutes.updateClassifiedAd());
+
+        Spark.put("/classified_ad/:classifiedAdId/title",
+                MEDIA_APPLICATION_JSON,
+                classifiedAdSparkRoutes.updateClassifiedAdTitle());
+
+        Spark.put("/classified_ad/:classifiedAdId/owner",
+                MEDIA_APPLICATION_JSON,
+                classifiedAdSparkRoutes.updateClassifiedAdOwner());
+
+        Spark.put("/classified_ad/:classifiedAdId/text",
+                MEDIA_APPLICATION_JSON,
+                classifiedAdSparkRoutes.updateClassifiedAdText());
+
+        Spark.put("/classified_ad/:classifiedAdId/approve",
+                MEDIA_APPLICATION_JSON,
+                classifiedAdSparkRoutes.approveClassifiedAd());
+
+        Spark.put("/classified_ad/:classifiedAdId/publish",
+                MEDIA_APPLICATION_JSON,
+                classifiedAdSparkRoutes.publishClassifiedAd());
 
         System.out.println("Spark Server is running on port :" + Spark.port());
     }

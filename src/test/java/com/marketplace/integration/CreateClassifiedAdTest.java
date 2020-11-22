@@ -28,14 +28,14 @@ public class CreateClassifiedAdTest {
         var repository = ApplicationRunner.getBean(ClassifiedAdRepository.class);
         var controller = ApplicationRunner.getBean(ClassifiedAdController.class);
         assert controller != null;
-        CreateAdResponse ad = controller.createAd(createAdDto);
+        var ad = controller.createAd(createAdDto);
 
-        assertThat(ad).isNotNull();
-        assertThat(ad.getId()).isNotNull();
-        assertThat(ad.getOwnerId()).isNotNull().isEqualByComparingTo(createAdDto.getOwnerId());
+        assertThat(ad.result).isNotNull();
+        assertThat(ad.result.getId()).isNotNull();
+        assertThat(ad.result.getOwnerId()).isNotNull().isEqualByComparingTo(createAdDto.getOwnerId());
 
         assert repository != null;
-        Optional<ClassifiedAd> load = repository.load(new ClassifiedAdId(ad.getId()));
+        Optional<ClassifiedAd> load = repository.load(new ClassifiedAdId(ad.result.getId()));
         assertThat(load).isPresent();
 
         ClassifiedAd classifiedAd = load.get();
@@ -55,11 +55,11 @@ public class CreateClassifiedAdTest {
         var repository = ApplicationRunner.getBean(ClassifiedAdRepository.class);
         var controller = ApplicationRunner.getBean(ClassifiedAdController.class);
         assert controller != null;
-        CreateAdResponse ad = controller.createAd(createAdDto);
+        var ad = controller.createAd(createAdDto);
 
 
         assert repository != null;
-        Optional<ClassifiedAd> load = repository.load(new ClassifiedAdId(ad.getId()));
+        Optional<ClassifiedAd> load = repository.load(new ClassifiedAdId(ad.result.getId()));
         assertThat(load).isPresent();
 
         ClassifiedAd classifiedAd = load.get();

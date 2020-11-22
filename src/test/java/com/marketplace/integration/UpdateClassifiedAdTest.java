@@ -29,18 +29,18 @@ public class UpdateClassifiedAdTest {
         var repository = ApplicationRunner.getBean(ClassifiedAdRepository.class);
         var controller = ApplicationRunner.getBean(ClassifiedAdController.class);
         assert controller != null;
-        CreateAdResponse ad = controller.createAd(createAdDto);
+        var ad = controller.createAd(createAdDto);
 
-        assertThat(ad).isNotNull();
+        assertThat(ad.result).isNotNull();
 
         UpdateClassifiedAd updateAdDto = LoadUpdateAdEvent.load();
 
         // id for ad is generated dynamically.
-        updateAdDto.setId(ad.getId());
+        updateAdDto.setId(ad.result.getId());
         controller.updateClassifiedAd(updateAdDto);
 
         assert repository != null;
-        Optional<ClassifiedAd> load = repository.load(new ClassifiedAdId(ad.getId()));
+        Optional<ClassifiedAd> load = repository.load(new ClassifiedAdId(ad.result.getId()));
         assertThat(load).isPresent();
 
         ClassifiedAd classifiedAd = load.get();

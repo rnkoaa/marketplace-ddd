@@ -26,23 +26,23 @@ public class ResizePictureOfClassifiedAdTest {
         var repository = ApplicationRunner.getBean(ClassifiedAdRepository.class);
         var controller = ApplicationRunner.getBean(ClassifiedAdController.class);
         assert controller != null;
-        CreateAdResponse ad = controller.createAd(createClassifiedAd);
+        var ad = controller.createAd(createClassifiedAd);
 
-        assertThat(ad).isNotNull();
-        assertThat(ad.getId()).isNotNull();
-        assertThat(ad.getOwnerId()).isNotNull().isEqualByComparingTo(createClassifiedAd.getOwnerId());
+        assertThat(ad.result).isNotNull();
+        assertThat(ad.result.getId()).isNotNull();
+        assertThat(ad.result.getOwnerId()).isNotNull().isEqualByComparingTo(createClassifiedAd.getOwnerId());
 
         AddPictureToClassifiedAd addPictureToClassifiedAd = LoadAddPicture.load();
-        addPictureToClassifiedAd.setId(ad.getId());
+        addPictureToClassifiedAd.setId(ad.result.getId());
         AddPictureResponse addPictureResponse = controller.addPicture(addPictureToClassifiedAd);
 
         ResizeClassifiedAdPicture resizeClassifiedAdPicture = LoadResizePicture.load();
-        resizeClassifiedAdPicture.setClassifiedAdId(ad.getId());
+        resizeClassifiedAdPicture.setClassifiedAdId(ad.result.getId());
         resizeClassifiedAdPicture.setId(addPictureResponse.getId());
         controller.resizePicture(resizeClassifiedAdPicture);
 
         assert repository != null;
-        Optional<ClassifiedAd> load = repository.load(new ClassifiedAdId(ad.getId()));
+        Optional<ClassifiedAd> load = repository.load(new ClassifiedAdId(ad.result.getId()));
         assertThat(load).isPresent();
 
         ClassifiedAd classifiedAd = load.get();
