@@ -17,9 +17,10 @@ public class UserProfileRepositoryImpl implements UserProfileRepository {
     private final MongoTemplate mongoTemplate;
 
     @Inject
-    public UserProfileRepositoryImpl(MongoTemplate mongoTemplate){
+    public UserProfileRepositoryImpl(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
+
     @Override
     public boolean exists(UserId id) {
         return load(id).isPresent();
@@ -34,10 +35,15 @@ public class UserProfileRepositoryImpl implements UserProfileRepository {
     @Override
     public UserProfile add(UserProfile entity) {
         var userProfileEntity = new UserProfileEntity(entity);
-        var save = mongoTemplate.save(userProfileEntity, collectionName, UserProfileEntity.class);
+        var save = mongoTemplate.add(userProfileEntity, entity.getId().id(), collectionName, UserProfileEntity.class);
         if (save != null) {
             return entity;
         }
         return null;
+    }
+
+    @Override
+    public void deleteAll() {
+        mongoTemplate.deleteAll(collectionName, UserProfileEntity.class);
     }
 }

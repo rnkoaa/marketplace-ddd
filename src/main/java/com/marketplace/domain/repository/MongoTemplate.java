@@ -1,16 +1,23 @@
 package com.marketplace.domain.repository;
 
 import com.marketplace.context.mongo.MongoConfig;
+import com.marketplace.context.mongo.codec.DocumentConverter;
+import com.marketplace.domain.userprofile.entity.UserProfileEntity;
 import com.marketplace.mongo.entity.MongoEntity;
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.*;
+import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -22,6 +29,18 @@ public class MongoTemplate {
         this.mongoDatabase = mongoClient.getDatabase(mongoConfig.getDatabase());
     }
 
+    public <T extends MongoEntity, U> T add(T object, U id, String collectionName, Class<T> clzz) {
+        MongoCollection<T> collection = mongoDatabase.getCollection(collectionName, clzz);
+        Optional<T> byId = findById(id, collectionName, clzz);
+        return byId.map(exists -> {
+            UpdateResult updateResult = collection.replaceOne(eq("_id", id), object, new ReplaceOptions().upsert(true));
+            if (updateResult.wasAcknowledged()) {
+                return object;
+            }
+            return null;
+        }).orElseGet(() -> save(object, collectionName, clzz));
+    }
+
     public <T extends MongoEntity> T save(T object, String collectionName, Class<T> clzz) {
         MongoCollection<T> collection = mongoDatabase.getCollection(collectionName, clzz);
         try {
@@ -29,7 +48,7 @@ public class MongoTemplate {
             if (insertOneResult.wasAcknowledged()) {
                 return object;
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println(ex.getMessage());
         }
@@ -51,5 +70,10 @@ public class MongoTemplate {
             results.add(next);
         }
         return results;
+    }
+
+    public <T extends MongoEntity> void deleteAll(String collectionName, Class<T> clzz) {
+        MongoCollection<T> collection = mongoDatabase.getCollection(collectionName, clzz);
+        collection.deleteMany(new Document());
     }
 }

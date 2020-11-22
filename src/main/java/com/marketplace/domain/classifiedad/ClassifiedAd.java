@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-
 import java.util.*;
 
 @Setter
@@ -21,10 +20,7 @@ import java.util.*;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 public class ClassifiedAd extends AggregateRoot<EventId, Event> {
-//    @Id
     private ClassifiedAdId id;
-
-//    @BsonIgnore
     private final List<Picture> pictures;
     private UserId ownerId;
     private ClassifiedAdTitle title;

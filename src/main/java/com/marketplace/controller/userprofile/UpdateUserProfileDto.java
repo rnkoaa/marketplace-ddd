@@ -11,6 +11,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UpdateUserProfileDto {
     private UUID id;
-    private String photoUri;
+    private String photoUrl;
 
 }

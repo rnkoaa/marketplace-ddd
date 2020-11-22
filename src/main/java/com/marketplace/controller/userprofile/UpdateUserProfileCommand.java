@@ -18,7 +18,7 @@ public class UpdateUserProfileCommand {
     public static UpdateUserProfileCommand from(UpdateUserProfileDto updateUserProfileDto) {
         return new UpdateUserProfileCommand(
                 updateUserProfileDto.getId(),
-                updateUserProfileDto.getPhotoUri()
+                updateUserProfileDto.getPhotoUrl()
         );
     }
 }

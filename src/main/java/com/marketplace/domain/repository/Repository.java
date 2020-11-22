@@ -24,4 +24,7 @@ public interface Repository<T, U> {
     default String entityId(U id, Class<T> tClass) {
         return String.format("%s:%s", tClass.getSimpleName(), id.toString());
     }
+
+    default void deleteAll() {
+    }
 }

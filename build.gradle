@@ -55,6 +55,9 @@ dependencies {
     compileOnly('org.projectlombok:lombok:1.18.16')
     annotationProcessor('org.projectlombok:lombok:1.18.16')
 
+    // Runtime reflections
+    implementation("org.reflections:reflections:0.9.12")
+
     // 2.11.3
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
