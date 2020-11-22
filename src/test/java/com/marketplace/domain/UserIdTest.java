@@ -11,7 +11,7 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class UserIdTest {
-    ObjectMapper objectMapper = ObjectMapperModule.objectMapper();
+    ObjectMapper objectMapper = ObjectMapperModule.provideObjectMapper();
 
     // https://gist.github.com/youribonnaffe/03176be516c0ed06828ccc7d6c1724ce
     //    static record User(UserId userId, String username) {

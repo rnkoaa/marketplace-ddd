@@ -1,8 +1,8 @@
 package com.marketplace.integration;
 
-import com.marketplace.controller.*;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
+import com.marketplace.domain.classifiedad.controller.*;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 import com.marketplace.fixtures.ApplicationRunner;
 import com.marketplace.fixtures.LoadAddPicture;
@@ -18,28 +18,28 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 public class ResizePictureOfClassifiedAdTest {
     @Test
     void classifiedAdCanBeCreatedAndAPictureCanBeAdded() throws IOException {
-        CreateAdDto createAdDto = LoadCreateAdEvent.loadCreateAdDto();
+        var createClassifiedAd = LoadCreateAdEvent.loadCreateAdDto();
 
-        assertThat(createAdDto).isNotNull();
-        assertThat(createAdDto.getOwnerId()).isNotNull();
+        assertThat(createClassifiedAd).isNotNull();
+        assertThat(createClassifiedAd.getOwnerId()).isNotNull();
 
         var repository = ApplicationRunner.getBean(ClassifiedAdRepository.class);
         var controller = ApplicationRunner.getBean(ClassifiedAdController.class);
         assert controller != null;
-        CreateAdResponse ad = controller.createAd(createAdDto);
+        CreateAdResponse ad = controller.createAd(createClassifiedAd);
 
         assertThat(ad).isNotNull();
         assertThat(ad.getId()).isNotNull();
-        assertThat(ad.getOwnerId()).isNotNull().isEqualByComparingTo(createAdDto.getOwnerId());
+        assertThat(ad.getOwnerId()).isNotNull().isEqualByComparingTo(createClassifiedAd.getOwnerId());
 
-        AddPictureDto addPictureDto = LoadAddPicture.load();
-        addPictureDto.setClassifiedAdId(ad.getId());
-        AddPictureResponse addPictureResponse = controller.addPicture(addPictureDto);
+        AddPictureToClassifiedAd addPictureToClassifiedAd = LoadAddPicture.load();
+        addPictureToClassifiedAd.setId(ad.getId());
+        AddPictureResponse addPictureResponse = controller.addPicture(addPictureToClassifiedAd);
 
-        ResizePictureDto resizePictureDto = LoadResizePicture.load();
-        resizePictureDto.setClassifiedAdId(ad.getId());
-        resizePictureDto.setId(addPictureResponse.getId());
-        controller.resizePicture(resizePictureDto);
+        ResizeClassifiedAdPicture resizeClassifiedAdPicture = LoadResizePicture.load();
+        resizeClassifiedAdPicture.setClassifiedAdId(ad.getId());
+        resizeClassifiedAdPicture.setId(addPictureResponse.getId());
+        controller.resizePicture(resizeClassifiedAdPicture);
 
         assert repository != null;
         Optional<ClassifiedAd> load = repository.load(new ClassifiedAdId(ad.getId()));

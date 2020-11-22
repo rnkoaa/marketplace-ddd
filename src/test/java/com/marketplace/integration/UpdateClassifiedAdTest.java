@@ -1,9 +1,9 @@
 package com.marketplace.integration;
 
-import com.marketplace.controller.ClassifiedAdController;
-import com.marketplace.controller.CreateAdDto;
-import com.marketplace.controller.CreateAdResponse;
-import com.marketplace.controller.UpdateAdDto;
+import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
+import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
+import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
@@ -21,7 +21,7 @@ public class UpdateClassifiedAdTest {
     //
     @Test
     void classifiedAdCanBeCreatedAndUpdated() throws IOException {
-        CreateAdDto createAdDto = LoadCreateAdEvent.loadCreateAdDto();
+        CreateClassifiedAd createAdDto = LoadCreateAdEvent.loadCreateAdDto();
 
         assertThat(createAdDto).isNotNull();
         assertThat(createAdDto.getOwnerId()).isNotNull();
@@ -33,7 +33,7 @@ public class UpdateClassifiedAdTest {
 
         assertThat(ad).isNotNull();
 
-        UpdateAdDto updateAdDto = LoadUpdateAdEvent.load();
+        UpdateClassifiedAd updateAdDto = LoadUpdateAdEvent.load();
 
         // id for ad is generated dynamically.
         updateAdDto.setId(ad.getId());

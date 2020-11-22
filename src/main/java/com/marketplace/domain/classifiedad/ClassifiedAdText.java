@@ -1,6 +1,6 @@
 package com.marketplace.domain.classifiedad;
 
-public record ClassifiedAdText(String value) {
+public record ClassifiedAdText( String value) {
     public ClassifiedAdText {
         if (value == null || value.isEmpty()) {
             throw new IllegalArgumentException("value cannot be empty or null");

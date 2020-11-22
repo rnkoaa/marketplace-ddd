@@ -1,13 +1,13 @@
 package com.marketplace.fixtures;
 
 import com.marketplace.context.ObjectMapperModule;
-import com.marketplace.controller.UpdateAdDto;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 
 import java.io.IOException;
 
 public class LoadUpdateAdEvent {
-    public static UpdateAdDto load() throws IOException {
+    public static UpdateClassifiedAd load() throws IOException {
         var resourceAsStream = LoadUpdateAdEvent.class.getClassLoader().getResourceAsStream("fixtures/update_ad.json");
-        return ObjectMapperModule.objectMapper().readValue(resourceAsStream, UpdateAdDto.class);
+        return ObjectMapperModule.provideObjectMapper().readValue(resourceAsStream, UpdateClassifiedAd.class);
     }
 }

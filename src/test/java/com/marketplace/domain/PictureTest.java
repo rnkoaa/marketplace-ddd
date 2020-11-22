@@ -17,7 +17,7 @@ public class PictureTest {
     void testPictureValidationWithIncorrectSize() {
         var classifiedAd = new ClassifiedAd(new ClassifiedAdId(UUID.randomUUID()), new UserId(UUID.randomUUID()));
         assertThatThrownBy(() -> {
-            classifiedAd.createPicture(new PictureSize(400, 300));
+            classifiedAd.createPicture(new PictureSize(400, 300), "", 0);
         }).isInstanceOf(InvalidStateException.class);
 
     }
@@ -25,7 +25,7 @@ public class PictureTest {
     @Test
     void testPictureValidation() {
         var classifiedAd = new ClassifiedAd(new ClassifiedAdId(UUID.randomUUID()), new UserId(UUID.randomUUID()));
-        Picture picture = classifiedAd.createPicture(new PictureSize(800, 600));
+        Picture picture = classifiedAd.createPicture(new PictureSize(800, 600), "", 0);
         assertThat(picture.hasCorrectSize()).isTrue();
 
     }

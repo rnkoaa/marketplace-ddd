@@ -1,17 +1,19 @@
 package com.marketplace.domain.classifiedad.command;
 
 import com.marketplace.command.CommandHandler;
-import com.marketplace.controller.UpdateClassifiedAdResponse;
+import com.marketplace.domain.classifiedad.controller.UpdateClassifiedAdResponse;
 import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.framework.Strings;
 
+import javax.inject.Inject;
 import java.util.Optional;
 
 public class UpdateClassifiedAdCommandHandler implements CommandHandler<UpdateClassifiedAd> {
     private final ClassifiedAdRepository classifiedAdRepository;
 
+    @Inject
     public UpdateClassifiedAdCommandHandler(ClassifiedAdRepository classifiedAdRepository) {
         this.classifiedAdRepository = classifiedAdRepository;
     }
@@ -30,7 +32,9 @@ public class UpdateClassifiedAdCommandHandler implements CommandHandler<UpdateCl
                 classifiedAd.updateText(new ClassifiedAdText(command.getText()));
             }
             if (command.getPrice() != null) {
-                classifiedAd.updatePrice(command.getPrice());
+                var money = new Money(command.getPrice().getBigDecimal(), command.getPrice().getCurrencyCode(), new DefaultCurrencyLookup());
+                var price = new Price(money);
+                classifiedAd.updatePrice(price);
             }
 
             if (command.getApprovedBy() != null) {

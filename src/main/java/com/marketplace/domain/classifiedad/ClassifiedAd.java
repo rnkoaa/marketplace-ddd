@@ -1,6 +1,8 @@
 package com.marketplace.domain.classifiedad;
 
-import com.marketplace.domain.*;
+import com.marketplace.domain.InvalidStateException;
+import com.marketplace.domain.PictureId;
+import com.marketplace.domain.PictureSize;
 import com.marketplace.domain.classifiedad.events.*;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.event.Event;
@@ -8,16 +10,18 @@ import com.marketplace.event.EventId;
 import com.marketplace.framework.AggregateRoot;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.util.*;
 
+@Setter
 @Getter
 @ToString
 @EqualsAndHashCode(callSuper = false)
 public class ClassifiedAd extends AggregateRoot<EventId, Event> {
-    private final List<Picture> pictures;
     private ClassifiedAdId id;
+    private final List<Picture> pictures;
     private UserId ownerId;
     private ClassifiedAdTitle title;
     private ClassifiedAdText text;
@@ -29,7 +33,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
     /**
      * this is for jackson deserialization
      */
-    private ClassifiedAd() {
+    public ClassifiedAd() {
         pictures = new ArrayList<>();
 //        apply();
     }
@@ -66,8 +70,22 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
         apply(new ClassifiedAdSentForReview(id.id()));
     }
 
-    public PictureId addPicture(String uri, PictureSize size) {
-        int newPictureOrder = (pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1;
+    public PictureId addPicture(PictureId id, String uri, PictureSize size, int order) {
+        int newPictureOrder = (order > 0) ? order : ((pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1);
+        var pictureId = (id != null) ? id : PictureId.newPictureId();
+        apply(PictureAddedToAClassifiedAd.builder()
+                .classifiedAdId(this.id.id())
+                .pictureId(pictureId.id())
+                .url(uri)
+                .height(size.height())
+                .width(size.width())
+                .order(newPictureOrder)
+                .build());
+        return pictureId;
+    }
+
+    public PictureId addPicture(String uri, PictureSize size, int order) {
+        int newPictureOrder = (order > 0) ? order : ((pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1);
         var pictureId = UUID.randomUUID();
         apply(PictureAddedToAClassifiedAd.builder()
                 .classifiedAdId(this.id.id())
@@ -80,10 +98,18 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
         return new PictureId(pictureId);
     }
 
-    public Picture createPicture(PictureSize pictureSize) {
+
+    public Picture createPicture(PictureSize pictureSize, String uri, int order) {
         var pictureItem = new Picture(this);
-        var pictureId = addPicture("", pictureSize);
+        var pictureId = addPicture(uri, pictureSize, order);
         Optional<Picture> picture = findPicture(pictureId);
+        return picture.orElse(pictureItem);
+    }
+
+    public Picture createPicture(PictureId pictureId, PictureSize pictureSize, String uri, int order) {
+        var pictureItem = new Picture(this);
+        var result = addPicture(pictureId,  uri, pictureSize, order);
+        Optional<Picture> picture = findPicture(result);
         return picture.orElse(pictureItem);
     }
 

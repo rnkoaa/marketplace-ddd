@@ -1,16 +1,19 @@
 package com.marketplace.domain.classifiedad.command;
 
 import com.marketplace.command.CommandHandler;
-import com.marketplace.controller.CreateAdResponse;
+import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.framework.Strings;
 
+import javax.inject.Inject;
+
 public class CreateClassifiedAdCommandHandler implements CommandHandler<CreateClassifiedAd> {
 
     private final ClassifiedAdRepository classifiedAdRepository;
 
+    @Inject
     public CreateClassifiedAdCommandHandler(ClassifiedAdRepository classifiedAdRepository) {
         this.classifiedAdRepository = classifiedAdRepository;
     }
@@ -18,7 +21,7 @@ public class CreateClassifiedAdCommandHandler implements CommandHandler<CreateCl
     @Override
     public CommandHandlerResult<CreateAdResponse> handle(CreateClassifiedAd command) {
         var classifiedAdId = new ClassifiedAdId();
-        var ownerId = new UserId(command.getUserId());
+        var ownerId = new UserId(command.getOwnerId());
         var classifiedAd = new ClassifiedAd(classifiedAdId, ownerId);
 
         if (!Strings.isNullOrEmpty(command.getTitle())) {
@@ -29,8 +32,11 @@ public class CreateClassifiedAdCommandHandler implements CommandHandler<CreateCl
             classifiedAd.updateText(new ClassifiedAdText(command.getText()));
         }
 
-        classifiedAdRepository.add(classifiedAd);
-        var classifiedAdResponse = new CreateAdResponse(command.getUserId(), classifiedAdId.id());
+        var saved = classifiedAdRepository.add(classifiedAd);
+        if(saved == null){
+            return new CommandHandlerResult<>(null, false, "failed to save classifiedAd");
+        }
+        var classifiedAdResponse = new CreateAdResponse(command.getOwnerId(), classifiedAdId.id());
 
         return new CommandHandlerResult<>(classifiedAdResponse, true, "");
     }

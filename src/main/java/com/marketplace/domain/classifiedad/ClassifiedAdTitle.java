@@ -8,12 +8,16 @@ public record ClassifiedAdTitle(String value) {
         }
     }
 
+    public static ClassifiedAdTitle fromString(String title) {
+        return new ClassifiedAdTitle(title);
+    }
+
     @Override
     public String toString() {
         return value;
     }
 
-    public ClassifiedAdText fromHtmlString(String htmlString) {
+    public ClassifiedAdTitle fromHtmlString(String htmlString) {
 //        var supportedTagsReplaced = htmlTitle
 //                .Replace("<i>", "*")
 //                .Replace("</i>", "*")
@@ -24,7 +28,7 @@ public record ClassifiedAdTitle(String value) {
 //        CheckValidity(value);
 //
 //        if (value == null || value.isEmpty() || value.length() > 100) {
-        return new ClassifiedAdText("");
+        return new ClassifiedAdTitle("");
     }
 
     private boolean isValid(String value) {

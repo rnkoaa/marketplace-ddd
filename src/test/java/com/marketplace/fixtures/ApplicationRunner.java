@@ -1,9 +1,9 @@
 package com.marketplace.fixtures;
 
-import com.marketplace.controller.ClassifiedAdController;
+import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepositoryImpl;
-import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
+import com.marketplace.domain.userprofile.service.ClassifiedAdService;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAdCommandHandler;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdCommandHandler;
 

@@ -13,6 +13,10 @@ public record ClassifiedAdId(UUID id) {
         this(UUID.randomUUID());
     }
 
+    public static ClassifiedAdId newClassifedAdId() {
+        return new ClassifiedAdId(UUID.randomUUID());
+    }
+
     @Override
     public String toString() {
         return id.toString();

@@ -8,9 +8,16 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.marketplace.domain.shared.UserId;
+import dagger.Module;
+import dagger.Provides;
 
+import javax.inject.Singleton;
+
+@Module
 public class ObjectMapperModule {
-    public static ObjectMapper objectMapper() {
+    @Provides
+    @Singleton
+    public static ObjectMapper provideObjectMapper() {
         var objectMapper = new ObjectMapper().findAndRegisterModules();
         SimpleModule module = new SimpleModule();
         module.addSerializer(UserId.class, new UserIdSerializer());

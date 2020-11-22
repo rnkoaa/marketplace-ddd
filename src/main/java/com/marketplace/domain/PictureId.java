@@ -9,12 +9,16 @@ public record PictureId(UUID id) {
         }
     }
 
+    public static PictureId newPictureId() {
+       return new PictureId(UUID.randomUUID());
+    }
+
     @Override
     public String toString() {
         return id.toString();
     }
 
-    static PictureId fromString(String uuid) {
+    public static PictureId fromString(String uuid) {
         var id = UUID.fromString(uuid);
         return new PictureId(id);
     }

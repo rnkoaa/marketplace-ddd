@@ -1,8 +1,16 @@
 package com.marketplace.domain.classifiedad.command;
 
-import lombok.Value;
+import com.marketplace.command.Command;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value
-public class UpdateClassifiedAdText {
-    String text;
+import java.util.UUID;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UpdateClassifiedAdText implements Command {
+    private UUID id;
+    private String text;
 }
