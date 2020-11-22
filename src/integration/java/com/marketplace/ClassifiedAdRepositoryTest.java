@@ -6,7 +6,7 @@ import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
 import com.marketplace.context.mongo.MongoConfig;
 import com.marketplace.context.mongo.MongoConfigModule;
-import com.marketplace.controller.classifiedad.CreateAdDto;
+import com.marketplace.domain.classifiedad.controller.CreateAdDto;
 import com.marketplace.domain.PictureSize;
 import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;

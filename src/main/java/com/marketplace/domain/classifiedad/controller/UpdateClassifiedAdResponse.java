@@ -1,4 +1,4 @@
-package com.marketplace.controller.classifiedad;
+package com.marketplace.domain.classifiedad.controller;
 
 import lombok.Data;
 

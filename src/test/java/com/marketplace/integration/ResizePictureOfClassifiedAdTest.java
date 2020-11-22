@@ -1,8 +1,8 @@
 package com.marketplace.integration;
 
-import com.marketplace.controller.classifiedad.*;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
+import com.marketplace.domain.classifiedad.controller.*;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 import com.marketplace.fixtures.ApplicationRunner;
 import com.marketplace.fixtures.LoadAddPicture;

@@ -1,7 +1,7 @@
 package com.marketplace.domain.classifiedad.command;
 
 import com.marketplace.command.Command;
-import com.marketplace.controller.classifiedad.CreateAdDto;
+import com.marketplace.domain.classifiedad.controller.CreateAdDto;
 import lombok.Value;
 
 import java.time.Instant;

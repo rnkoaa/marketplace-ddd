@@ -1,7 +1,7 @@
 package com.marketplace.domain.classifiedad.command;
 
 import com.marketplace.command.CommandHandler;
-import com.marketplace.controller.classifiedad.CreateAdResponse;
+import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 import com.marketplace.domain.shared.UserId;

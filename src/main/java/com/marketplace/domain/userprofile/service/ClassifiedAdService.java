@@ -1,6 +1,5 @@
 package com.marketplace.domain.userprofile.service;
 
-import com.marketplace.controller.classifiedad.*;
 import com.marketplace.domain.PictureId;
 import com.marketplace.domain.PictureSize;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
@@ -10,6 +9,7 @@ import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAdCommandHandler;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdCommandHandler;
+import com.marketplace.domain.classifiedad.controller.*;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 
 import javax.inject.Inject;

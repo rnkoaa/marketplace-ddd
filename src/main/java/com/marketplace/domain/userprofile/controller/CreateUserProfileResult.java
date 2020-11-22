@@ -1,4 +1,4 @@
-package com.marketplace.controller.userprofile;
+package com.marketplace.domain.userprofile.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class UpdateUserProfileDto {
+@AllArgsConstructor
+public class CreateUserProfileResult {
     private UUID id;
-    private String photoUrl;
 
 }

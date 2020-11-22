@@ -1,4 +1,4 @@
-package com.marketplace.controller.userprofile;
+package com.marketplace.domain.userprofile.controller;
 
 import com.marketplace.domain.classifiedad.CommandHandlerResult;
 import com.marketplace.domain.shared.UserId;
@@ -32,7 +32,7 @@ public class UserProfileService {
         Optional<UserProfile> load = userProfileRepository.load(UserId.from(command.getId()));
         return load
                 .map(userProfile -> {
-                    userProfile.updatePhoto(command.getPhotoUri());
+                    userProfile.updatePhoto(command.getPhotoUrl());
                     UserProfile saved = userProfileRepository.add(userProfile);
                     if (saved != null) {
                         return new CommandHandlerResult<>(new UpdateUserProfileResult(command.getId()), true, "");

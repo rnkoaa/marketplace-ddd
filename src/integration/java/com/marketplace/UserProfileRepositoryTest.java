@@ -6,11 +6,11 @@ import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
 import com.marketplace.context.mongo.MongoConfig;
 import com.marketplace.context.mongo.MongoConfigModule;
-import com.marketplace.controller.userprofile.CreateUserProfileDto;
-import com.marketplace.controller.userprofile.UpdateUserProfileDto;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.UserProfile;
+import com.marketplace.domain.userprofile.controller.CreateUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.UpdateUserProfileCommand;
 import com.marketplace.domain.userprofile.entity.UserProfileEntity;
 import com.marketplace.domain.userprofile.repository.UserProfileRepository;
 import com.marketplace.fixtures.UserProfileFixture;
@@ -58,14 +58,14 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
 
     @Test
     void userProfileCanBeCreated() throws IOException {
-        CreateUserProfileDto createUserProfileDto = UserProfileFixture.loadCreateUserProfileDto();
-        assertThat(createUserProfileDto).isNotNull();
-        assertThat(createUserProfileDto.getFirstName()).isNotBlank();
-        assertThat(createUserProfileDto.getMiddleName()).isNotBlank();
-        assertThat(createUserProfileDto.getLastName()).isNotBlank();
+        CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
+        assertThat(command).isNotNull();
+        assertThat(command.getFirstName()).isNotBlank();
+        assertThat(command.getMiddleName()).isNotBlank();
+        assertThat(command.getLastName()).isNotBlank();
 
-        UserProfile userProfile = new UserProfile(UserId.fromString(insertId), createUserProfileDto.getFullName(),
-                new DisplayName(createUserProfileDto.getDisplayName()));
+        UserProfile userProfile = new UserProfile(UserId.fromString(insertId), command.fullName(),
+                command.displayName());
 
         UserProfile add = userProfileRepository.add(userProfile);
 
@@ -74,14 +74,14 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
 
     @Test
     void userProfileCanBeCreatedAndLoaded() throws IOException {
-        CreateUserProfileDto createUserProfileDto = UserProfileFixture.loadCreateUserProfileDto();
-        assertThat(createUserProfileDto).isNotNull();
-        assertThat(createUserProfileDto.getFirstName()).isNotBlank();
-        assertThat(createUserProfileDto.getMiddleName()).isNotBlank();
-        assertThat(createUserProfileDto.getLastName()).isNotBlank();
+        CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
+        assertThat(command).isNotNull();
+        assertThat(command.getFirstName()).isNotBlank();
+        assertThat(command.getMiddleName()).isNotBlank();
+        assertThat(command.getLastName()).isNotBlank();
 
-        UserProfile userProfile = new UserProfile(UserId.fromString(insertId), createUserProfileDto.getFullName(),
-                new DisplayName(createUserProfileDto.getDisplayName()));
+        UserProfile userProfile = new UserProfile(UserId.fromString(insertId), command.fullName(),
+                command.displayName());
 
         UserProfile add = userProfileRepository.add(userProfile);
 
@@ -98,21 +98,21 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
 
     @Test
     void userProfileCanBeUpdated() throws IOException {
-        CreateUserProfileDto createUserProfileDto = UserProfileFixture.loadCreateUserProfileDto();
-        UpdateUserProfileDto updateUserProfileDto = UserProfileFixture.loadUpdateUserProfileDto();
-        assertThat(createUserProfileDto).isNotNull();
-        assertThat(createUserProfileDto.getFirstName()).isNotBlank();
-        assertThat(createUserProfileDto.getMiddleName()).isNotBlank();
-        assertThat(createUserProfileDto.getLastName()).isNotBlank();
+        CreateUserProfileCommand createUserProfileCmd = UserProfileFixture.loadCreateUserProfileDto();
+        UpdateUserProfileCommand updateUserProfileCommand = UserProfileFixture.loadUpdateUserProfileDto();
+        assertThat(createUserProfileCmd).isNotNull();
+        assertThat(createUserProfileCmd.getFirstName()).isNotBlank();
+        assertThat(createUserProfileCmd.getMiddleName()).isNotBlank();
+        assertThat(createUserProfileCmd.getLastName()).isNotBlank();
 
-        UserProfile userProfile = new UserProfile(UserId.fromString(insertId), createUserProfileDto.getFullName(),
-                new DisplayName(createUserProfileDto.getDisplayName()));
+        UserProfile userProfile = new UserProfile(UserId.fromString(insertId), createUserProfileCmd.fullName(),
+                new DisplayName(createUserProfileCmd.getDisplayName()));
 
         UserProfile add = userProfileRepository.add(userProfile);
 
         assertThat(add).isNotNull();
 
-        add.updatePhoto(updateUserProfileDto.getPhotoUrl());
+        add.updatePhoto(updateUserProfileCommand.getPhotoUrl());
         UserProfile secondSaved = userProfileRepository.add(add);
         assertThat(secondSaved).isNotNull();
 
@@ -128,14 +128,14 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
 
     @Test
     void userProfileCanBeCreatedAndShownToExist() throws IOException {
-        CreateUserProfileDto createUserProfileDto = UserProfileFixture.loadCreateUserProfileDto();
-        assertThat(createUserProfileDto).isNotNull();
-        assertThat(createUserProfileDto.getFirstName()).isNotBlank();
-        assertThat(createUserProfileDto.getMiddleName()).isNotBlank();
-        assertThat(createUserProfileDto.getLastName()).isNotBlank();
+        CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
+        assertThat(command).isNotNull();
+        assertThat(command.getFirstName()).isNotBlank();
+        assertThat(command.getMiddleName()).isNotBlank();
+        assertThat(command.getLastName()).isNotBlank();
 
-        UserProfile userProfile = new UserProfile(UserId.fromString(insertId), createUserProfileDto.getFullName(),
-                new DisplayName(createUserProfileDto.getDisplayName()));
+        UserProfile userProfile = new UserProfile(UserId.fromString(insertId), command.fullName(),
+                command.displayName());
 
         UserProfile add = userProfileRepository.add(userProfile);
 

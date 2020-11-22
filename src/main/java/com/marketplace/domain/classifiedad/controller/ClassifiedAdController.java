@@ -1,4 +1,4 @@
-package com.marketplace.controller.classifiedad;
+package com.marketplace.domain.classifiedad.controller;
 
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
