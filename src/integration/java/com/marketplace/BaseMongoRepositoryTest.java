@@ -19,40 +19,41 @@ import org.junit.jupiter.api.BeforeEach;
 import java.io.IOException;
 
 public abstract class BaseMongoRepositoryTest extends AbstractContainerInitializer {
-    MongoConfig mongoConfig;
-    MongoClient mongoClient;
-    MongoCollection<ClassifiedAd> classifiedAdCollection;
-    ApplicationContext context;
-    ClassifiedAdRepository classifiedAdRepository;
-    ClassifiedAdService classifiedAdService;
 
-    @BeforeEach
-    void setup() throws IOException {
-        ApplicationConfig config = ConfigLoader.loadClasspathResource("application.yml", ApplicationConfig.class);
+  MongoConfig mongoConfig;
+  MongoClient mongoClient;
+  MongoCollection<ClassifiedAd> classifiedAdCollection;
+  ApplicationContext context;
+  ClassifiedAdRepository classifiedAdRepository;
+  ClassifiedAdService classifiedAdService;
 
-        context = DaggerApplicationContext.
-                builder()
-                .config(config)
-                .build();
+  @BeforeEach
+  void setup() throws IOException {
+    ApplicationConfig config = ConfigLoader.loadClasspathResource("application.yml", ApplicationConfig.class);
 
-        String hosts = mongoDBContainer.getHost();
-        int port = mongoDBContainer.getMappedPort(27017);
-        mongoConfig = new MongoConfig(hosts, "test_db", port);
-        config.setMongoConfig(mongoConfig);
-        mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
-        classifiedAdCollection = MongoConfigModule.provideMongoDatabase(mongoClient, mongoConfig)
-                .getCollection(ClassifiedAd.class.getSimpleName().toLowerCase(), ClassifiedAd.class);
-        classifiedAdRepository = context.getClassifiedAdRepository();
-        classifiedAdService = context.getClassifiedAdService();
+    context = DaggerApplicationContext.
+        builder()
+        .config(config)
+        .build();
+
+    String hosts = mongoDBContainer.getHost();
+    int port = mongoDBContainer.getMappedPort(27017);
+    mongoConfig = new MongoConfig(hosts, "test_db", port);
+    config.setMongoConfig(mongoConfig);
+    mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
+    classifiedAdCollection = MongoConfigModule.provideMongoDatabase(mongoClient, mongoConfig)
+        .getCollection(ClassifiedAd.class.getSimpleName().toLowerCase(), ClassifiedAd.class);
+    classifiedAdRepository = context.getClassifiedAdRepository();
+    classifiedAdService = context.getClassifiedAdService();
+  }
+
+  @AfterEach
+  public void cleanup() {
+    DeleteResult deleteResult = classifiedAdCollection.deleteMany(new Document());
+    if (deleteResult.wasAcknowledged()) {
+      System.out.println("delete was acknowledged.");
     }
-
-    @AfterEach
-    public void cleanup() {
-        DeleteResult deleteResult = classifiedAdCollection.deleteMany(new Document());
-        if (deleteResult.wasAcknowledged()) {
-            System.out.println("delete was acknowledged.");
-        }
-        System.out.println("Number of records deleted: " + deleteResult.getDeletedCount());
-    }
+    System.out.println("Number of records deleted: " + deleteResult.getDeletedCount());
+  }
 
 }

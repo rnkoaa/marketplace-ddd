@@ -4,7 +4,7 @@ public enum ClassifiedAdState {
     pendingReview,
     active,
     inactive,
-    markedAsSold;
+    markedAsSold, approved;
 
     static ClassifiedAdState fromString(String name) {
         return switch (name) {
