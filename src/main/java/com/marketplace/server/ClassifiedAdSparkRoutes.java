@@ -11,6 +11,7 @@ import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdPrice;
 import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
+import com.marketplace.domain.classifiedad.read.ClassifiedAdReadEntity;
 import com.marketplace.framework.Strings;
 import spark.Request;
 import spark.Route;
@@ -66,7 +67,7 @@ public class ClassifiedAdSparkRoutes {
 
   public Route updateClassifiedAd() {
     return (request, response) -> {
-      String classifiedAdId = request.params(":classifiedAdId");
+      String classifiedAdId = getClassifiedIdFromRequest(request);
       response.type("application/json");
       try {
         byte[] body = request.bodyAsBytes();
@@ -94,9 +95,9 @@ public class ClassifiedAdSparkRoutes {
 
   public Route findClassifiedAdById() {
     return (request, response) -> {
-      String classifiedAdId = request.params(":classifiedAdId");
-      Optional<ClassifiedAd> mayBe = classifiedAdController
-          .findClassifiedAdById(ClassifiedAdId.fromString(classifiedAdId));
+      String classifiedAdId = getClassifiedIdFromRequest(request);
+      Optional<ClassifiedAdReadEntity> mayBe = classifiedAdController
+          .findEntityById(UUID.fromString(classifiedAdId));
       return mayBe.map(classifiedAd -> {
         String result = null;
         try {
@@ -289,7 +290,7 @@ public class ClassifiedAdSparkRoutes {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
       var updateClassifiedAd = read(req);
-      if(updateClassifiedAd.getPictures() == null || updateClassifiedAd.getPictures().size() == 0) {
+      if (updateClassifiedAd.getPictures() == null || updateClassifiedAd.getPictures().size() == 0) {
         Map<String, Object> resMessage = Map.of(
             "status", false,
             "message", "at least add a picture to be added to classifiedAd"
@@ -314,6 +315,7 @@ public class ClassifiedAdSparkRoutes {
       }
     };
   }
+
   private String getClassifiedIdFromRequest(Request req) {
     return req.params(":classifiedAdId");
   }

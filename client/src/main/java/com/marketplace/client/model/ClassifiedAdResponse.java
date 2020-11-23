@@ -9,7 +9,7 @@ public class ClassifiedAdResponse {
 
   private UUID id;
   private UUID ownerId;
-  private UUID approvedBy;
+  private UUID approver;
   private String title;
   private String text;
   private Price price;

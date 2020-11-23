@@ -4,6 +4,7 @@ import com.marketplace.command.Command;
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,7 +29,10 @@ public class UpdateClassifiedAd implements Command {
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
+  @Builder
   public static class PictureDto {
+    private UUID id;
+    private int order;
     private String uri;
     private int width;
     private int height;
@@ -37,6 +41,7 @@ public class UpdateClassifiedAd implements Command {
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
+  @Builder
   public static class PriceDto {
 
     private String currencyCode;

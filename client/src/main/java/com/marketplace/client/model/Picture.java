@@ -6,7 +6,7 @@ import lombok.Data;
 public class Picture {
 
   private String id;
-  private int with;
+  private int width;
   private int height;
   private String uri;
   private int order;

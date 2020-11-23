@@ -4,13 +4,8 @@ import com.marketplace.config.ApplicationConfig;
 import com.marketplace.config.ConfigLoader;
 import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
-import com.marketplace.domain.userprofile.UserProfile;
-import com.marketplace.domain.userprofile.entity.UserProfileEntity;
-import com.marketplace.domain.userprofile.repository.UserProfileRepository;
 import com.marketplace.server.SparkServer;
-
 import java.io.IOException;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 

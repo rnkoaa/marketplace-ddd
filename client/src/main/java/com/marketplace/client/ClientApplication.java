@@ -3,7 +3,7 @@ package com.marketplace.client;
 import com.marketplace.client.config.ClientConfig;
 import com.marketplace.client.context.ClientContext;
 import com.marketplace.client.context.DaggerClientContext;
-import com.marketplace.client.model.ClassifiedAdRequest;
+import com.marketplace.client.model.ClassifiedAdResponse;
 import com.marketplace.config.ConfigLoader;
 import java.io.IOException;
 import java.util.UUID;
@@ -22,25 +22,36 @@ public class ClientApplication {
         .config(config)
         .build();
 
-    UUID ownerId = UUID.fromString("8d4da197-0ba1-479e-9ae4-cd0e60b9ba72");
-
+//    UUID ownerId = UUID.fromString("8d4da197-0ba1-479e-9ae4-cd0e60b9ba72");
+//
     ClassifiedAdRestService classifiedAdRestService = context.classifiedAdRestService();
-    var classifiedAd = ClassifiedAdRequest.builder()
-        .ownerId(ownerId)
-        .build();
+//    var classifiedAd = ClassifiedAdRequest.builder()
+//        .ownerId(ownerId)
+//        .build();
+//
+//    Call<Void> res = classifiedAdRestService.createClassifiedAd(classifiedAd);
+//    Response<Void> execute = res.execute();
+//    if (execute.isSuccessful()) {
+//      String location = execute.headers().get("Location");
+//      System.out.println(location);
+//    } else {
+//      if(execute.errorBody() != null) {
+//        System.out.println(execute.errorBody().string());
+//      }
+//    }
 
-    Call<Void> res = classifiedAdRestService.createClassifiedAd(classifiedAd);
-    Response<Void> execute = res.execute();
-    if (execute.isSuccessful()) {
-      String location = execute.headers().get("Location");
-      System.out.println(location);
-    } else {
-      if(execute.errorBody() != null) {
+    Call<ClassifiedAdResponse> call = classifiedAdRestService.findById(UUID.fromString("da31260e-b943-425f-8563-ddb6a911662d"));
+    Response<ClassifiedAdResponse> execute = call.execute();
+    if(execute.isSuccessful()){
+      ClassifiedAdResponse body = execute.body();
+      if(body != null) {
+        System.out.println(body.toString());
+      }
+    }else{
+      if (execute.errorBody() != null) {
         System.out.println(execute.errorBody().string());
       }
     }
-
-//    classifiedAdRestService.getById()
 //    ClientContext context = DaggerClientContext.
 //        builder()
 ////        .config(config)
