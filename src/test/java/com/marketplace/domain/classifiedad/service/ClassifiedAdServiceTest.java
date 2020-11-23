@@ -1,8 +1,10 @@
-package com.marketplace.domain.classifiedad.command;
+package com.marketplace.domain.classifiedad.service;
 
 import com.marketplace.domain.classifiedad.*;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
 import com.marketplace.domain.shared.UserId;
+import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,18 +15,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateClassifiedAdCommandHandlerTest {
+class ClassifiedAdServiceTest {
+
     @Mock
     ClassifiedAdRepository classifiedAdRepository;
 
-    UpdateClassifiedAdCommandHandler commandHandler;
+    ClassifiedAdService classifiedAdService;
+
 
     @BeforeEach
     void setup() {
-        commandHandler = new UpdateClassifiedAdCommandHandler(classifiedAdRepository);
+        classifiedAdService = new ClassifiedAdService(classifiedAdRepository);
     }
 
     @Test
@@ -57,11 +61,11 @@ class UpdateClassifiedAdCommandHandlerTest {
         updateClassifiedAd.setText("test text");
         updateClassifiedAd.setTitle("test title");
 
-        var handleResponse = commandHandler.handle(updateClassifiedAd);
+        var handleResponse = classifiedAdService.handle(updateClassifiedAd);
         assertThat(handleResponse).isNotNull();
         assertThat(handleResponse.result).isNotNull();
         assertThat(handleResponse.isSuccessful()).isTrue();
-        assertThat(expectedClassifiedAd.getChanges()).hasSize(3);
+        AssertionsForInterfaceTypes.assertThat(expectedClassifiedAd.getChanges()).hasSize(3);
     }
 
     @Test
@@ -85,11 +89,11 @@ class UpdateClassifiedAdCommandHandlerTest {
         updateClassifiedAd.setText("test text");
         updateClassifiedAd.setTitle("test title");
 
-        var handleResponse = commandHandler.handle(updateClassifiedAd);
+        var handleResponse = classifiedAdService.handle(updateClassifiedAd);
         assertThat(handleResponse).isNotNull();
         assertThat(handleResponse.result).isNotNull();
         assertThat(handleResponse.isSuccessful()).isTrue();
-        assertThat(expectedClassifiedAd.getChanges()).hasSize(4);
+        AssertionsForInterfaceTypes.assertThat(expectedClassifiedAd.getChanges()).hasSize(4);
     }
 
     @Test
@@ -110,11 +114,11 @@ class UpdateClassifiedAdCommandHandlerTest {
         updateClassifiedAd.setId(UUID.fromString(uuidString));
         updateClassifiedAd.setText("test text");
 
-        var handleResponse = commandHandler.handle(updateClassifiedAd);
+        var handleResponse = classifiedAdService.handle(updateClassifiedAd);
         assertThat(handleResponse).isNotNull();
         assertThat(handleResponse.result).isNotNull();
         assertThat(handleResponse.isSuccessful()).isTrue();
-        assertThat(expectedClassifiedAd.getChanges()).hasSize(2);
+        AssertionsForInterfaceTypes.assertThat(expectedClassifiedAd.getChanges()).hasSize(2);
     }
 
     @Test
@@ -133,7 +137,7 @@ class UpdateClassifiedAdCommandHandlerTest {
         assertThat(found).isPresent();
 
         ClassifiedAd foundClassifiedAd = found.get();
-        assertThat(foundClassifiedAd.getChanges()).hasSize(1);
+        AssertionsForInterfaceTypes.assertThat(foundClassifiedAd.getChanges()).hasSize(1);
         assertThat(foundClassifiedAd.getId()).isEqualTo(classifiedAdId);
         assertThat(foundClassifiedAd.getOwnerId()).isEqualTo(ownerId);
     }

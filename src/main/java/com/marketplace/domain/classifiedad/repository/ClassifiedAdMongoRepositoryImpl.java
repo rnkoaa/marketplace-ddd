@@ -39,7 +39,7 @@ public class ClassifiedAdMongoRepositoryImpl implements ClassifiedAdRepository {
     @Override
     public ClassifiedAd add(ClassifiedAd entity) {
         var classifiedAdEntity = new ClassifiedAdEntity(entity);
-        ClassifiedAdEntity save = mongoTemplate.save(classifiedAdEntity, collectionName, ClassifiedAdEntity.class);
+        ClassifiedAdEntity save = mongoTemplate.add(classifiedAdEntity, entity.getId().id(), collectionName, ClassifiedAdEntity.class);
         if (save != null) {
             return entity;
         }
