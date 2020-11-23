@@ -45,7 +45,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
         String hosts = mongoDBContainer.getHost();
         int port = mongoDBContainer.getMappedPort(27017);
         mongoConfig = new MongoConfig(hosts, "test_db", port);
-        config.setMongoConfig(mongoConfig);
+        config.setMongo(mongoConfig);
         mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
         userProfileRepository = context.getUserProfileRepository();
     }

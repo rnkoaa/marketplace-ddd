@@ -49,6 +49,10 @@ public class SparkServer {
                 MEDIA_APPLICATION_JSON,
                 classifiedAdSparkRoutes.updateClassifiedAdText());
 
+        Spark.put("/classified_ad/:classifiedAdId/price",
+                MEDIA_APPLICATION_JSON,
+                classifiedAdSparkRoutes.updateClassifiedAdPrice());
+
         Spark.put("/classified_ad/:classifiedAdId/approve",
                 MEDIA_APPLICATION_JSON,
                 classifiedAdSparkRoutes.approveClassifiedAd());
@@ -56,6 +60,10 @@ public class SparkServer {
         Spark.put("/classified_ad/:classifiedAdId/publish",
                 MEDIA_APPLICATION_JSON,
                 classifiedAdSparkRoutes.publishClassifiedAd());
+
+        Spark.put("/classified_ad/:classifiedAdId/pictures",
+                MEDIA_APPLICATION_JSON,
+                classifiedAdSparkRoutes.addPictureToClassifiedAd());
 
         System.out.println("Spark Server is running on port :" + Spark.port());
     }

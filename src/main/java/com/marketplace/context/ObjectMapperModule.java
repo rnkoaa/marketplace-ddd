@@ -14,7 +14,7 @@ import dagger.Provides;
 import javax.inject.Singleton;
 
 @Module
-public class ObjectMapperModule {
+public abstract class ObjectMapperModule {
     @Provides
     @Singleton
     public static ObjectMapper provideObjectMapper() {
@@ -27,6 +27,8 @@ public class ObjectMapperModule {
 
         // Ignore null values when writing json.
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
+//        objectMapper.configure(SerializationFeature., true);
 
         // Write times as a String instead of a Long so its human readable.
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);

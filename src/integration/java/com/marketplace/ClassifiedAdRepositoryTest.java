@@ -28,7 +28,7 @@ public class ClassifiedAdRepositoryTest extends BaseMongoRepositoryTest {
         classifiedAd.updateText(new ClassifiedAdText("Snow Blower for sale for Cheap"));
         classifiedAd.updatePrice(new Price(Money.fromDecimal(4.59, "USD")));
         classifiedAd.addPicture("uri", new PictureSize(800, 600), 0);
-        classifiedAd.setState(ClassifiedAdState.active);
+        classifiedAd.setState(ClassifiedAdState.ACTIVE);
 
         ClassifiedAd savedClassifiedAd = classifiedAdRepository.add(classifiedAd);
 

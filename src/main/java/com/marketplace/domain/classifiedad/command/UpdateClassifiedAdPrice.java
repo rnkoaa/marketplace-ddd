@@ -17,6 +17,6 @@ import java.util.UUID;
 @Builder
 public class UpdateClassifiedAdPrice implements Command {
     private UUID id;
-    private BigDecimal price;
-    private Currency currency;
+    private BigDecimal amount;
+    private String currency;
 }

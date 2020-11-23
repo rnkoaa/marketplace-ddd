@@ -15,7 +15,7 @@ java {
 }
 
 
-group 'com.richard.agyei'
+group 'com.marketplace'
 version '1.0.0-SNAPSHOT'
 
 repositories {
@@ -63,6 +63,7 @@ configurations {
 
 dependencies {
     compile project(":config")
+    compile project(":common")
 
     implementation("com.sparkjava:spark-core:2.9.3")
 

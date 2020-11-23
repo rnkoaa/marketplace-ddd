@@ -3,17 +3,27 @@ package com.marketplace.domain.classifiedad;
 import com.marketplace.domain.InvalidStateException;
 import com.marketplace.domain.PictureId;
 import com.marketplace.domain.PictureSize;
-import com.marketplace.domain.classifiedad.events.*;
+import com.marketplace.domain.classifiedad.events.ClassifiedAdCreated;
+import com.marketplace.domain.classifiedad.events.ClassifiedAdPictureResized;
+import com.marketplace.domain.classifiedad.events.ClassifiedAdPriceUpdated;
+import com.marketplace.domain.classifiedad.events.ClassifiedAdSentForReview;
+import com.marketplace.domain.classifiedad.events.ClassifiedAdTextUpdated;
+import com.marketplace.domain.classifiedad.events.ClassifiedAdTitleChanged;
+import com.marketplace.domain.classifiedad.events.ClassifiedApproved;
+import com.marketplace.domain.classifiedad.events.PictureAddedToAClassifiedAd;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.event.Event;
 import com.marketplace.event.EventId;
 import com.marketplace.framework.AggregateRoot;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.*;
 
 @Setter
 @Getter
@@ -136,17 +146,17 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
     if (event instanceof ClassifiedAdCreated e) {
       this.id = ClassifiedAdId.from(e.getId());
       this.ownerId = new UserId(e.getUserId());
-      this.state = ClassifiedAdState.inactive;
+      this.state = ClassifiedAdState.INACTIVE;
     } else if (event instanceof ClassifiedAdTextUpdated e) {
-      this.text = new ClassifiedAdText(e.getAdText());
+      this.text = new ClassifiedAdText(e.getText());
     } else if (event instanceof ClassifiedAdPriceUpdated e) {
       this.price = new Price(new Money(e.getPrice(), e.getCurrencyCode()));
     } else if (event instanceof ClassifiedAdTitleChanged e) {
       this.title = new ClassifiedAdTitle(e.getTitle());
     } else if (event instanceof ClassifiedAdSentForReview e) {
-      this.state = ClassifiedAdState.pendingReview;
+      this.state = ClassifiedAdState.PENDING_REVIEW;
     } else if (event instanceof ClassifiedApproved e) {
-      this.state = ClassifiedAdState.approved;
+      this.state = ClassifiedAdState.APPROVED;
       this.approvedBy = UserId.from(e.getUserId());
     } else if (event instanceof PictureAddedToAClassifiedAd e) {
       var picture = new Picture(this);
@@ -165,13 +175,13 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
     boolean foundBadPictures = /*pictures.size() == 0 ||*/ pictures.stream().anyMatch(p -> !p.hasCorrectSize());
 
     valid = valid && switch (this.state) {
-      case pendingReview -> title != null && text != null
+      case PENDING_REVIEW -> title != null && text != null
           && price != null
           && price.money() != null
           && price.money().amount().doubleValue() > 0
           && !foundBadPictures;
-      case inactive, markedAsSold -> !foundBadPictures;
-      case active, approved -> title != null
+      case INACTIVE, MARKED_AS_SOLD -> !foundBadPictures;
+      case ACTIVE, APPROVED -> title != null
           && text != null
           && price != null
           && price.money() != null

@@ -2,4 +2,6 @@ rootProject.name = 'marketplace'
 include 'config'
 include 'annotations'
 include 'annotations-compiler'
+include 'client'
+include 'common'
 

@@ -1,4 +1,4 @@
-package com.marketplace.domain.classifiedad;
+package com.marketplace.client.model;
 
 public enum ClassifiedAdState {
   PENDING_REVIEW,

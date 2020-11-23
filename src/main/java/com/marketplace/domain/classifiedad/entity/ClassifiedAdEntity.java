@@ -81,7 +81,7 @@ public class ClassifiedAdEntity implements MongoEntity {
       classifiedAd.approve(new UserId(approvedBy));
     }
 
-    if (state == ClassifiedAdState.pendingReview) {
+    if (state == ClassifiedAdState.PENDING_REVIEW) {
       classifiedAd.requestToPublish();
     }
     return classifiedAd;

@@ -73,11 +73,11 @@ public class ClassifiedAdFullScenarioTest extends BaseMongoRepositoryTest {
     assertThat(thirdClassifiedAd.getText().value()).isNotBlank().contains("2018 Mac mini");
     assertThat(thirdClassifiedAd.getTitle().value()).isNotBlank().contains("2018 Mac Mini");
 
-    // update title
+    // update price
     classifiedAdService.handle(UpdateClassifiedAdPrice.builder()
         .id(classifiedAdIdUuid)
-        .currency(new Currency("USD", true, 2))
-        .price(new BigDecimal("10.50"))
+        .currency("USD")
+        .amount(new BigDecimal("10.50"))
         .build());
 
     Optional<ClassifiedAd> fourthMaybe = classifiedAdService.findById(ClassifiedAdId.from(classifiedAdIdUuid));
@@ -90,7 +90,7 @@ public class ClassifiedAdFullScenarioTest extends BaseMongoRepositoryTest {
     assertThat(fourthClassifiedAd.getPrice().money()).isNotNull();
     assertThat(fourthClassifiedAd.getPrice().money().amount()).isNotNull().isEqualTo(new BigDecimal("10.50"));
 
-    // update title
+    // update approve
     classifiedAdService.handle(ApproveClassifiedAd.builder()
         .approverId(approverIdUuid)
         .id(classifiedAdIdUuid)
@@ -103,8 +103,9 @@ public class ClassifiedAdFullScenarioTest extends BaseMongoRepositoryTest {
     assertThat(fifthClassifiedAd.getText()).isNotNull();
     assertThat(fifthClassifiedAd.getTitle()).isNotNull();
     assertThat(fifthClassifiedAd.getApprovedBy()).isNotNull();
-    assertThat(fifthClassifiedAd.getState()).isEqualTo(ClassifiedAdState.approved);// update title
+    assertThat(fifthClassifiedAd.getState()).isEqualTo(ClassifiedAdState.APPROVED);// update title
 
+    // publish
     classifiedAdService.handle(PublishClassifiedAd.builder().id(classifiedAdIdUuid).build());
     TimeUnit.MILLISECONDS.sleep(200);
 
@@ -112,7 +113,7 @@ public class ClassifiedAdFullScenarioTest extends BaseMongoRepositoryTest {
     assertThat(sixthMaybe).isPresent();
     ClassifiedAd sixthClassifiedAd = sixthMaybe.get();
     assertThat(sixthClassifiedAd.getChanges()).hasSize(6);
-    assertThat(sixthClassifiedAd.getState()).isEqualTo(ClassifiedAdState.pendingReview);
+    assertThat(sixthClassifiedAd.getState()).isEqualTo(ClassifiedAdState.PENDING_REVIEW);
 
   }
 }
