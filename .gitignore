@@ -3,6 +3,8 @@
 .project
 .settings/
 .idea/
+!.idea/httpRequests/http-requests-log.http
+
 marketplace.iml
 marketplace.ipr
 marketplace.iws
