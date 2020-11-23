@@ -21,7 +21,9 @@ public class ClassifiedAdService {
     }
 
     public CommandHandlerResult<CreateAdResponse> handle(CreateClassifiedAd command) {
-        var classifiedAdId = new ClassifiedAdId();
+        ClassifiedAdId classifiedAdId = (command.getId() == null)
+                ? new ClassifiedAdId() : ClassifiedAdId.from(command.getId());
+
         var ownerId = new UserId(command.getOwnerId());
         var classifiedAd = new ClassifiedAd(classifiedAdId, ownerId);
 

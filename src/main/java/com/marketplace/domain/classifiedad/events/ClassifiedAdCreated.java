@@ -16,7 +16,6 @@ public class ClassifiedAdCreated implements Event {
     UUID id;
     UUID userId;
 
-
     public ClassifiedAdCreated(UUID id, UUID userId) {
         this.id = id;
         this.userId = userId;

@@ -33,6 +33,13 @@ sourceSets {
         compileClasspath += main.output + test.output
         runtimeClasspath += main.output + test.output
     }
+
+    functional {
+        java.srcDir "$projectDir/src/functional/groovy"
+        resources.srcDir "$projectDir/src/functional/resources"
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
 }
 
 configurations {
@@ -43,6 +50,12 @@ configurations {
         extendsFrom testImplementation
     }
     integrationRuntime {
+        extendsFrom testRuntime
+    }
+    functionalImplementation {
+        extendsFrom testImplementation
+    }
+    functionalRuntime {
         extendsFrom testRuntime
     }
 }
@@ -118,12 +131,19 @@ task integrationTest(type: Test) {
     testClassesDirs = sourceSets.integration.output.classesDirs
     classpath = sourceSets.integration.runtimeClasspath
 }
-
-//tasks.withType(integrationTest) {
-//    jvmArgs += "--enable-preview"
-//}
+task functionalTest(type: Test) {
+    testClassesDirs = sourceSets.functional.output.classesDirs
+    classpath = sourceSets.functional.runtimeClasspath
+}
 
 integrationTest {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+functionalTest {
     useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"
@@ -133,7 +153,6 @@ integrationTest {
 check.dependsOn integrationTest
 
 subprojects {
-
     repositories {
         mavenLocal()
         mavenCentral()

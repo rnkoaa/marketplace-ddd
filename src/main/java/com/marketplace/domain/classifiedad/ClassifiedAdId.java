@@ -17,6 +17,10 @@ public record ClassifiedAdId(UUID id) {
         return new ClassifiedAdId(UUID.randomUUID());
     }
 
+    public static ClassifiedAdId from(UUID value) {
+        return new ClassifiedAdId(value);
+    }
+
     @Override
     public String toString() {
         return id.toString();

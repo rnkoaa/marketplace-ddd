@@ -4,6 +4,7 @@ import com.marketplace.domain.PictureId;
 import com.marketplace.domain.PictureSize;
 import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.shared.UserId;
+import com.marketplace.framework.Strings;
 import com.marketplace.mongo.entity.MongoEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,8 +58,12 @@ public class ClassifiedAdEntity implements MongoEntity {
 
     public ClassifiedAd toClassifiedAd() {
         ClassifiedAd classifiedAd = new ClassifiedAd(new ClassifiedAdId(id), new UserId(owner));
-        classifiedAd.updateText(new ClassifiedAdText(text));
-        classifiedAd.updateTitle(new ClassifiedAdTitle(title));
+        if (!Strings.isNullOrEmpty(text)) {
+            classifiedAd.updateText(new ClassifiedAdText(text));
+        }
+        if (!Strings.isNullOrEmpty(title)) {
+            classifiedAd.updateTitle(new ClassifiedAdTitle(title));
+        }
         if (price != null) {
             classifiedAd.updatePrice(price);
         }
