@@ -1,18 +1,19 @@
 package com.marketplace.domain.classifiedad;
 
 public enum ClassifiedAdState {
-    pendingReview,
-    active,
-    inactive,
-    markedAsSold;
+  PENDING_REVIEW,
+  ACTIVE,
+  INACTIVE,
+  MARKED_AS_SOLD,
+  APPROVED;
 
-    static ClassifiedAdState fromString(String name) {
-        return switch (name) {
-            case "pendingReview" -> pendingReview;
-            case "active" -> active;
-            case "inactive" -> inactive;
-            case "markedAsSold" -> markedAsSold;
-            default -> inactive;
-        };
-    }
+  static ClassifiedAdState fromString(String name) {
+    return switch (name) {
+      case "PENDING_REVIEW" -> PENDING_REVIEW;
+      case "ACTIVE" -> ACTIVE;
+      case "INACTIVE" -> INACTIVE;
+      case "MARKED_AS_SOLD" -> MARKED_AS_SOLD;
+      default -> INACTIVE;
+    };
+  }
 }

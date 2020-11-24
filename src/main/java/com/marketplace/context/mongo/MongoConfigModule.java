@@ -27,7 +27,7 @@ public class MongoConfigModule {
     @Provides
     @Singleton
     public static MongoConfig provideMongoConfig(ApplicationConfig applicationConfig) {
-        return applicationConfig.getMongoConfig();
+        return applicationConfig.getMongo();
     }
 
     @Provides

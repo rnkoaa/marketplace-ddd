@@ -30,7 +30,6 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
     String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
     MongoConfig mongoConfig;
     MongoClient mongoClient;
-    MongoCollection<UserProfileEntity> classifiedAdCollection;
     ApplicationContext context;
     UserProfileRepository userProfileRepository;
 
@@ -46,7 +45,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
         String hosts = mongoDBContainer.getHost();
         int port = mongoDBContainer.getMappedPort(27017);
         mongoConfig = new MongoConfig(hosts, "test_db", port);
-        config.setMongoConfig(mongoConfig);
+        config.setMongo(mongoConfig);
         mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
         userProfileRepository = context.getUserProfileRepository();
     }

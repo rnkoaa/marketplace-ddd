@@ -14,7 +14,6 @@ import java.util.UUID;
 public class AddPictureResponse {
     UUID id;
     UUID classifiedAdId;
-
     boolean status;
     String message;
 }

@@ -38,7 +38,7 @@ public class ClassifiedAdTest {
         classifiedAd.updatePrice(new Price(Money.fromDecimal(100, "EUR", new FakeCurrencyLookup())));
 
         classifiedAd.requestToPublish();
-        assertThat(classifiedAd.getState()).isEqualTo(ClassifiedAdState.pendingReview);
+        assertThat(classifiedAd.getState()).isEqualTo(ClassifiedAdState.PENDING_REVIEW);
 
         assertThat(classifiedAd.getChanges().size()).isEqualTo(5);
     }
