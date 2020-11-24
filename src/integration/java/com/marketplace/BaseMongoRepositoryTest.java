@@ -7,7 +7,7 @@ import com.marketplace.context.DaggerApplicationContext;
 import com.marketplace.context.mongo.MongoConfig;
 import com.marketplace.context.mongo.MongoConfigModule;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
-import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
+import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -24,7 +24,7 @@ public abstract class BaseMongoRepositoryTest extends AbstractContainerInitializ
   MongoClient mongoClient;
   MongoCollection<ClassifiedAd> classifiedAdCollection;
   ApplicationContext context;
-  ClassifiedAdRepository classifiedAdRepository;
+  ClassifiedAdCommandRepository classifiedAdCommandRepository;
   ClassifiedAdService classifiedAdService;
 
   @BeforeEach
@@ -43,7 +43,7 @@ public abstract class BaseMongoRepositoryTest extends AbstractContainerInitializ
     mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
     classifiedAdCollection = MongoConfigModule.provideMongoDatabase(mongoClient, mongoConfig)
         .getCollection(ClassifiedAd.class.getSimpleName().toLowerCase(), ClassifiedAd.class);
-    classifiedAdRepository = context.getClassifiedAdRepository();
+    classifiedAdCommandRepository = context.getClassifiedAdRepository();
     classifiedAdService = context.getClassifiedAdService();
   }
 

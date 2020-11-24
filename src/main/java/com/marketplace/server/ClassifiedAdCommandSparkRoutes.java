@@ -3,15 +3,12 @@ package com.marketplace.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.domain.classifiedad.ClassifiedAd;
-import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import com.marketplace.domain.classifiedad.CommandHandlerResult;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdPrice;
 import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
-import com.marketplace.domain.classifiedad.read.ClassifiedAdReadEntity;
+import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryEntity;
 import com.marketplace.framework.Strings;
 import spark.Request;
 import spark.Route;
@@ -28,7 +25,7 @@ import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
 
 @Singleton
 @Named
-public class ClassifiedAdSparkRoutes {
+public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
 
   public static final String HEADER_CONTENT_TYPE = "Content-Type";
   public static final String NO_CONTENT = "";
@@ -36,7 +33,7 @@ public class ClassifiedAdSparkRoutes {
   private final ClassifiedAdController classifiedAdController;
 
   @Inject
-  public ClassifiedAdSparkRoutes(ObjectMapper objectMapper, ClassifiedAdController classifiedAdController) {
+  public ClassifiedAdCommandSparkRoutes(ObjectMapper objectMapper, ClassifiedAdController classifiedAdController) {
     this.objectMapper = objectMapper;
     this.classifiedAdController = classifiedAdController;
   }
@@ -90,27 +87,6 @@ public class ClassifiedAdSparkRoutes {
         response.status(502);
       }
       return null;
-    };
-  }
-
-  public Route findClassifiedAdById() {
-    return (request, response) -> {
-      String classifiedAdId = getClassifiedIdFromRequest(request);
-      Optional<ClassifiedAdReadEntity> mayBe = classifiedAdController
-          .findEntityById(UUID.fromString(classifiedAdId));
-      return mayBe.map(classifiedAd -> {
-        String result = null;
-        try {
-          result = objectMapper.writeValueAsString(classifiedAd);
-          response.status(200);
-        } catch (JsonProcessingException e) {
-          e.printStackTrace();
-        }
-        return result;
-      }).orElseGet(() -> {
-        response.status(404);
-        return null;
-      });
     };
   }
 
@@ -314,10 +290,6 @@ public class ClassifiedAdSparkRoutes {
         return s;
       }
     };
-  }
-
-  private String getClassifiedIdFromRequest(Request req) {
-    return req.params(":classifiedAdId");
   }
 
   private UpdateClassifiedAd read(Request req) throws IOException {

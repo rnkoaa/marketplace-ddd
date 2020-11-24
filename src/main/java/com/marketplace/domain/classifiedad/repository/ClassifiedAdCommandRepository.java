@@ -7,7 +7,7 @@ import com.marketplace.domain.repository.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface ClassifiedAdRepository extends Repository<ClassifiedAd, ClassifiedAdId> {
+public interface ClassifiedAdCommandRepository extends Repository<ClassifiedAd, ClassifiedAdId> {
 //    /**
 //     * @param id
 //     * @return

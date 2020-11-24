@@ -6,10 +6,10 @@ import com.marketplace.domain.repository.RedisTemplate;
 
 import java.util.Optional;
 
-public class ClassifiedAdRedisRepositoryImpl implements ClassifiedAdRepository {
+public class ClassifiedAdRedisCommandRepositoryImpl implements ClassifiedAdCommandRepository {
     private final RedisTemplate redisTemplate;
 
-    public ClassifiedAdRedisRepositoryImpl(RedisTemplate redisTemplate) {
+    public ClassifiedAdRedisCommandRepositoryImpl(RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 

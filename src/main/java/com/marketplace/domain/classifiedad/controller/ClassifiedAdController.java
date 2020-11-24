@@ -1,36 +1,32 @@
 package com.marketplace.domain.classifiedad.controller;
 
-import com.marketplace.domain.classifiedad.ClassifiedAd;
-import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import com.marketplace.domain.classifiedad.CommandHandlerResult;
-import com.marketplace.domain.classifiedad.command.ApproveClassifiedAd;
-import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
-import com.marketplace.domain.classifiedad.command.PublishClassifiedAd;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
+import com.marketplace.domain.classifiedad.command.*;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdOwner;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdPrice;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdText;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdTitle;
-import com.marketplace.domain.classifiedad.read.ClassifiedAdReadEntity;
-import com.marketplace.domain.classifiedad.read.ClassifiedAdReadService;
+import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryEntity;
+import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryService;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.inject.Inject;
 
+@Named
+@Singleton
 public class ClassifiedAdController {
 
   private final ClassifiedAdService classifiedAdService;
-  private final ClassifiedAdReadService classifiedAdReadService;
+  private final ClassifiedAdQueryService classifiedAdQueryService;
 
   @Inject
   public ClassifiedAdController(ClassifiedAdService classifiedAdService,
-      ClassifiedAdReadService classifiedAdReadService) {
+      ClassifiedAdQueryService classifiedAdQueryService) {
     this.classifiedAdService = classifiedAdService;
-    this.classifiedAdReadService = classifiedAdReadService;
+    this.classifiedAdQueryService = classifiedAdQueryService;
   }
 
   public CommandHandlerResult<CreateAdResponse> createAd(CreateClassifiedAd createClassifiedAd) {
@@ -49,12 +45,9 @@ public class ClassifiedAdController {
     return classifiedAdService.handle(resizeClassifiedAdPicture);
   }
 
-  public Optional<ClassifiedAd> findClassifiedAdById(ClassifiedAdId classifiedAdId) {
-    return classifiedAdService.findById(classifiedAdId);
-  }
 
-  public Optional<ClassifiedAdReadEntity> findEntityById(UUID classifiedAdId) {
-    return classifiedAdReadService.findById(classifiedAdId);
+  public Optional<ClassifiedAdQueryEntity> findEntityById(UUID classifiedAdId) {
+    return classifiedAdQueryService.findById(classifiedAdId);
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> updateClassifiedAdOwner(UUID classifiedAdId, UUID ownerId) {

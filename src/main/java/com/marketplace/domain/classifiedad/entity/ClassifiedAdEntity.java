@@ -10,7 +10,7 @@ import com.marketplace.domain.classifiedad.ClassifiedAdTitle;
 import com.marketplace.domain.classifiedad.Price;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PriceDto;
-import com.marketplace.domain.classifiedad.read.ClassifiedAdReadEntity;
+import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryEntity;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.framework.Strings;
 import com.marketplace.mongo.entity.MongoEntity;
@@ -98,8 +98,8 @@ public class ClassifiedAdEntity implements MongoEntity {
     return ClassifiedAd.class.getSimpleName().toLowerCase();
   }
 
-  public ClassifiedAdReadEntity toClassifiedAdReadEntity() {
-    var builder = ClassifiedAdReadEntity.builder();
+  public ClassifiedAdQueryEntity toClassifiedAdReadEntity() {
+    var builder = ClassifiedAdQueryEntity.builder();
     builder
         .id(id)
         .text(text).title(title)

@@ -2,7 +2,7 @@ package com.marketplace.domain.classifiedad.service;
 
 import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
-import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
+import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.shared.UserId;
 import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,23 +21,23 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class ClassifiedAdServiceTest {
 
     @Mock
-    ClassifiedAdRepository classifiedAdRepository;
+    ClassifiedAdCommandRepository classifiedAdCommandRepository;
 
     ClassifiedAdService classifiedAdService;
 
 
     @BeforeEach
     void setup() {
-        classifiedAdService = new ClassifiedAdService(classifiedAdRepository);
+        classifiedAdService = new ClassifiedAdService(classifiedAdCommandRepository);
     }
 
     @Test
     void canBeSaved() {
         var classifiedAd = new ClassifiedAd(new ClassifiedAdId(UUID.randomUUID()), new UserId(UUID.randomUUID()));
 
-        Mockito.when(classifiedAdRepository.add(classifiedAd)).thenReturn(classifiedAd);
+        Mockito.when(classifiedAdCommandRepository.add(classifiedAd)).thenReturn(classifiedAd);
 
-        var saved = classifiedAdRepository.add(classifiedAd);
+        var saved = classifiedAdCommandRepository.add(classifiedAd);
         assertThat(saved).isNotNull().isEqualTo(classifiedAd);
     }
 
@@ -53,8 +53,8 @@ class ClassifiedAdServiceTest {
         expectedClassifiedAd.updateText(new ClassifiedAdText("test text"));
         expectedClassifiedAd.updateTitle(new ClassifiedAdTitle("test title"));
 
-        Mockito.when(classifiedAdRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))).thenReturn(Optional.of(classifiedAd));
-        Mockito.when(classifiedAdRepository.add(classifiedAd)).thenReturn(expectedClassifiedAd);
+        Mockito.when(classifiedAdCommandRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))).thenReturn(Optional.of(classifiedAd));
+        Mockito.when(classifiedAdCommandRepository.add(classifiedAd)).thenReturn(expectedClassifiedAd);
 
         var updateClassifiedAd = new UpdateClassifiedAd();
         updateClassifiedAd.setId(UUID.fromString(uuidString));
@@ -81,8 +81,8 @@ class ClassifiedAdServiceTest {
         expectedClassifiedAd.updateTitle(new ClassifiedAdTitle("test title"));
         expectedClassifiedAd.updatePrice(new Price(Money.fromDecimal(10.0, "USD")));
 
-        Mockito.when(classifiedAdRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))).thenReturn(Optional.of(classifiedAd));
-        Mockito.when(classifiedAdRepository.add(classifiedAd)).thenReturn(expectedClassifiedAd);
+        Mockito.when(classifiedAdCommandRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))).thenReturn(Optional.of(classifiedAd));
+        Mockito.when(classifiedAdCommandRepository.add(classifiedAd)).thenReturn(expectedClassifiedAd);
 
         var updateClassifiedAd = new UpdateClassifiedAd();
         updateClassifiedAd.setId(UUID.fromString(uuidString));
@@ -107,8 +107,8 @@ class ClassifiedAdServiceTest {
         var expectedClassifiedAd = new ClassifiedAd(classifiedAdId, ownerId);
         expectedClassifiedAd.updateText(new ClassifiedAdText("test text"));
 
-        Mockito.when(classifiedAdRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))).thenReturn(Optional.of(classifiedAd));
-        Mockito.when(classifiedAdRepository.add(classifiedAd)).thenReturn(expectedClassifiedAd);
+        Mockito.when(classifiedAdCommandRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))).thenReturn(Optional.of(classifiedAd));
+        Mockito.when(classifiedAdCommandRepository.add(classifiedAd)).thenReturn(expectedClassifiedAd);
 
         var updateClassifiedAd = new UpdateClassifiedAd();
         updateClassifiedAd.setId(UUID.fromString(uuidString));
@@ -130,9 +130,9 @@ class ClassifiedAdServiceTest {
         var classifiedAd = new ClassifiedAd(classifiedAdId, ownerId);
 
 
-        Mockito.when(classifiedAdRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))).thenReturn(Optional.of(classifiedAd));
+        Mockito.when(classifiedAdCommandRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))).thenReturn(Optional.of(classifiedAd));
 
-        var found = classifiedAdRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)));
+        var found = classifiedAdCommandRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)));
 
         assertThat(found).isPresent();
 

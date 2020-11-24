@@ -5,7 +5,7 @@ import com.marketplace.domain.classifiedad.ClassifiedAdId;
 
 import java.util.*;
 
-public class ClassifiedAdRepositoryImpl implements ClassifiedAdRepository {
+public class ClassifiedAdCommandRepositoryImpl implements ClassifiedAdCommandRepository {
     Map<ClassifiedAdId, ClassifiedAd> cache = new HashMap<>();
 
     @Override

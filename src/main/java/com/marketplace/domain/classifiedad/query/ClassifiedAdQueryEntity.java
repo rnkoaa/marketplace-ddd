@@ -1,4 +1,4 @@
-package com.marketplace.domain.classifiedad.read;
+package com.marketplace.domain.classifiedad.query;
 
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ClassifiedAdReadEntity {
+public class ClassifiedAdQueryEntity {
 
   private UUID id;
   private UUID ownerId;

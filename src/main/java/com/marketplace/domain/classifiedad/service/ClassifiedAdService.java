@@ -6,7 +6,7 @@ import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.command.*;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
 import com.marketplace.domain.classifiedad.controller.*;
-import com.marketplace.domain.classifiedad.repository.ClassifiedAdRepository;
+import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.framework.Strings;
 
@@ -16,11 +16,11 @@ import java.util.Optional;
 
 public class ClassifiedAdService {
 
-  private final ClassifiedAdRepository classifiedAdRepository;
+  private final ClassifiedAdCommandRepository classifiedAdCommandRepository;
 
   @Inject
-  public ClassifiedAdService(ClassifiedAdRepository classifiedAdRepository) {
-    this.classifiedAdRepository = classifiedAdRepository;
+  public ClassifiedAdService(ClassifiedAdCommandRepository classifiedAdCommandRepository) {
+    this.classifiedAdCommandRepository = classifiedAdCommandRepository;
   }
 
   public CommandHandlerResult<CreateAdResponse> handle(CreateClassifiedAd command) {
@@ -38,7 +38,7 @@ public class ClassifiedAdService {
       classifiedAd.updateText(new ClassifiedAdText(command.getText()));
     }
 
-    var saved = classifiedAdRepository.add(classifiedAd);
+    var saved = classifiedAdCommandRepository.add(classifiedAd);
     if (saved == null) {
       return new CommandHandlerResult<>(null, false, "failed to save classifiedAd");
     }
@@ -48,7 +48,7 @@ public class ClassifiedAdService {
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAd command) {
-    Optional<ClassifiedAd> mayBe = classifiedAdRepository.load(new ClassifiedAdId(command.getId()));
+    Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getId()));
     return mayBe.map(classifiedAd -> {
       if (command.getOwnerId() != null) {
         classifiedAd.updateOwner(new UserId(command.getOwnerId()));
@@ -69,7 +69,7 @@ public class ClassifiedAdService {
         classifiedAd.approve(new UserId(command.getApprovedBy()));
       }
 
-      return classifiedAdRepository.add(classifiedAd);
+      return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> {
       var updateResponse = new UpdateClassifiedAdResponse();
       return new CommandHandlerResult<>(updateResponse, true, "");
@@ -77,14 +77,14 @@ public class ClassifiedAdService {
   }
 
   public AddPictureResponse handle(AddPictureToClassifiedAd addPictureToClassifiedAd) {
-    Optional<ClassifiedAd> load = classifiedAdRepository.load(new ClassifiedAdId(addPictureToClassifiedAd.getId()));
+    Optional<ClassifiedAd> load = classifiedAdCommandRepository.load(new ClassifiedAdId(addPictureToClassifiedAd.getId()));
 
     return load.map(classifiedAd -> {
 
       PictureSize pictureSize = new PictureSize(addPictureToClassifiedAd.getWidth(), addPictureToClassifiedAd.getHeight());
       var pictureId = classifiedAd.addPicture(addPictureToClassifiedAd.getUri(), pictureSize, 0);
 
-      var savedClassifiedAd = classifiedAdRepository.add(classifiedAd);
+      var savedClassifiedAd = classifiedAdCommandRepository.add(classifiedAd);
 
       return AddPictureResponse.builder()
           .id(pictureId.id())
@@ -94,12 +94,12 @@ public class ClassifiedAdService {
   }
 
   public ResizePictureResponse handle(ResizeClassifiedAdPicture pictureDto) {
-    Optional<ClassifiedAd> load = classifiedAdRepository.load(new ClassifiedAdId(pictureDto.getClassifiedAdId()));
+    Optional<ClassifiedAd> load = classifiedAdCommandRepository.load(new ClassifiedAdId(pictureDto.getClassifiedAdId()));
 
     return load.map(classifiedAd -> {
       PictureSize pictureSize = new PictureSize(pictureDto.getWidth(), pictureDto.getHeight());
       var pictureId = classifiedAd.resizePicture(new PictureId(pictureDto.getId()), pictureSize);
-      var savedClassifiedAd = classifiedAdRepository.add(classifiedAd);
+      var savedClassifiedAd = classifiedAdCommandRepository.add(classifiedAd);
       return ResizePictureResponse.builder()
           .classifiedAdId(savedClassifiedAd.getId().id())
           .id(pictureId.id())
@@ -108,16 +108,16 @@ public class ClassifiedAdService {
   }
 
   public Optional<ClassifiedAd> findById(ClassifiedAdId classifiedAdId) {
-    return classifiedAdRepository.load(classifiedAdId);
+    return classifiedAdCommandRepository.load(classifiedAdId);
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdOwner command) {
-    Optional<ClassifiedAd> mayBe = classifiedAdRepository.load(new ClassifiedAdId(command.getId()));
+    Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getId()));
     return mayBe.map(classifiedAd -> {
       if (command.getOwnerId() != null) {
         classifiedAd.updateOwner(new UserId(command.getOwnerId()));
       }
-      return classifiedAdRepository.add(classifiedAd);
+      return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> {
       var updateResponse = new UpdateClassifiedAdResponse();
       return new CommandHandlerResult<>(updateResponse, true, "");
@@ -125,11 +125,11 @@ public class ClassifiedAdService {
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdTitle command) {
-    Optional<ClassifiedAd> mayBe = classifiedAdRepository.load(new ClassifiedAdId(command.getId()));
+    Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getId()));
     return mayBe.map(classifiedAd -> {
       if (!Strings.isNullOrEmpty(command.getTitle())) {
         classifiedAd.updateTitle(new ClassifiedAdTitle(command.getTitle()));
-        return classifiedAdRepository.add(classifiedAd);
+        return classifiedAdCommandRepository.add(classifiedAd);
       }
       // TODO - throw illegalArgumentException
       return null;
@@ -140,11 +140,11 @@ public class ClassifiedAdService {
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdText command) {
-    Optional<ClassifiedAd> mayBe = classifiedAdRepository.load(new ClassifiedAdId(command.getId()));
+    Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getId()));
     return mayBe.map(classifiedAd -> {
       if (!Strings.isNullOrEmpty(command.getText())) {
         classifiedAd.updateText(new ClassifiedAdText(command.getText()));
-        return classifiedAdRepository.add(classifiedAd);
+        return classifiedAdCommandRepository.add(classifiedAd);
       } else {
         // TODO - throw illegalArgumentException
         return null;
@@ -156,11 +156,11 @@ public class ClassifiedAdService {
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> handle(ApproveClassifiedAd command) {
-    Optional<ClassifiedAd> mayBe = classifiedAdRepository.load(new ClassifiedAdId(command.getId()));
+    Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getId()));
     return mayBe.map(classifiedAd -> {
       if (command.getApproverId() != null) {
         classifiedAd.approve(UserId.from(command.getApproverId()));
-        return classifiedAdRepository.add(classifiedAd);
+        return classifiedAdCommandRepository.add(classifiedAd);
       }
       // TODO - throw illegalArgumentException
       return null;
@@ -171,10 +171,10 @@ public class ClassifiedAdService {
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> handle(PublishClassifiedAd command) {
-    Optional<ClassifiedAd> mayBe = classifiedAdRepository.load(new ClassifiedAdId(command.getId()));
+    Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getId()));
     return mayBe.map(classifiedAd -> {
       classifiedAd.requestToPublish();
-      return classifiedAdRepository.add(classifiedAd);
+      return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> {
       var updateResponse = new UpdateClassifiedAdResponse();
       return new CommandHandlerResult<>(updateResponse, true, "");
@@ -182,11 +182,11 @@ public class ClassifiedAdService {
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdPrice command) {
-    Optional<ClassifiedAd> mayBe = classifiedAdRepository.load(new ClassifiedAdId(command.getId()));
+    Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getId()));
     return mayBe.map(classifiedAd -> {
       Price price = new Price(new Money(command.getAmount(), command.getCurrency()));
       classifiedAd.updatePrice(price);
-      return classifiedAdRepository.add(classifiedAd);
+      return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> {
       var updateResponse = new UpdateClassifiedAdResponse();
       return new CommandHandlerResult<>(updateResponse, true, "");
@@ -195,7 +195,7 @@ public class ClassifiedAdService {
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> handle(AddPicturesToClassifiedAd command) {
-    Optional<ClassifiedAd> mayBe = classifiedAdRepository.load(new ClassifiedAdId(command.getId()));
+    Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getId()));
     return mayBe.map(classifiedAd -> {
 //      Price price = new Price(new Money(command.getAmount(), command.getCurrency()));
       List<PictureDto> pictures = command.getPictures();
@@ -203,7 +203,7 @@ public class ClassifiedAdService {
         var pictureSize = new PictureSize(pic.getWidth(), pic.getHeight());
         classifiedAd.addPicture(pic.getUri(), pictureSize, 0);
       });
-      return classifiedAdRepository.add(classifiedAd);
+      return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> {
       var updateResponse = new UpdateClassifiedAdResponse();
       return new CommandHandlerResult<>(updateResponse, true, "");

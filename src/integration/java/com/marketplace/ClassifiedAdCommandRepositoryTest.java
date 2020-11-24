@@ -13,7 +13,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-public class ClassifiedAdRepositoryTest extends BaseMongoRepositoryTest {
+public class ClassifiedAdCommandRepositoryTest extends BaseMongoRepositoryTest {
     String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
 
     @Test
@@ -30,13 +30,13 @@ public class ClassifiedAdRepositoryTest extends BaseMongoRepositoryTest {
         classifiedAd.addPicture("uri", new PictureSize(800, 600), 0);
         classifiedAd.setState(ClassifiedAdState.ACTIVE);
 
-        ClassifiedAd savedClassifiedAd = classifiedAdRepository.add(classifiedAd);
+        ClassifiedAd savedClassifiedAd = classifiedAdCommandRepository.add(classifiedAd);
 
         assertThat(savedClassifiedAd.getId()).isNotNull();
         assertThat(savedClassifiedAd.getId().id()).isNotNull()
                 .isEqualByComparingTo(UUID.fromString(insertId));
 
-        Optional<ClassifiedAd> load = classifiedAdRepository.load(ClassifiedAdId.fromString(insertId));
+        Optional<ClassifiedAd> load = classifiedAdCommandRepository.load(ClassifiedAdId.fromString(insertId));
 
         assertThat(load).isPresent();
         ClassifiedAd found = load.get();

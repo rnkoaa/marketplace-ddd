@@ -14,13 +14,13 @@ import java.util.stream.Collectors;
 
 @Named
 @Singleton
-public class ClassifiedAdMongoRepositoryImpl implements ClassifiedAdRepository {
+public class ClassifiedAdMongoCommandRepositoryImpl implements ClassifiedAdCommandRepository {
 
   private final MongoTemplate mongoTemplate;
   private final String collectionName = ClassifiedAd.class.getSimpleName().toLowerCase();
 
   @Inject
-  public ClassifiedAdMongoRepositoryImpl(MongoTemplate mongoTemplate) {
+  public ClassifiedAdMongoCommandRepositoryImpl(MongoTemplate mongoTemplate) {
     this.mongoTemplate = mongoTemplate;
   }
 
