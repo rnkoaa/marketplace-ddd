@@ -6,3 +6,5 @@ Java implementation of domain driven design for classified ads ported from [Doma
 - Docker
 - Gradle 
 - junit 5
+
+`![Event Diagram](file)`
