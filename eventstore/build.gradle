@@ -15,8 +15,8 @@ dependencies {
 
     implementation("com.google.guava:guava:30.0-jre")
 
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     testImplementation(platform("org.junit:junit-bom:${junitVersion}"))
+    testImplementation('org.junit.jupiter:junit-jupiter')
     testImplementation("org.assertj:assertj-core:${assertjVersion}")
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
     testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")

@@ -23,10 +23,8 @@ import static org.mockito.Mockito.verify;
 class InMemoryEventStoreTest {
 
   private EventStore<Event> eventStore;
-  private final ClassifiedAdEventProcessor eventProcessor =
-      Mockito.mock(ClassifiedAdEventProcessor.class);
-  private final EventListener classifiedAdEventListener =
-      new ClassifiedAdEventListener(eventProcessor);
+  private final ClassifiedAdEventProcessor eventProcessor = Mockito.mock(ClassifiedAdEventProcessor.class);
+  private final EventListener classifiedAdEventListener = new ClassifiedAdEventListener(eventProcessor);
 
   InMemoryEventPublisher eventPublisher;
 
@@ -146,12 +144,12 @@ class InMemoryEventStoreTest {
     assertThat(eventStore.size()).isEqualTo(1);
 
     EventStream<Event> eventStream = eventStore.load(streamId);
-    assertThat(eventStream.size()).isEqualTo(3);
-    assertThat(eventStream.getVersion()).isEqualTo(2);
+    assertThat(eventStream.size()).isEqualTo(2);
+    assertThat(eventStream.getVersion()).isEqualTo(1);
   }
 
   @Test
-  void publishEventSavesEventAndPublishesEvent() {
+  void publishSavesEventAndPublishes() {
     String classifiedAdId = "9d5d69ee-eadd-4352-942e-47935e194d22";
     String ownerId = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
 
