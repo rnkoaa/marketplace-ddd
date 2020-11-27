@@ -4,4 +4,5 @@ include 'annotations'
 include 'annotations-compiler'
 include 'client'
 include 'common'
+include 'eventstore'
 
