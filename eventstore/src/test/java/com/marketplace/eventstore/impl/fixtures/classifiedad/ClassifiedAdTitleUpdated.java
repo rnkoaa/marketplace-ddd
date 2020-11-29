@@ -29,7 +29,7 @@ public class ClassifiedAdTitleUpdated implements Event {
   }
 
   @Override
-  public UUID aggregateId() {
+  public UUID getAggregateId() {
     return aggregateId;
   }
 

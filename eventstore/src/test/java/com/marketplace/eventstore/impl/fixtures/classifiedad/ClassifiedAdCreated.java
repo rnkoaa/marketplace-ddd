@@ -33,7 +33,7 @@ public class ClassifiedAdCreated implements Event {
   }
 
   @Override
-  public UUID aggregateId() {
+  public UUID getAggregateId() {
     return aggregateId;
   }
 }

@@ -15,4 +15,6 @@ public class AbstractContainerInitializer {
   static void setupAll() {
     mongoDBContainer.start();
   }
+
+
 }

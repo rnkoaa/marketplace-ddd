@@ -5,6 +5,7 @@ import com.marketplace.eventstore.framework.event.EventListener;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ClassifiedAdEventListener implements EventListener {
+  private final ClassifiedAdEventProcessor eventProcessor;
 
   private final ClassifiedAdEventProcessor eventProcessor;
 

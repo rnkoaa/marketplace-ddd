@@ -1,5 +1,6 @@
 package com.marketplace.context.mongo;
 
+import com.marketplace.common.config.MongoConfig;
 import com.marketplace.config.ApplicationConfig;
 import com.marketplace.context.mongo.codec.DisplayNameCodecProviderImpl;
 import com.marketplace.context.mongo.codec.PriceCodecProviderImpl;

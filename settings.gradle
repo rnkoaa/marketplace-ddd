@@ -6,4 +6,6 @@ include 'client'
 include 'common'
 include 'eventstore'
 include 'eventstore-mongodb'
+include 'common-test'
+include 'libs:mongo-config-commons'
 
