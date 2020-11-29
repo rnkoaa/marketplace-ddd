@@ -1,24 +1,16 @@
 package com.marketplace.domain.repository;
 
-import com.marketplace.context.mongo.MongoConfig;
-import com.marketplace.context.mongo.codec.DocumentConverter;
-import com.marketplace.domain.userprofile.entity.UserProfileEntity;
+import com.marketplace.common.config.MongoConfig;
 import com.marketplace.mongo.entity.MongoEntity;
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.*;
 import com.mongodb.client.model.ReplaceOptions;
-import com.mongodb.client.model.UpdateOptions;
-import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import javax.inject.Inject;
-import java.lang.reflect.Field;
 import java.util.*;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 

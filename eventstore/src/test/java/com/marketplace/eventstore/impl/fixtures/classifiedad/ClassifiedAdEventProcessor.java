@@ -4,6 +4,6 @@ import com.marketplace.eventstore.impl.fixtures.classifiedad.query.ClassifiedAdQ
 
 public class ClassifiedAdEventProcessor implements EventProcessor{
     public ClassifiedAdQueryModel create(ClassifiedAdCreated event) {
-        return new ClassifiedAdQueryModel(event.aggregateId(), event.getOwner());
+        return new ClassifiedAdQueryModel(event.getAggregateId(), event.getOwner());
     }
 }

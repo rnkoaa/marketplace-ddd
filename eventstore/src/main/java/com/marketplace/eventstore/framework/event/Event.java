@@ -13,7 +13,7 @@ public interface Event {
   UUID getId();
 
   /** @return the id of the aggregate from which this event was dispatched */
-  UUID aggregateId();
+  UUID getAggregateId();
 
   /** @return name of the class from which this aggregate was published from */
   default String aggregateName() {

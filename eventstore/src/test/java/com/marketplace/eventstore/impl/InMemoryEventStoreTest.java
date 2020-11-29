@@ -146,8 +146,8 @@ class InMemoryEventStoreTest {
     assertThat(eventStore.size()).isEqualTo(1);
 
     EventStream<Event> eventStream = eventStore.load(streamId);
-    assertThat(eventStream.size()).isEqualTo(3);
-    assertThat(eventStream.getVersion()).isEqualTo(2);
+    assertThat(eventStream.size()).isEqualTo(2);
+    assertThat(eventStream.getVersion()).isEqualTo(1);
   }
 
   @Test
