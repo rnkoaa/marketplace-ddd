@@ -21,7 +21,8 @@ public abstract class BaseMongoRepositoryTest extends AbstractContainerInitializ
   static MongoClient mongoClient;
 
   @BeforeAll
-  static void setup() {
+  public static void setup() {
+    System.out.println("BaseMongoRepositoryTest:setup");
     String hosts = mongoDBContainer.getHost();
     int port = mongoDBContainer.getMappedPort(27017);
     mongoConfig = new MongoConfig(hosts, "event_store", port);
