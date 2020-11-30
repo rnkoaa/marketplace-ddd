@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.immutables.criteria.backend.WriteResult;
 import org.reactivestreams.Publisher;
@@ -121,17 +122,9 @@ public class MongoEventStoreRepositoryImpl implements EventStoreRepository<Event
         mongoEventEntityRepository
             .find(MongoEventEntityCriteria.mongoEventEntity.aggregateId.is(aggregateId))
             .select(MongoEventEntityCriteria.mongoEventEntity.version.max())
-            .one();
+            .oneOrNone();
 
-    return Mono.from(publisher)
-        .map(
-            it -> {
-              if (it != null) {
-                return it;
-              }
-              return 0;
-            })
-        .block();
+    return Mono.from(publisher).switchIfEmpty(Mono.just(0)).block();
   }
 
   private MongoEventEntity fromEvent(Event event, UUID aggregateId, int version) {
