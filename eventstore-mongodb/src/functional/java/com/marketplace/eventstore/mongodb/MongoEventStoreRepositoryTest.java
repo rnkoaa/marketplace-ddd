@@ -1,12 +1,17 @@
 package com.marketplace.eventstore.mongodb;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.marketplace.common.ObjectMapperBuilder;
+import com.marketplace.eventstore.annotations.Event;
+import com.marketplace.eventstore.framework.event.EventStore;
 import com.mongodb.reactivestreams.client.MongoDatabase;
+import java.util.UUID;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.immutables.criteria.backend.Backend;
 import org.immutables.criteria.mongo.MongoBackend;
@@ -27,10 +32,11 @@ public class MongoEventStoreRepositoryTest extends BaseMongoRepositoryTest {
 
   static MongoDatabase db;
   static Backend mongoBackend;
+  MongoEventStoreRepositoryImpl eventEventStoreRepository;
 
   @BeforeAll
   static void initializeAll() {
-//    BaseMongoRepositoryTest.setup();
+    //    BaseMongoRepositoryTest.setup();
 
     System.out.println("MongoEventStoreRepositoryTest:setupAll");
     ObjectMapper mapper =
@@ -55,12 +61,20 @@ public class MongoEventStoreRepositoryTest extends BaseMongoRepositoryTest {
   @BeforeEach
   void setupEach() {
     mongoEventEntityRepository = new MongoEventEntityRepository(mongoBackend);
+    eventEventStoreRepository =
+        new MongoEventStoreRepositoryImpl(objectMapper, mongoEventEntityRepository);
   }
 
   @AfterEach
   void cleanUp() throws InterruptedException {
     Flux.from(mongoEventEntityRepository.delete(MongoEventEntityCriteria.mongoEventEntity))
         .blockFirst();
+  }
+
+  @Test
+  void findLastVersionInvalidAggregateId() {
+    int version = eventEventStoreRepository.lastVersion(UUID.randomUUID());
+    assertThat(version).isEqualTo(0);
   }
 
   @Test

@@ -1,9 +1,6 @@
 package com.marketplace.eventstore.mongodb;
 
-import com.marketplace.eventstore.framework.event.Event;
-
 import java.util.List;
-import java.util.UUID;
 
 public interface EventStoreRepository<T, U> {
   List<T> load(U aggregateId, int fromVersion);
