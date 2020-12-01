@@ -3,72 +3,60 @@ package com.marketplace.eventstore.mongodb;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.marketplace.common.ObjectMapperBuilder;
 import com.marketplace.eventstore.framework.event.Event;
 import com.marketplace.eventstore.mongodb.application.event.TestEvent;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import java.util.UUID;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.immutables.criteria.backend.Backend;
-import org.immutables.criteria.mongo.MongoBackend;
-import org.immutables.criteria.mongo.MongoSetup;
-import org.immutables.criteria.mongo.bson4jackson.BsonModule;
-import org.immutables.criteria.mongo.bson4jackson.IdAnnotationModule;
-import org.immutables.criteria.mongo.bson4jackson.JacksonCodecs;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Flux;
 
 @SuppressWarnings("UnstableApiUsage")
 public class MongoEventStoreRepositoryTest extends BaseMongoRepositoryTest {
-  MongoEventEntityRepository mongoEventEntityRepository;
+//  MongoEventEntityRepository mongoEventEntityRepository;
   private static final ObjectMapper objectMapper = new ObjectMapperBuilder().build();
 
   static MongoDatabase db;
-  static Backend mongoBackend;
   MongoEventStoreRepositoryImpl eventStoreRepository;
 
   @BeforeAll
   static void initializeAll() {
-    //    BaseMongoRepositoryTest.setup();
-
-    System.out.println("MongoEventStoreRepositoryTest:setupAll");
-    ObjectMapper mapper =
-        new ObjectMapper()
-            .findAndRegisterModules()
-            // register default codecs like Jsr310, BsonValueCodec,
-            .registerModule(new BsonModule())
-            .registerModule(new JavaTimeModule())
-            // used for Criteria.Id to '_id' attribute mapping
-            .registerModule(new IdAnnotationModule())
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-    CodecRegistry registry =
-        JacksonCodecs.registryFromMapper(mapper); // create CodecRegistry (adapter) from ObjectMapper
-
-
-    db = mongoClient.getDatabase(mongoConfig.getDatabase()).withCodecRegistry(registry);
-    mongoBackend = new MongoBackend(MongoSetup.of(db));
+//    //    BaseMongoRepositoryTest.setup();
+//
+//    System.out.println("MongoEventStoreRepositoryTest:setupAll");
+//    ObjectMapper mapper =
+//        new ObjectMapper()
+//            .findAndRegisterModules()
+//            // register default codecs like Jsr310, BsonValueCodec,
+//            .registerModule(new BsonModule())
+//            .registerModule(new JavaTimeModule())
+//            // used for Criteria.Id to '_id' attribute mapping
+//            .registerModule(new IdAnnotationModule())
+//            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+//            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//
+//    CodecRegistry registry =
+//        JacksonCodecs.registryFromMapper(mapper); // create CodecRegistry (adapter) from ObjectMapper
+//
+//
+//    db = mongoClient.getDatabase(mongoConfig.getDatabase()).withCodecRegistry(registry);
+//    mongoBackend = new MongoBackend(MongoSetup.of(db));
   }
 
   @BeforeEach
   void setupEach() {
-    mongoEventEntityRepository = new MongoEventEntityRepository(mongoBackend);
-    eventStoreRepository =
-        new MongoEventStoreRepositoryImpl(objectMapper, mongoEventEntityRepository);
+//    mongoEventEntityRepository = new MongoEventEntityRepository(mongoBackend);
+//    eventStoreRepository =
+//        new MongoEventStoreRepositoryImpl(objectMapper, mongoEventEntityRepository);
   }
 
   @AfterEach
   void cleanUp() throws InterruptedException {
-    Flux.from(mongoEventEntityRepository.delete(MongoEventEntityCriteria.mongoEventEntity))
-        .blockFirst();
+//    Flux.from(mongoEventEntityRepository.delete(MongoEventEntityCriteria.mongoEventEntity))
+//        .blockFirst();
   }
 
   @Test
