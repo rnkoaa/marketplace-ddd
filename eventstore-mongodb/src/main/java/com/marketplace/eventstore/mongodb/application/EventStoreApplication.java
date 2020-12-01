@@ -1,42 +1,35 @@
 package com.marketplace.eventstore.mongodb.application;
 
+import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Aggregates.match;
+import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.common.ObjectMapperBuilder;
 import com.marketplace.common.config.MongoConfig;
-import com.marketplace.eventstore.mongodb.ImmutableMongoEventEntity;
-import com.marketplace.eventstore.mongodb.MongoEventEntity;
-import com.marketplace.eventstore.mongodb.MongoEventEntityRepository;
-import com.marketplace.eventstore.mongodb.application.codecs.CustomBsonModule;
-import com.marketplace.eventstore.mongodb.application.codecs.ObjectMapperCodecs;
-import com.marketplace.eventstore.mongodb.application.event.TestEvent;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.reactivestreams.client.AggregatePublisher;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.MongoDatabase;
-import com.mongodb.reactivestreams.client.Success;
+import java.util.List;
 import java.util.UUID;
+import org.bson.Document;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.UuidCodecProvider;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
-import org.immutables.criteria.backend.Backend;
-import org.immutables.criteria.backend.WriteResult;
-import org.immutables.criteria.mongo.MongoBackend;
-import org.immutables.criteria.mongo.MongoSetup;
-import org.immutables.criteria.mongo.bson4jackson.BsonModule;
-import org.immutables.criteria.mongo.bson4jackson.IdAnnotationModule;
-import org.immutables.criteria.mongo.bson4jackson.JacksonCodecs;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 @SuppressWarnings("UnstableApiUsage")
 public class EventStoreApplication {
+
   private static final ObjectMapper objectMapper = new ObjectMapperBuilder().build();
 
   public static void main(String[] args) throws InterruptedException {
@@ -48,12 +41,47 @@ public class EventStoreApplication {
             .getDatabase(mongoConfig.getDatabase())
             .withCodecRegistry(provideCodecRegistry());
     //
-    Backend backend = new MongoBackend(MongoSetup.of(db));
-    MongoEventEntityRepository eventEntityRepository = new MongoEventEntityRepository(backend);
+//    Backend backend = new MongoBackend(MongoSetup.of(db));
+//    MongoEventEntityRepository eventEntityRepository = new MongoEventEntityRepository(backend);
     //
     UUID eventId = UUID.fromString("39aabfca-a333-448d-b644-259c550604bd");
     UUID aggregateId = UUID.fromString("246219a4-4266-440b-964e-f292baadf133");
-    var testEvent = TestEvent.of(UUID.randomUUID(), aggregateId, "test event");
+//    Publisher<Integer> integerPublisher = eventEntityRepository.find(MongoEventEntityCriteria.mongoEventEntity.aggregateId.is(aggregateId))
+//        .groupBy(MongoEventEntityCriteria.mongoEventEntity.version.max())
+//        .select(MongoEventEntityCriteria.mongoEventEntity.version)
+//        .oneOrNone();
+//
+//    Integer block = Mono.from(integerPublisher)
+//        .switchIfEmpty(Mono.just(0))
+//        .block();
+//    System.out.println(block);
+    MongoCollection<Document> eventCollection = db.getCollection("event");
+
+    AggregatePublisher<Document> aggregatePublisher = eventCollection.aggregate(List.of(
+        match(
+//            eq("streamName", "ClassifiedAd:246219a4-4266-440b-964e-f292baadf133")
+//            eq("_id", UUID.fromString("09398a4a-59ef-4fd7-90cf-15a861b1903c"))
+            eq("aggregateId", aggregateId)
+//            eq("aggregateId", Filters"246219a4-4266-440b-964e-f292baadf133")
+        ),
+        group(null, Accumulators.max("version", "$version"))
+    ), Document.class);
+
+//    AggregatePublisher<Document> aggregatePublisher = eventCollection.aggregate(List.of(
+//        match(
+//            eq("streamName", "ClassifiedAd:246219a4-4266-440b-964e-f292baadf133")
+////            eq("aggregateId", aggregateId)
+//        ),
+//        group(null, Accumulators.max("version", "$version"))
+//    ), Document.class);
+//
+    Document aggregateDocument = Mono.from(aggregatePublisher)
+        .switchIfEmpty(Mono.just(new Document()))
+        .block();
+
+    System.out.println(aggregateDocument);
+//    event.find()
+  /*  var testEvent = TestEvent.of(UUID.randomUUID(), aggregateId, "test event");
     MongoEventEntity eventEntity =
         ImmutableMongoEventEntity.builder()
             .eventBody(serialize(testEvent))
@@ -97,7 +125,7 @@ public class EventStoreApplication {
             .version(2)
             .build();
     insertResult = eventEntityRepository.insert(eventEntity);
-    Mono.from(insertResult).block();
+    Mono.from(insertResult).block();*/
 
     // db.mongoEventEntity.aggregate([{
     //  $match: { aggregateId: UUID('246219a4-4266-440b-964e-f292baadf133')}
@@ -108,7 +136,6 @@ public class EventStoreApplication {
     //    $max: "$version"
     //  }
     // }}])
-
 
     //
     //    Mono.from(insertResult).block();
@@ -142,7 +169,7 @@ public class EventStoreApplication {
     var connectionString = new ConnectionString(config.getConnectionString());
     MongoClientSettings settings =
         MongoClientSettings.builder()
-            //            .uuidRepresentation(UuidRepresentation.STANDARD)
+            .uuidRepresentation(UuidRepresentation.STANDARD)
             .applyConnectionString(connectionString)
             .codecRegistry(codecRegistry)
             .build();
@@ -150,21 +177,10 @@ public class EventStoreApplication {
   }
 
   public static CodecRegistry provideCodecRegistry() {
-    ObjectMapper mapper =
-        new ObjectMapper()
-            .registerModule(new BsonModule())
-            // register default codecs like Jsr310, BsonValueCodec,
-            .registerModule(new CustomBsonModule())
-            // ValueCodecProvider etc.
-            //              .registerModule(new GuavaModule()) // for Immutable* classes from Guava
-            // (eg. ImmutableList)
-            //              .registerModule(new Jdk8Module()) // used for java 8 types like Optional
-            // / OptionalDouble etc.
-            .registerModule(new IdAnnotationModule());
+
 
     return CodecRegistries.fromRegistries(
         MongoClientSettings.getDefaultCodecRegistry(),
-        JacksonCodecs.registryFromMapper(mapper),
         fromProviders(PojoCodecProvider.builder().automatic(true).build()),
         fromProviders(new UuidCodecProvider(UuidRepresentation.STANDARD)));
   }
