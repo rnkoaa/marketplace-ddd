@@ -10,6 +10,7 @@ public class TestEvent implements Event {
   private UUID aggregateId;
   private String title;
   private String text;
+  private String aggregateName;
 
   public TestEvent() {}
 
@@ -18,11 +19,13 @@ public class TestEvent implements Event {
     this.aggregateId = aggregateId;
     this.title = title;
     this.text = text;
+    this.aggregateName = "";
   }
 
   public static TestEvent of(UUID eventId, UUID aggregateId, String title) {
     return new TestEvent(eventId, aggregateId, title, "");
   }
+
   public static TestEvent of(UUID aggregateId, String title) {
     return new TestEvent(UUID.randomUUID(), aggregateId, title, "");
   }
@@ -33,6 +36,15 @@ public class TestEvent implements Event {
 
   public static TestEvent of(UUID id, UUID aggregateId, String title, String text) {
     return new TestEvent(id, aggregateId, title, text);
+  }
+
+  public String getAggregateName() {
+    return aggregateName;
+  }
+
+  @Override
+  public String aggregateName() {
+    return "%s:%s".formatted(aggregateName, getAggregateId().toString());
   }
 
   @Override
@@ -67,5 +79,9 @@ public class TestEvent implements Event {
 
   public void setText(String text) {
     this.text = text;
+  }
+
+  public void setAggregateName(String aggregateName) {
+    this.aggregateName = aggregateName;
   }
 }

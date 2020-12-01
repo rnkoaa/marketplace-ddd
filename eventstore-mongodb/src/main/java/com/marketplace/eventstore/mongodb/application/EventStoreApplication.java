@@ -1,5 +1,7 @@
 package com.marketplace.eventstore.mongodb.application;
 
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.common.ObjectMapperBuilder;
@@ -7,12 +9,17 @@ import com.marketplace.common.config.MongoConfig;
 import com.marketplace.eventstore.mongodb.ImmutableMongoEventEntity;
 import com.marketplace.eventstore.mongodb.MongoEventEntity;
 import com.marketplace.eventstore.mongodb.MongoEventEntityRepository;
+import com.marketplace.eventstore.mongodb.application.codecs.CustomBsonModule;
+import com.marketplace.eventstore.mongodb.application.codecs.ObjectMapperCodecs;
 import com.marketplace.eventstore.mongodb.application.event.TestEvent;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
+import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.MongoDatabase;
+import com.mongodb.reactivestreams.client.Success;
+import java.util.UUID;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.UuidCodecProvider;
 import org.bson.codecs.configuration.CodecRegistries;
@@ -26,13 +33,7 @@ import org.immutables.criteria.mongo.bson4jackson.BsonModule;
 import org.immutables.criteria.mongo.bson4jackson.IdAnnotationModule;
 import org.immutables.criteria.mongo.bson4jackson.JacksonCodecs;
 import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import reactor.core.publisher.Mono;
 
 @SuppressWarnings("UnstableApiUsage")
 public class EventStoreApplication {
@@ -42,32 +43,17 @@ public class EventStoreApplication {
     //
     MongoConfig mongoConfig = new MongoConfig("localhost", "eventstore", 27017);
     MongoClient mongoClient = createClient(mongoConfig, provideCodecRegistry());
-    ObjectMapper mapper =
-        new ObjectMapper()
-            .registerModule(
-                new BsonModule()) // register default codecs like Jsr310, BsonValueCodec,
-                                  // ValueCodecProvider etc.
-            //              .registerModule(new GuavaModule()) // for Immutable* classes from Guava
-            // (eg. ImmutableList)
-            //              .registerModule(new Jdk8Module()) // used for java 8 types like Optional
-            // / OptionalDouble etc.
-            .registerModule(
-                new IdAnnotationModule()); // used for Criteria.Id to '_id' attribute mapping
-
-    CodecRegistry registry =
-        JacksonCodecs.registryFromMapper(
-            mapper); // create CodecRegistry (adapter) from ObjectMapper
-
     MongoDatabase db =
-        mongoClient.getDatabase(mongoConfig.getDatabase()).withCodecRegistry(registry);
-
+        mongoClient
+            .getDatabase(mongoConfig.getDatabase())
+            .withCodecRegistry(provideCodecRegistry());
+    //
     Backend backend = new MongoBackend(MongoSetup.of(db));
     MongoEventEntityRepository eventEntityRepository = new MongoEventEntityRepository(backend);
-
+    //
     UUID eventId = UUID.fromString("39aabfca-a333-448d-b644-259c550604bd");
     UUID aggregateId = UUID.fromString("246219a4-4266-440b-964e-f292baadf133");
-    var testEvent = TestEvent.of(eventId, aggregateId, "test event");
-
+    var testEvent = TestEvent.of(UUID.randomUUID(), aggregateId, "test event");
     MongoEventEntity eventEntity =
         ImmutableMongoEventEntity.builder()
             .eventBody(serialize(testEvent))
@@ -79,37 +65,84 @@ public class EventStoreApplication {
             .version(0)
             .build();
 
+    //    MongoCollection<MongoEventEntity> collection = db.getCollection("test",
+    // MongoEventEntity.class);
+    //    Publisher<Success> insertResult = collection.insertOne(eventEntity);
     Publisher<WriteResult> insertResult = eventEntityRepository.insert(eventEntity);
-    insertResult.subscribe(
-        new Subscriber<>() {
-          @Override
-          public void onSubscribe(Subscription s) {
-            s.request(1);
-          }
+    Mono.from(insertResult).block();
 
-          @Override
-          public void onNext(WriteResult writeResult) {
-            System.out.println(writeResult);
-          }
+    testEvent = TestEvent.of(UUID.randomUUID(), aggregateId, "test event 1");
+    eventEntity =
+        ImmutableMongoEventEntity.builder()
+            .eventBody(serialize(testEvent))
+            .streamName("ClassifiedAd:" + aggregateId)
+            .eventType(testEvent.getClass().getSimpleName())
+            .aggregateId(testEvent.getAggregateId())
+            .id(UUID.randomUUID())
+            .createdAt(testEvent.createdAt())
+            .version(1)
+            .build();
+    insertResult = eventEntityRepository.insert(eventEntity);
+    Mono.from(insertResult).block();
 
-          @Override
-          public void onError(Throwable t) {
-            System.out.println(t.getMessage());
-          }
+    testEvent = TestEvent.of(UUID.randomUUID(), aggregateId, "test event 2");
+    eventEntity =
+        ImmutableMongoEventEntity.builder()
+            .eventBody(serialize(testEvent))
+            .streamName("ClassifiedAd:" + aggregateId)
+            .eventType(testEvent.getClass().getSimpleName())
+            .aggregateId(testEvent.getAggregateId())
+            .id(UUID.randomUUID())
+            .createdAt(testEvent.createdAt())
+            .version(2)
+            .build();
+    insertResult = eventEntityRepository.insert(eventEntity);
+    Mono.from(insertResult).block();
 
-          @Override
-          public void onComplete() {
-            System.out.println("complete");
-          }
-        });
+    // db.mongoEventEntity.aggregate([{
+    //  $match: { aggregateId: UUID('246219a4-4266-440b-964e-f292baadf133')}
+    // },{
+    //  $group: {
+    //  _id: null,
+    //  version: {
+    //    $max: "$version"
+    //  }
+    // }}])
 
-    TimeUnit.SECONDS.sleep(2);
+
+    //
+    //    Mono.from(insertResult).block();
+    //    insertResult.subscribe(
+    //        new Subscriber<>() {
+    //          @Override
+    //          public void onSubscribe(Subscription s) {
+    //            s.request(1);
+    //          }
+    //
+    //          @Override
+    //          public void onNext(WriteResult writeResult) {
+    //            System.out.println(writeResult);
+    //          }
+    //
+    //          @Override
+    //          public void onError(Throwable t) {
+    //            System.out.println(t.getMessage());
+    //          }
+    //
+    //          @Override
+    //          public void onComplete() {
+    //            System.out.println("complete");
+    //          }
+    //        });
+    //
+    //    TimeUnit.SECONDS.sleep(2);
   }
 
   static MongoClient createClient(MongoConfig config, CodecRegistry codecRegistry) {
     var connectionString = new ConnectionString(config.getConnectionString());
     MongoClientSettings settings =
         MongoClientSettings.builder()
+            //            .uuidRepresentation(UuidRepresentation.STANDARD)
             .applyConnectionString(connectionString)
             .codecRegistry(codecRegistry)
             .build();
@@ -117,11 +150,23 @@ public class EventStoreApplication {
   }
 
   public static CodecRegistry provideCodecRegistry() {
+    ObjectMapper mapper =
+        new ObjectMapper()
+            .registerModule(new BsonModule())
+            // register default codecs like Jsr310, BsonValueCodec,
+            .registerModule(new CustomBsonModule())
+            // ValueCodecProvider etc.
+            //              .registerModule(new GuavaModule()) // for Immutable* classes from Guava
+            // (eg. ImmutableList)
+            //              .registerModule(new Jdk8Module()) // used for java 8 types like Optional
+            // / OptionalDouble etc.
+            .registerModule(new IdAnnotationModule());
+
     return CodecRegistries.fromRegistries(
         MongoClientSettings.getDefaultCodecRegistry(),
+        JacksonCodecs.registryFromMapper(mapper),
         fromProviders(PojoCodecProvider.builder().automatic(true).build()),
-        fromProviders(new UuidCodecProvider(UuidRepresentation.STANDARD)),
-        MongoClientSettings.getDefaultCodecRegistry());
+        fromProviders(new UuidCodecProvider(UuidRepresentation.STANDARD)));
   }
 
   private static String serialize(Object object) {

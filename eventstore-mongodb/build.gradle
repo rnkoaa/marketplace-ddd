@@ -41,16 +41,25 @@ dependencies {
 //    compile project(":config")
     compile project(":eventstore")
 
+    implementation("org.slf4j:slf4j-api:1.7.30")
+    implementation("org.slf4j:slf4j-log4j12:1.7.30")
+
 //    implementation("org.mongodb:mongodb-driver-sync:4.1.1")
-    implementation 'org.mongodb:mongodb-driver-reactivestreams:1.13.1'
+    implementation('org.mongodb:mongodb-driver-reactivestreams:1.13.1') {
+//        exclude group: 'org.mongodb', module: 'bson'
+    }
+//    compile group: 'org.mongodb', name: 'bson', version: '4.1.1'
+
 
 //    implementation("javax.inject:javax.inject:1")
     implementation("javax.persistence:javax.persistence-api:2.2")
 
-    compileOnly 'org.immutables:value:2.8.2'
-    implementation 'org.immutables:criteria-inmemory:2.8.2'
-    implementation 'org.immutables:criteria-mongo:2.8.2'
-    annotationProcessor 'org.immutables:value:2.8.2'
+    compileOnly 'org.immutables:value:2.8.8'
+    implementation 'org.immutables:criteria-inmemory:2.8.8'
+    implementation('org.immutables:criteria-mongo:2.8.8') {
+//        exclude group: 'org.mongodb', module: 'bson'
+    }
+    annotationProcessor 'org.immutables:value:2.8.8'
 
     implementation 'io.projectreactor:reactor-core:3.4.0'
     implementation("com.google.guava:guava:30.0-jre")
