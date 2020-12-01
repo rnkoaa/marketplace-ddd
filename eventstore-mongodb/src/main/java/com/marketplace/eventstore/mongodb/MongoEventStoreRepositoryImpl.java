@@ -99,7 +99,7 @@ public class MongoEventStoreRepositoryImpl implements EventStoreRepository<Event
       return events;
     }
 
-    return null;
+    return List.of();
   }
 
   @Override
@@ -132,6 +132,7 @@ public class MongoEventStoreRepositoryImpl implements EventStoreRepository<Event
     return ImmutableMongoEventEntity.builder()
         .aggregateId(aggregateId)
         .createdAt(event.createdAt())
+        .streamName(event.aggregateName())
         .eventType(event.getClass().getCanonicalName())
         .eventBody(serialize(event))
         .id(event.getId())

@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.marketplace.common.ObjectMapperBuilder;
-import com.marketplace.eventstore.annotations.Event;
-import com.marketplace.eventstore.framework.event.EventStore;
+import com.marketplace.eventstore.framework.event.Event;
+import com.marketplace.eventstore.mongodb.application.event.TestEvent;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import java.util.UUID;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -32,7 +32,7 @@ public class MongoEventStoreRepositoryTest extends BaseMongoRepositoryTest {
 
   static MongoDatabase db;
   static Backend mongoBackend;
-  MongoEventStoreRepositoryImpl eventEventStoreRepository;
+  MongoEventStoreRepositoryImpl eventStoreRepository;
 
   @BeforeAll
   static void initializeAll() {
@@ -51,8 +51,8 @@ public class MongoEventStoreRepositoryTest extends BaseMongoRepositoryTest {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     CodecRegistry registry =
-        JacksonCodecs.registryFromMapper(
-            mapper); // create CodecRegistry (adapter) from ObjectMapper
+        JacksonCodecs.registryFromMapper(mapper); // create CodecRegistry (adapter) from ObjectMapper
+
 
     db = mongoClient.getDatabase(mongoConfig.getDatabase()).withCodecRegistry(registry);
     mongoBackend = new MongoBackend(MongoSetup.of(db));
@@ -61,7 +61,7 @@ public class MongoEventStoreRepositoryTest extends BaseMongoRepositoryTest {
   @BeforeEach
   void setupEach() {
     mongoEventEntityRepository = new MongoEventEntityRepository(mongoBackend);
-    eventEventStoreRepository =
+    eventStoreRepository =
         new MongoEventStoreRepositoryImpl(objectMapper, mongoEventEntityRepository);
   }
 
@@ -73,8 +73,30 @@ public class MongoEventStoreRepositoryTest extends BaseMongoRepositoryTest {
 
   @Test
   void findLastVersionInvalidAggregateId() {
-    int version = eventEventStoreRepository.lastVersion(UUID.randomUUID());
+    int version = eventStoreRepository.lastVersion(UUID.randomUUID());
     assertThat(version).isEqualTo(0);
+  }
+
+  @Test
+  void findLastVersionWithForSavedEvent() {
+
+    UUID eventId = UUID.fromString("39aabfca-a333-448d-b644-259c550604bd");
+    UUID secondEventId = UUID.fromString("186fd996-1d88-4386-85b4-67ca8302a28d");
+    UUID aggregateId = UUID.fromString("246219a4-4266-440b-964e-f292baadf133");
+    var testEvent = TestEvent.of(eventId, aggregateId, "test event");
+    testEvent.setAggregateName("ClassifiedAds");
+
+    Event save = eventStoreRepository.save(aggregateId, testEvent, 0);
+    assertThat(save).isNotNull();
+
+    testEvent = TestEvent.of(secondEventId, aggregateId, "test event");
+    testEvent.setAggregateName("ClassifiedAds");
+
+    save = eventStoreRepository.save(aggregateId, testEvent, 1);
+    assertThat(save).isNotNull();
+
+    int version = eventStoreRepository.lastVersion(aggregateId);
+    assertThat(version).isEqualTo(1);
   }
 
   @Test

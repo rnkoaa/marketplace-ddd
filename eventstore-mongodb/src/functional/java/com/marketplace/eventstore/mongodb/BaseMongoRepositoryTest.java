@@ -44,6 +44,7 @@ public abstract class BaseMongoRepositoryTest extends AbstractContainerInitializ
         MongoClientSettings.builder()
             .applyConnectionString(connectionString)
             .codecRegistry(codecRegistry)
+            .uuidRepresentation(UuidRepresentation.STANDARD)
             .build();
     return MongoClients.create(settings);
   }
