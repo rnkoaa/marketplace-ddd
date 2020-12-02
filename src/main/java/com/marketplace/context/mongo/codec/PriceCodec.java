@@ -34,6 +34,6 @@ public class PriceCodec implements Codec<Price> {
 
     @Override
     public Class<Price> getEncoderClass() {
-        return null;
+        return Price.class;
     }
 }
