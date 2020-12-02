@@ -7,9 +7,7 @@ public interface TypedEvent {
 
   String getType();
 
-  default int getSequenceId() {
-    return 0;
-  }
+  int getSequenceId();
 
   String getEventBody();
 
