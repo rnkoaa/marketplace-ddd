@@ -8,15 +8,26 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.bson.BSONObject;
+import org.bson.BsonBinary;
 import org.bson.BsonReader;
+import org.bson.BsonValue;
 import org.bson.BsonWriter;
 import org.bson.Document;
 import org.bson.codecs.Codec;
+import org.bson.codecs.CollectibleCodec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
 
-public class MongoEventEntityCodec implements Codec<ImmutableMongoEventEntity> {
+public class MongoEventEntityCodec implements CollectibleCodec<ImmutableMongoEventEntity> {
+
+  public static final String AGGREGATE_ID = "aggregateId";
+  public static final String VERSION = "version";
+  public static final String STREAM_NAME = "streamName";
+  public static final String CREATED_AT = "createdAt";
+  public static final String EVENTS = "events";
+  public static final String ID = "_id";
   private final CodecRegistry codecRegistry;
 
   public MongoEventEntityCodec(CodecRegistry codecRegistry) {
@@ -27,25 +38,20 @@ public class MongoEventEntityCodec implements Codec<ImmutableMongoEventEntity> {
   public ImmutableMongoEventEntity decode(BsonReader reader, DecoderContext decoderContext) {
     Codec<Document> documentCodec = codecRegistry.get(Document.class);
     Document document = documentCodec.decode(reader, decoderContext);
-    UUID id = document.get("_id", UUID.class);
-    UUID aggregateId = document.get("aggregateId", UUID.class);
-    String streamName = document.getString("streamName");
-    int version = document.getInteger("version", 0);
-    //    List<ImmutableTypedEvent> events = document.getList("events", ImmutableTypedEvent.class);
-    List<Document> events = document.getList("events", Document.class);
+    String streamName = document.getString(STREAM_NAME);
+    List<Document> events = document.getList(EVENTS, Document.class);
     List<TypedEvent> typedEvents =
         events.stream().map(this::decodeTypeEvent).collect(Collectors.toList());
 
-    Date createdAt = document.get("createdAt", Date.class);
+    Date createdAt = document.get(CREATED_AT, Date.class);
 
     return ImmutableMongoEventEntity.builder()
-        .id(id)
-        .aggregateId(aggregateId)
+        .id(document.get(ID, UUID.class))
+        .aggregateId(document.get(AGGREGATE_ID, UUID.class))
         .streamName((!Strings.isNullOrEmpty(streamName)) ? streamName : "")
-        .version(version)
-        //        .events(List.of())
+        .version(document.getInteger(VERSION, 0))
         .events(typedEvents)
-        .createdAt(createdAt.toInstant())
+        .createdAt((createdAt != null) ? createdAt.toInstant() : Instant.now())
         .build();
   }
 
@@ -54,12 +60,12 @@ public class MongoEventEntityCodec implements Codec<ImmutableMongoEventEntity> {
       BsonWriter writer, ImmutableMongoEventEntity value, EncoderContext encoderContext) {
     Codec<Document> documentCodec = codecRegistry.get(Document.class);
     Document document = new Document();
-    document.put("_id", value.getId());
-    document.put("aggregateId", value.getAggregateId());
-    document.put("version", value.getVersion());
-    document.put("streamName", value.getStreamName());
-    document.put("createdAt", value.getCreatedAt());
-    document.put("events", value.getEvents());
+    document.put(ID, value.getId());
+    document.put(AGGREGATE_ID, value.getAggregateId());
+    document.put(VERSION, value.getVersion());
+    document.put(STREAM_NAME, value.getStreamName());
+    document.put(CREATED_AT, value.getCreatedAt());
+    document.put(EVENTS, value.getEvents());
     documentCodec.encode(writer, document, encoderContext);
   }
 
@@ -67,29 +73,7 @@ public class MongoEventEntityCodec implements Codec<ImmutableMongoEventEntity> {
   public Class<ImmutableMongoEventEntity> getEncoderClass() {
     return ImmutableMongoEventEntity.class;
   }
-  /*
-   private final PriceConverter priceConverter;
-  private final CodecRegistry codecRegistry;
 
-  public PriceCodec(CodecRegistry codecRegistry, PriceConverter priceConverter) {
-      this.priceConverter = priceConverter;
-      this.codecRegistry = codecRegistry;
-  }
-
-  @Override
-  public Price decode(BsonReader reader, DecoderContext decoderContext) {
-      Codec<Document> documentCodec = codecRegistry.get(Document.class);
-      Document document = documentCodec.decode(reader, decoderContext);
-      return priceConverter.deserialize(document);
-  }
-
-  @Override
-  public void encode(BsonWriter writer, Price value, EncoderContext encoderContext) {
-      Codec<Document> documentCodec = codecRegistry.get(Document.class);
-      Document document = priceConverter.serialize(value);
-      documentCodec.encode(writer, document, encoderContext);
-  }
-   */
   private ImmutableTypedEvent decodeTypeEvent(Document doc) {
     String eventBody = doc.getString("eventBody");
     String type = doc.getString("type");
@@ -99,5 +83,24 @@ public class MongoEventEntityCodec implements Codec<ImmutableMongoEventEntity> {
         .type(type)
         .sequenceId(sequenceId)
         .build();
+  }
+
+  @Override
+  public ImmutableMongoEventEntity generateIdIfAbsentFromDocument(
+      ImmutableMongoEventEntity document) {
+    if (document.getId() == null) {
+      document = document.withId(UUID.randomUUID());
+    }
+    return document;
+  }
+
+  @Override
+  public boolean documentHasId(ImmutableMongoEventEntity document) {
+    return document.getId() != null;
+  }
+
+  @Override
+  public BsonValue getDocumentId(ImmutableMongoEventEntity document) {
+    return new BsonBinary(document.getId());
   }
 }

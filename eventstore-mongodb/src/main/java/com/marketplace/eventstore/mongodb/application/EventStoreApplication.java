@@ -45,7 +45,6 @@ public class EventStoreApplication {
   private static final ObjectMapper objectMapper = new ObjectMapperBuilder().build();
 
   public static void main(String[] args) throws InterruptedException {
-    //
     MongoConfig mongoConfig = new MongoConfig("localhost", "eventstore", 27017);
     MongoClient mongoClient = createClient(mongoConfig, provideCodecRegistry());
     MongoDatabase db =
@@ -53,13 +52,9 @@ public class EventStoreApplication {
             .getDatabase(mongoConfig.getDatabase())
             .withCodecRegistry(provideCodecRegistry());
 
-    MongoCollection<MongoEventEntity> eventCollection = db.getCollection("event", MongoEventEntity.class);
-//    MongoCollection<Document> eventCollection = db.getCollection("event");
-    //
-    //    Backend backend = new MongoBackend(MongoSetup.of(db));
-    //    MongoEventEntityRepository eventEntityRepository = new
-    // MongoEventEntityRepository(backend);
-    //
+    MongoCollection<MongoEventEntity> eventCollection =
+        db.getCollection("event", MongoEventEntity.class);
+
     UUID eventId = UUID.fromString("39aabfca-a333-448d-b644-259c550604bd");
     UUID aggregateId = UUID.fromString("246219a4-4266-440b-964e-f292baadf133");
     MongoEventEntitySerDe mongoEventEntitySerDe = new MongoEventEntitySerDe();
@@ -71,6 +66,7 @@ public class EventStoreApplication {
                 .eventBody(serialize(testEvent))
                 .sequenceId(0)
                 .build());
+
     MongoEventEntity eventEntity =
         ImmutableMongoEventEntity.builder()
             .events(typedEvent)
@@ -81,132 +77,30 @@ public class EventStoreApplication {
             .version(0)
             .build();
 
-//        Publisher<Success> successPublisher = eventCollection.insertOne(eventEntity);
-//        Success block = Mono.from(successPublisher).block();
-//        System.out.println(block);
-//
-//    FindPublisher<Document> findPublisher =
-//        eventCollection.find(eq("_id", UUID.fromString("9be7ed23-8910-4e18-a775-704599c8b454")));
-//    MongoEventEntity mongoEventEntity =
-//        Mono.from(findPublisher)
-//            .map(mongoEventEntitySerDe::decode)
-//            //            .switchIfEmpty(Mono.just(ImmutableMongoEventEntity.builder().build()))
-//            .block();
+    /*Publisher<Success> successPublisher = eventCollection.insertOne(eventEntity);
+    Success block = Mono.from(successPublisher).block();
+    System.out.println(block);
 
     FindPublisher<MongoEventEntity> findPublisher =
-        eventCollection.find(eq("_id", UUID.fromString("9be7ed23-8910-4e18-a775-704599c8b454")));
+        eventCollection.find(eq("_id", UUID.fromString("d2fbeb6f-8cf3-4f93-b24d-4786fcd9717c")));
     MongoEventEntity mongoEventEntity =
         Mono.from(findPublisher)
-//            .map(mongoEventEntitySerDe::decode)
             //            .switchIfEmpty(Mono.just(ImmutableMongoEventEntity.builder().build()))
             .block();
 
     System.out.println("Found Results");
-    System.out.println(mongoEventEntity);
+    System.out.println(mongoEventEntity);*/
 
-    //
-    //    Integer block = Mono.from(integerPublisher)
-    //        .switchIfEmpty(Mono.just(0))
-    //        .block();
-    //    System.out.println(block);
-    //    AggregatePublisher<Document> aggregatePublisher = findLatestVersion(
-    //        db, aggregateId);
+    UUID bad = UUID.fromString("d2fbeb6f-8cf3-4f93-b24d-4786fcd9717c");
 
-    //    AggregatePublisher<Document> aggregatePublisher = eventCollection.aggregate(List.of(
-    //        match(
-    //            eq("streamName", "ClassifiedAd:246219a4-4266-440b-964e-f292baadf133")
-    ////            eq("aggregateId", aggregateId)
-    //        ),
-    //        group(null, Accumulators.max("version", "$version"))
-    //    ), Document.class);
-    //
-    //    Document aggregateDocument =
-    //        Mono.from(aggregatePublisher).switchIfEmpty(Mono.just(new Document())).block();
-    //
-    //    System.out.println(aggregateDocument);
-    //    event.find()
-    /*  var testEvent = TestEvent.of(UUID.randomUUID(), aggregateId, "test event");
-    MongoEventEntity eventEntity =
-        ImmutableMongoEventEntity.builder()
-            .eventBody(serialize(testEvent))
-            .streamName("ClassifiedAd:" + aggregateId)
-            .eventType(testEvent.getClass().getSimpleName())
-            .aggregateId(testEvent.getAggregateId())
-            .id(testEvent.getId())
-            .createdAt(testEvent.createdAt())
-            .version(0)
-            .build();
+    AggregatePublisher<Document> latestVersion = findLatestVersion(db, bad);
+    Integer version =
+        Mono.from(latestVersion)
+            .map(versionDocument -> versionDocument.getInteger("version"))
+            .switchIfEmpty(Mono.just(0))
+            .block();
 
-    //    MongoCollection<MongoEventEntity> collection = db.getCollection("test",
-    // MongoEventEntity.class);
-    //    Publisher<Success> insertResult = collection.insertOne(eventEntity);
-    Publisher<WriteResult> insertResult = eventEntityRepository.insert(eventEntity);
-    Mono.from(insertResult).block();
-
-    testEvent = TestEvent.of(UUID.randomUUID(), aggregateId, "test event 1");
-    eventEntity =
-        ImmutableMongoEventEntity.builder()
-            .eventBody(serialize(testEvent))
-            .streamName("ClassifiedAd:" + aggregateId)
-            .eventType(testEvent.getClass().getSimpleName())
-            .aggregateId(testEvent.getAggregateId())
-            .id(UUID.randomUUID())
-            .createdAt(testEvent.createdAt())
-            .version(1)
-            .build();
-    insertResult = eventEntityRepository.insert(eventEntity);
-    Mono.from(insertResult).block();
-
-    testEvent = TestEvent.of(UUID.randomUUID(), aggregateId, "test event 2");
-    eventEntity =
-        ImmutableMongoEventEntity.builder()
-            .eventBody(serialize(testEvent))
-            .streamName("ClassifiedAd:" + aggregateId)
-            .eventType(testEvent.getClass().getSimpleName())
-            .aggregateId(testEvent.getAggregateId())
-            .id(UUID.randomUUID())
-            .createdAt(testEvent.createdAt())
-            .version(2)
-            .build();
-    insertResult = eventEntityRepository.insert(eventEntity);
-    Mono.from(insertResult).block();*/
-
-    // db.mongoEventEntity.aggregate([{
-    //  $match: { aggregateId: UUID('246219a4-4266-440b-964e-f292baadf133')}
-    // },{
-    //  $group: {
-    //  _id: null,
-    //  version: {
-    //    $max: "$version"
-    //  }
-    // }}])
-
-    //
-    //    Mono.from(insertResult).block();
-    //    insertResult.subscribe(
-    //        new Subscriber<>() {
-    //          @Override
-    //          public void onSubscribe(Subscription s) {
-    //            s.request(1);
-    //          }
-    //
-    //          @Override
-    //          public void onNext(WriteResult writeResult) {
-    //            System.out.println(writeResult);
-    //          }
-    //
-    //          @Override
-    //          public void onError(Throwable t) {
-    //            System.out.println(t.getMessage());
-    //          }
-    //
-    //          @Override
-    //          public void onComplete() {
-    //            System.out.println("complete");
-    //          }
-    //        });
-    //
-    //    TimeUnit.SECONDS.sleep(2);
+    System.out.println("Version: " + version);
   }
 
   private static AggregatePublisher<Document> findLatestVersion(
@@ -243,7 +137,6 @@ public class EventStoreApplication {
 
     return CodecRegistries.fromRegistries(
         MongoClientSettings.getDefaultCodecRegistry(),
-//        fromProviders(PojoCodecProvider.builder().automatic(true).build()),
         fromProviders(new UuidCodecProvider(UuidRepresentation.STANDARD)),
         fromProviders(new MongoEventEntityCodecProvider()));
   }
