@@ -1,5 +1,8 @@
 plugins {
     id 'java'
+    // which produces test fixtures
+    id 'java-test-fixtures'
+
     id 'idea'
     id 'groovy'
 }
@@ -70,8 +73,11 @@ dependencies {
     implementation("javax.persistence:javax.persistence-api:2.2")
 
     compileOnly 'org.immutables:value:2.8.8'
-
     annotationProcessor 'org.immutables:value:2.8.8'
+
+    // Implementation dependencies are not leaked to consumers when building
+    testFixturesImplementation 'org.immutables:value:2.8.8'
+    testFixturesAnnotationProcessor('org.immutables:value:2.8.8')
 
     implementation 'io.projectreactor:reactor-core:3.4.0'
     implementation("com.google.guava:guava:30.0-jre")
