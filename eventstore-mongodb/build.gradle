@@ -78,6 +78,12 @@ dependencies {
     // Implementation dependencies are not leaked to consumers when building
     testFixturesImplementation 'org.immutables:value:2.8.8'
     testFixturesAnnotationProcessor('org.immutables:value:2.8.8')
+    testFixturesImplementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    testFixturesImplementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
+    testFixturesImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion")
+    testFixturesImplementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
+    testFixturesImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+    testFixturesImplementation('io.vavr:vavr:1.0.0-alpha-3')
 
     implementation 'io.projectreactor:reactor-core:3.4.0'
     implementation("com.google.guava:guava:30.0-jre")
@@ -110,9 +116,11 @@ test {
 tasks.withType(JavaCompile) {
     options.compilerArgs += "--enable-preview"
 }
+
 tasks.withType(Test) {
     jvmArgs += "--enable-preview"
 }
+
 tasks.withType(JavaExec) {
     jvmArgs += "--enable-preview"
 }
@@ -128,14 +136,6 @@ task functionalTest(type: Test) {
     outputs.upToDateWhen { false }
     mustRunAfter test
 }
-
-//
-//functionalTest {
-//    useJUnitPlatform()
-//    testLogging {
-//        events "passed", "skipped", "failed"
-//    }
-//}
 
 check.dependsOn functionalTest
 
