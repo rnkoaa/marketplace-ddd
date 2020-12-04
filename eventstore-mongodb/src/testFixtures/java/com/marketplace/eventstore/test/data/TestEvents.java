@@ -1,0 +1,38 @@
+package com.marketplace.eventstore.test.data;
+
+import com.marketplace.eventstore.framework.event.ImmutableTypedEvent;
+import com.marketplace.eventstore.test.events.ImmutableTestCreatedEvent;
+import com.marketplace.eventstore.test.events.ImmutableTestTitleUpdatedEvent;
+import com.marketplace.eventstore.test.events.TestCreatedEvent;
+import com.marketplace.eventstore.test.events.TestTitleUpdatedEvent;
+import java.util.UUID;
+
+public class TestEvents {
+
+    public static final UUID aggregateId = UUID.fromString("0a4a2dfc-eb10-45ec-9f8c-4d05e9dab6fe");
+    public static final UUID createdEventId = UUID
+        .fromString("a7c92883-5406-4ea5-a1c4-8d9d6b7ee9bc");
+    public static final UUID titleUpdatedEventId = UUID
+        .fromString("5a5346eb-c9dd-476b-a83b-9cacb0625b7f");
+    public static final UUID titleUpdatedEventId2 = UUID
+        .fromString("73093141-cbdb-4692-98de-622d832b15f4");
+
+    public static TestCreatedEvent testCreatedEvent = ImmutableTestCreatedEvent.builder()
+        .aggregateId(aggregateId)
+        .id(createdEventId)
+        .build();
+
+    public static TestTitleUpdatedEvent testTitleUpdatedEvent = ImmutableTestTitleUpdatedEvent
+        .builder()
+        .aggregateId(aggregateId)
+        .id(titleUpdatedEventId)
+        .title("first title")
+        .build();
+
+    public static TestTitleUpdatedEvent testTitleUpdatedEvent2 = ImmutableTestTitleUpdatedEvent
+        .builder()
+        .aggregateId(aggregateId)
+        .id(titleUpdatedEventId2)
+        .title("first title")
+        .build();
+}
