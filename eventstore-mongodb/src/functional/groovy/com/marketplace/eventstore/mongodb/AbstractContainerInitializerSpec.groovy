@@ -47,9 +47,8 @@ abstract class AbstractContainerInitializerSpec extends BaseFunctionalSpec {
     static CodecRegistry provideCodecRegistry() {
         return CodecRegistries.fromRegistries(
                 MongoClientSettings.getDefaultCodecRegistry(),
-                fromProviders(PojoCodecProvider.builder().automatic(true).build()),
                 fromProviders(new UuidCodecProvider(UuidRepresentation.STANDARD)),
-                MongoClientSettings.getDefaultCodecRegistry());
+                fromProviders(new MongoEventEntityCodecProvider()));
     }
 
     static URL getResourceFromClasspath(String path) {

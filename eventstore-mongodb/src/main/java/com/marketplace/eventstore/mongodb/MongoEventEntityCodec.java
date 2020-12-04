@@ -76,7 +76,7 @@ public class MongoEventEntityCodec implements CollectibleCodec<ImmutableMongoEve
 
   private ImmutableTypedEvent decodeTypeEvent(Document doc) {
     String eventBody = doc.getString("eventBody");
-    String type = doc.getString("type");
+    String type = doc.getString("eventType");
     int sequenceId = doc.getInteger("sequenceId", 0);
     return ImmutableTypedEvent.builder()
         .eventBody(eventBody)

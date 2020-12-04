@@ -20,4 +20,8 @@ class BaseSpocSpec extends Specification {
     ObjectMapper getObjectMapper() {
         return objectMapper
     }
+
+    String serialize(Object object) {
+        return objectMapper.writeValueAsString(object)
+    }
 }
