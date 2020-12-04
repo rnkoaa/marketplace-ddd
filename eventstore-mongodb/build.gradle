@@ -32,19 +32,21 @@ configurations {
         extendsFrom annotationProcessor
     }
 
-    functionalImplementation.extendsFrom testImplementation
+    functionalImplementation {
+        extendsFrom testImplementation
+        canBeResolved true
+    }
     functionalRuntime.extendsFrom testRuntime
 }
 
 idea {
     module {
-        iml {
-            generateTo = file("$projectDir/.ideaproject/")
-        }
-        sourceDirs -= file("src/functional/groovy")
+//        iml {
+//            generateTo = file("$projectDir/.ideaproject/")
+//        }
         testSourceDirs += file("src/functional/groovy")
-        resourceDirs -= file("src/functional/resources")
         testResourceDirs += file("src/functional/resources")
+        scopes.TEST.plus += [ configurations.functionalImplementation ]
     }
 }
 
@@ -115,6 +117,10 @@ task functionalTest(type: Test) {
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
     group = 'verification'
+
+    // run the tests even if inputs have not changed
+    outputs.upToDateWhen { false }
+    mustRunAfter test
 }
 
 //
