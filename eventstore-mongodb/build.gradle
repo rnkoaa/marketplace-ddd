@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'idea'
+    id 'groovy'
 }
 
 group 'com.marketplace.eventstore.mongodb'
@@ -8,14 +10,20 @@ version '1.0.0-SNAPSHOT'
 repositories {
     mavenCentral()
 }
+
 //
 sourceSets {
 
     functional {
-        java.srcDir "$projectDir/src/functional/java"
-        resources.srcDir "$projectDir/src/functional/resources"
-        compileClasspath += sourceSets.main.output + sourceSets.test.output + configurations.testRuntime
-        runtimeClasspath += sourceSets.main.output + sourceSets.test.output + configurations.testRuntime
+        groovy {
+            srcDirs += "src/functional/groovy"
+        }
+        resources {
+            srcDirs += "src/functional/resources"
+        }
+
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
     }
 }
 
@@ -24,21 +32,24 @@ configurations {
         extendsFrom annotationProcessor
     }
 
-    functionalTestCompile {
-        extendsFrom testCompile
-    }
+    functionalImplementation.extendsFrom testImplementation
+    functionalRuntime.extendsFrom testRuntime
+}
 
-    functionalImplementation {
-        extendsFrom testImplementation
-    }
-    functionalRuntime {
-        extendsFrom testRuntime
+idea {
+    module {
+        iml {
+            generateTo = file("$projectDir/.ideaproject/")
+        }
+        sourceDirs -= file("src/functional/groovy")
+        testSourceDirs += file("src/functional/groovy")
+        resourceDirs -= file("src/functional/resources")
+        testResourceDirs += file("src/functional/resources")
     }
 }
 
 dependencies {
     compile project(":common")
-//    compile project(":config")
     compile project(":eventstore")
 
     implementation("org.slf4j:slf4j-api:1.7.30")
@@ -51,12 +62,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
-//    implementation("org.mongodb:mongodb-driver-sync:4.1.1")
-    implementation('org.mongodb:mongodb-driver-reactivestreams:1.13.1') {
-//        exclude group: 'org.mongodb', module: 'bson'
-    }
-//    compile group: 'org.mongodb', name: 'bson', version: '4.1.1'
-
+    implementation('org.mongodb:mongodb-driver-reactivestreams:1.13.1')
 
 //    implementation("javax.inject:javax.inject:1")
     implementation("javax.persistence:javax.persistence-api:2.2")
@@ -79,6 +85,11 @@ dependencies {
     testCompile project(":config")
     testImplementation("org.testcontainers:junit-jupiter:1.15.0")
     testImplementation("org.testcontainers:mongodb:1.15.0")
+
+    testImplementation("org.codehaus.groovy:groovy-all:2.5.13")
+    testImplementation("org.spockframework:spock-core:1.2-groovy-2.5") {
+        exclude group: "org.codehaus.groovy", module: "groovy-all"
+    }
 }
 
 test {
@@ -97,6 +108,7 @@ tasks.withType(Test) {
 tasks.withType(JavaExec) {
     jvmArgs += "--enable-preview"
 }
+
 //
 task functionalTest(type: Test) {
     description 'Runs the functional tests.'
@@ -104,14 +116,14 @@ task functionalTest(type: Test) {
     classpath = sourceSets.functional.runtimeClasspath
     group = 'verification'
 }
+
 //
-functionalTest {
-    useJUnitPlatform()
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-}
-//
-//check.dependsOn functionalTest
-//
+//functionalTest {
+//    useJUnitPlatform()
+//    testLogging {
+//        events "passed", "skipped", "failed"
+//    }
+//}
+
+check.dependsOn functionalTest
 
