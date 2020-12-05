@@ -64,6 +64,7 @@ configurations {
 dependencies {
     compile project(":config")
     compile project(":common")
+    compile project(":libs:mongo-config-commons")
 
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("org.slf4j:slf4j-log4j12:1.7.30")
@@ -97,6 +98,8 @@ dependencies {
     testImplementation("org.assertj:assertj-core:${assertjVersion}")
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
     testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
+
+    testCompile project(":common-test")
     testImplementation("org.testcontainers:junit-jupiter:1.15.0")
     testImplementation("org.testcontainers:mongodb:1.15.0")
 

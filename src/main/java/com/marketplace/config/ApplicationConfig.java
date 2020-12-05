@@ -1,6 +1,6 @@
 package com.marketplace.config;
 
-import com.marketplace.context.mongo.MongoConfig;
+import com.marketplace.common.config.MongoConfig;
 import lombok.Data;
 
 @Data
