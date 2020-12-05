@@ -2,6 +2,7 @@ package com.marketplace.eventstore.mongodb
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.marketplace.common.ObjectMapperBuilder
+import groovy.transform.PackageScope
 import spock.lang.Specification
 
 class BaseSpocSpec extends Specification {
@@ -23,5 +24,10 @@ class BaseSpocSpec extends Specification {
 
     String serialize(Object object) {
         return objectMapper.writeValueAsString(object)
+    }
+
+    @PackageScope
+    <T> T deserialize(String value, Class<T> clzz) {
+        return objectMapper.readValue(value, clzz)
     }
 }

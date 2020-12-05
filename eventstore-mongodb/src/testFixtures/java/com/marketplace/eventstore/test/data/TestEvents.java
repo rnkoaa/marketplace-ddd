@@ -42,6 +42,7 @@ public class TestEvents {
       .id(titleUpdatedEventId2)
       .title("second title")
       .build();
+
   public static TestTextUpdatedEvent testTextUpdatedEvent = ImmutableTestTextUpdatedEvent
       .builder()
       .aggregateId(aggregateId)
