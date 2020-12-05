@@ -1,6 +1,7 @@
 .classpath
 .gradle/
 .project
+generated/
 .settings/
 .idea/
 !.idea/httpRequests/http-requests-log.http
