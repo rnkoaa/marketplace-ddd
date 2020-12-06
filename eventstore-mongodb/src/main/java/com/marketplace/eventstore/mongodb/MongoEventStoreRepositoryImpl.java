@@ -1,14 +1,25 @@
 package com.marketplace.eventstore.mongodb;
 
+import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Aggregates.match;
+import static com.mongodb.client.model.Filters.eq;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.eventstore.framework.event.Event;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import java.util.List;
 import java.util.UUID;
+import org.bson.Document;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository {
 
+  public static final String COL_AGGREGATE_ID = "aggregateId";
+  public static final String COL_VERSION = "version";
   private final EventClassCache eventClassCache = EventClassCache.getInstance();
 
   private final ObjectMapper objectMapper;
@@ -113,15 +124,23 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
   }
 
   @Override
-  public int lastVersion(UUID aggregateId) {
-    //    Publisher<Integer> publisher =
-    //        mongoEventEntityRepository
-    //            .find(MongoEventEntityCriteria.mongoEventEntity.aggregateId.is(aggregateId))
-    //            .select(MongoEventEntityCriteria.mongoEventEntity.version.max())
-    //            .oneOrNone();
-    //
-    //    return Mono.from(publisher).switchIfEmpty(Mono.just(0)).block();
-    return 0;
+  public Mono<Integer> getVersion(UUID aggregateId) {
+    Publisher<Document> aggregateResultPublisher = eventCollection.aggregate(
+        List.of(
+            match(Filters.eq(COL_AGGREGATE_ID, aggregateId)),
+            group(null, Accumulators.max(COL_VERSION, "$version"))
+        ),
+        Document.class);
+    return Mono.from(aggregateResultPublisher)
+        .map(it -> it.getInteger(COL_VERSION))
+        .switchIfEmpty(Mono.just(0));
+  }
+
+  @Override
+  public Mono<Long> countEvents(UUID aggregateId) {
+    Publisher<Long> countPublisher = eventCollection.countDocuments(eq(COL_AGGREGATE_ID, aggregateId));
+    return Mono.from(countPublisher)
+        .switchIfEmpty(Mono.just(0L));
   }
 
   private MongoEventEntity fromEvent(Event event, UUID aggregateId, int version) {

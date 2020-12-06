@@ -1,4 +1,4 @@
 package com.marketplace.eventstore.mongodb
 
-class BaseFunctionalSpec extends BaseSpocSpec{
+class BaseFunctionalSpec extends BaseSpockSpec{
 }

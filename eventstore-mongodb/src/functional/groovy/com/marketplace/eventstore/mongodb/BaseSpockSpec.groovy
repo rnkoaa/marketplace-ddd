@@ -3,23 +3,16 @@ package com.marketplace.eventstore.mongodb
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.marketplace.common.ObjectMapperBuilder
 import groovy.transform.PackageScope
+import spock.lang.Shared
 import spock.lang.Specification
 
-class BaseSpocSpec extends Specification {
+class BaseSpockSpec extends Specification {
+    @Shared
     ObjectMapper objectMapper
 
-    def setup() {
+    def setupSpec() {
         objectMapper = new ObjectMapperBuilder()
                 .build()
-    }
-
-    /**
-     * Getter is required for intellij to give you the declaration
-     *
-     * @return object objectMapper
-     */
-    ObjectMapper getObjectMapper() {
-        return objectMapper
     }
 
     String serialize(Object object) {

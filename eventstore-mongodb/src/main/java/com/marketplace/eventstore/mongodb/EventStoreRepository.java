@@ -1,6 +1,9 @@
 package com.marketplace.eventstore.mongodb;
 
 import java.util.List;
+import java.util.UUID;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 public interface EventStoreRepository<T, U> {
   List<T> load(U aggregateId, int fromVersion);
@@ -13,5 +16,7 @@ public interface EventStoreRepository<T, U> {
 
   T save(U aggregateId, T event, int version);
 
-  int lastVersion(U aggregateId);
+  Mono<Integer> getVersion(U aggregateId);
+
+  Mono<Long> countEvents(UUID aggregateId);
 }
