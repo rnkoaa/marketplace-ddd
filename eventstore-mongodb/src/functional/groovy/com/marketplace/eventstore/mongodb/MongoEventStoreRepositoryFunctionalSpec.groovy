@@ -29,6 +29,28 @@ class MongoEventStoreRepositoryFunctionalSpec extends BaseMongoContainerSpec {
         Mono.from(publisher).block()
     }
 
+    void "first event of aggregate can be saved"() {
+        when:
+        Mono<Optional<Boolean>> savedPublisher = eventStoreRepository.save(TestEvents.testCreatedEvent.aggregateId,
+                TestEvents.testCreatedEvent, 0)
+
+        then:
+        StepVerifier.create(savedPublisher)
+                .assertNext {
+                    assert it.isPresent()
+                    assert it.get()
+                }
+
+        when:
+        Mono<Long> docCount = eventStoreRepository.countEvents(TestEvents.testCreatedEvent.aggregateId)
+
+        then:
+        StepVerifier.create(docCount)
+                .assertNext {
+                    assert it == 1
+                }
+    }
+
     void "the maximum version of the aggregate can be retrieved"() {
         given:
         UUID testAggregateId = TestEvents.testCreatedEvent.aggregateId

@@ -4,20 +4,27 @@ import static com.mongodb.client.model.Aggregates.group;
 import static com.mongodb.client.model.Aggregates.match;
 import static com.mongodb.client.model.Filters.eq;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.eventstore.framework.event.Event;
+import com.marketplace.eventstore.framework.event.ImmutableTypedEvent;
+import com.marketplace.eventstore.framework.event.TypedEvent;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoCollection;
+import com.mongodb.reactivestreams.client.Success;
+import io.vavr.control.Try;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(MongoEventStoreRepositoryImpl.class);
   public static final String COL_AGGREGATE_ID = "aggregateId";
   public static final String COL_VERSION = "version";
   private final EventClassCache eventClassCache = EventClassCache.getInstance();
@@ -86,7 +93,7 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
   }
 
   @Override
-  public Event save(UUID aggregateId, Event event) {
+  public Mono<Optional<Boolean>> save(UUID aggregateId, Event event) {
     return save(aggregateId, event, 0);
   }
 
@@ -110,17 +117,47 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
   }
 
   @Override
-  public Event save(UUID aggregateId, Event event, int version) {
-    //    ImmutableMongoEventEntity eventEntity =
-    //        (ImmutableMongoEventEntity) fromEvent(event, aggregateId, version);
-    //    Publisher<WriteResult> insert = mongoEventEntityRepository.insert(eventEntity);
-    //    WriteResult writeResult = Mono.from(insert).block();
-    //
-    //    if (writeResult != null) {
-    //      return event;
-    //    }
+  public Mono<Optional<Boolean>> save(UUID aggregateId, Event event, int expectedVersion) {
+    Mono<Integer> nextVersionPublisher = getVersion(aggregateId)
+        .map(it -> it + 1);
+    Integer nextVersion = nextVersionPublisher.block();
 
-    return null;
+//    // Concurrency check.
+    if ((expectedVersion == 0) || (nextVersion != null && nextVersion == expectedVersion)) {
+      Try<MongoEventEntity> mongoEventEntities = create(aggregateId, event, expectedVersion);
+      MongoEventEntity mongoEventEntity = mongoEventEntities
+//          .onFailure(ex -> logger.info("error while creating mongo event entity for event {} with aggregateId {}",
+//              event.getId(), aggregateId))
+          .getOrElseThrow(() -> new EventPersistenceException("failed to convert event to be persisted"));
+
+      Publisher<Success> insertOne = eventCollection.insertOne(mongoEventEntity);
+      return Mono.from(insertOne)
+          .map(success -> Optional.of(success == Success.SUCCESS));
+    }
+    LOGGER.info("expected version did not match current version: expected version: {}, current version: {}",
+        expectedVersion, nextVersion);
+    return Mono.empty();
+  }
+
+  private Try<MongoEventEntity> create(UUID aggregateId, Event event, int expectedVersion) {
+    Try<TypedEvent> typedEvent = fromEvent(event);
+    return typedEvent.map(e -> ImmutableMongoEventEntity.builder()
+        .id(event.getId())
+        .aggregateId(aggregateId)
+        .version(expectedVersion)
+        .createdAt(event.createdAt())
+        .addEvents(e)
+        .streamName("ClassifiedAd:" + aggregateId.toString())
+        .build());
+  }
+
+  private Try<TypedEvent> fromEvent(Event event) {
+    Try<String> trySerialize = serialize(event);
+    return trySerialize.map(eventBody -> ImmutableTypedEvent.builder()
+        .type(event.getClass().getCanonicalName())
+        .sequenceId(0)
+        .eventBody(eventBody)
+        .build());
   }
 
   @Override
@@ -156,11 +193,7 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
         .build();
   }
 
-  private String serialize(Object object) {
-    try {
-      return objectMapper.writeValueAsString(object);
-    } catch (JsonProcessingException e) {
-      return "";
-    }
+  private Try<String> serialize(Object object) {
+    return Try.of(() -> objectMapper.writeValueAsString(object));
   }
 }
