@@ -40,6 +40,48 @@ class MongoEventStoreRepositoryFunctionalSpec extends BaseMongoContainerSpec {
                     assert it.isPresent()
                     assert it.get()
                 }
+                .expectComplete()
+                .verify()
+        when:
+        Mono<Long> docCount = eventStoreRepository.countEvents(TestEvents.testCreatedEvent.aggregateId)
+
+        then:
+        StepVerifier.create(docCount)
+                .assertNext {
+                    assert it == 1
+                }
+                .expectComplete()
+                .verify()
+    }
+
+
+    void "invalid expected version for subsequent event of aggregate cannot be saved"() {
+        when:
+        Mono<Optional<Boolean>> savedPublisher = eventStoreRepository.save(TestEvents.testCreatedEvent.aggregateId,
+                TestEvents.testCreatedEvent, 0)
+
+        then:
+        StepVerifier.create(savedPublisher)
+                .assertNext {
+                    assert it.isPresent()
+                    assert it.get()
+                }
+                .expectComplete()
+                .verify()
+
+        when:
+        Mono<Optional<Boolean>> secondSavedPublisher = eventStoreRepository.save(TestEvents.testTextUpdatedEvent
+                .aggregateId,
+                TestEvents.testTextUpdatedEvent, 2)
+
+        then:
+        StepVerifier.create(secondSavedPublisher)
+                .assertNext {
+                    assert it.isPresent()
+                    assert !it.get()
+                }
+                .expectComplete()
+                .verify()
 
         when:
         Mono<Long> docCount = eventStoreRepository.countEvents(TestEvents.testCreatedEvent.aggregateId)
@@ -49,6 +91,48 @@ class MongoEventStoreRepositoryFunctionalSpec extends BaseMongoContainerSpec {
                 .assertNext {
                     assert it == 1
                 }
+                .expectComplete()
+                .verify()
+    }
+
+    void "subsequent event of aggregate can be saved"() {
+        when:
+        Mono<Optional<Boolean>> savedPublisher = eventStoreRepository.save(TestEvents.testCreatedEvent.aggregateId,
+                TestEvents.testCreatedEvent, 0)
+
+        then:
+        StepVerifier.create(savedPublisher)
+                .assertNext {
+                    assert it.isPresent()
+                    assert it.get()
+                }
+                .expectComplete()
+                .verify()
+
+        when:
+        Mono<Optional<Boolean>> secondSavedPublisher = eventStoreRepository.save(TestEvents.testTextUpdatedEvent
+                .aggregateId,
+                TestEvents.testTextUpdatedEvent, 1)
+
+        then:
+        StepVerifier.create(secondSavedPublisher)
+                .assertNext {
+                    assert it.isPresent()
+                    assert it.get()
+                }
+                .expectComplete()
+                .verify()
+
+        when:
+        Mono<Long> docCount = eventStoreRepository.countEvents(TestEvents.testCreatedEvent.aggregateId)
+
+        then:
+        StepVerifier.create(docCount)
+                .assertNext {
+                    assert it == 2
+                }
+                .expectComplete()
+                .verify()
     }
 
     void "the maximum version of the aggregate can be retrieved"() {

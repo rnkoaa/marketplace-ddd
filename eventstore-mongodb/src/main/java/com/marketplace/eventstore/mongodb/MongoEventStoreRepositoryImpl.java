@@ -136,7 +136,7 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
     }
     LOGGER.info("expected version did not match current version: expected version: {}, current version: {}",
         expectedVersion, nextVersion);
-    return Mono.empty();
+    return Mono.just(Optional.of(false));
   }
 
   private Try<MongoEventEntity> create(UUID aggregateId, Event event, int expectedVersion) {
