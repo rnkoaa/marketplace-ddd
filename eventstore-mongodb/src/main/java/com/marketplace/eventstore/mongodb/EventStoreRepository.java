@@ -1,18 +1,19 @@
 package com.marketplace.eventstore.mongodb;
 
+import com.marketplace.eventstore.framework.event.Event;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import reactor.core.publisher.Mono;
 
 public interface EventStoreRepository<T, U> {
-  List<T> load(U aggregateId, int fromVersion);
+  Mono<List<Event>> load(U aggregateId, int fromVersion);
 
-  List<T> load(U aggregateId);
+  Mono<List<Event>> load(U aggregateId);
 
   Mono<Optional<Boolean>> save(U aggregateId, T event);
 
-  List<T> save(U aggregateId, List<T> events, int version);
+  Mono<Optional<Boolean>> save(U aggregateId, List<T> events, int version);
 
   Mono<Optional<Boolean>> save(U aggregateId, T event, int version);
 
