@@ -7,8 +7,10 @@ import com.marketplace.eventstore.framework.event.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import reactor.core.publisher.Mono;
 
 public class InMemoryEventStore implements EventStore<Event> {
+
   private final EventPublisher<Event> eventPublisher;
 
   private final Map<String, List<EventRecord>> entityStore = new HashMap<>();
@@ -18,10 +20,10 @@ public class InMemoryEventStore implements EventStore<Event> {
   }
 
   @Override
-  public EventStream<Event> load(String streamId) {
+  public Mono<EventStream<Event>> load(String streamId) {
     List<EventRecord> eventStream = entityStore.get(streamId);
     if (eventStream == null || eventStream.size() == 0) {
-      return new EventStreamImpl(streamId, "", 0, List.of());
+      return Mono.just(new EventStreamImpl(streamId, "", 0, List.of()));
     }
 
     eventStream.sort(Comparator.comparing(EventRecord::getVersion));
@@ -30,14 +32,14 @@ public class InMemoryEventStore implements EventStore<Event> {
         eventStream.stream().map(EventRecord::getEvent).collect(Collectors.toList());
 
     int version = eventStream.get(eventStream.size() - 1).getVersion();
-    return new EventStreamImpl(streamId, "", version, events);
+    return Mono.just(new EventStreamImpl(streamId, "", version, events));
   }
 
   @Override
-  public EventStream<Event> load(String streamId, int fromVersion) {
+  public Mono<EventStream<Event>> load(String streamId, int fromVersion) {
     List<EventRecord> eventStream = entityStore.get(streamId);
     if (eventStream == null || eventStream.size() == 0) {
-      return new EventStreamImpl(streamId, "", 0, List.of());
+      return Mono.just(new EventStreamImpl(streamId, "", 0, List.of()));
     }
 
     eventStream.sort(Comparator.comparing(EventRecord::getVersion));
@@ -49,102 +51,111 @@ public class InMemoryEventStore implements EventStore<Event> {
             .map(EventRecord::getEvent)
             .collect(Collectors.toList());
 
-    return new EventStreamImpl(streamId, "", version, events);
+    return Mono.just(new EventStreamImpl(streamId, "", version, events));
   }
 
   @Override
-  public OperationResult append(String streamId, int expectedVersion, List<Event> events) {
-    int currentVersion = getVersion(streamId);
-    int nextVersion = currentVersion + 1;
-    if ((expectedVersion == 0) || nextVersion == expectedVersion) {
-      int numberOfEvents = events.size();
-      List<EventRecord> eventStream = entityStore.get(streamId);
-      if (eventStream == null) {
-        eventStream = new ArrayList<>();
-      }
-      for (int index = 0; index < numberOfEvents; index++) {
-        Event event = events.get(index);
-        EventRecord eventEntity = EventRecord.fromEvent(streamId, event, expectedVersion + index);
-        eventStream.add(eventEntity);
-      }
-      entityStore.put(streamId, eventStream);
-      return new Success();
-    }
-    return new Failure(
-        String.format("expected version: %d, actual: %d", expectedVersion, nextVersion));
+  public Mono<OperationResult> append(String streamId, int expectedVersion, List<Event> events) {
+    return getVersion(streamId)
+        .map(currentVersion -> {
+          int nextVersion = currentVersion + 1;
+
+          if ((expectedVersion == 0) || nextVersion == expectedVersion) {
+            int numberOfEvents = events.size();
+            List<EventRecord> eventStream = entityStore.get(streamId);
+            if (eventStream == null) {
+              eventStream = new ArrayList<>();
+            }
+            for (int index = 0; index < numberOfEvents; index++) {
+              Event event = events.get(index);
+              EventRecord eventEntity = EventRecord.fromEvent(streamId, event, expectedVersion + index);
+              eventStream.add(eventEntity);
+            }
+            entityStore.put(streamId, eventStream);
+            return new Success();
+          }
+          return new Failure(String.format("expected version: %d, actual: %d", expectedVersion, nextVersion));
+        });
   }
 
   @Override
-  public OperationResult append(String streamId, int expectedVersion, Event event) {
-    int currentVersion = getVersion(streamId);
-    int nextVersion = currentVersion + 1;
+  public Mono<OperationResult> append(String streamId, int expectedVersion, Event event) {
+    return getVersion(streamId)
+        .map(currentVersion -> {
+          int nextVersion = currentVersion + 1;
 
-    // Concurrency check.
-    if ((expectedVersion == 0) || nextVersion == expectedVersion) {
-      var entity = EventRecord.fromEvent(streamId, event, expectedVersion);
-      List<EventRecord> eventStream = entityStore.get(streamId);
-      if (eventStream == null) {
-        eventStream = new ArrayList<>();
-      }
-      eventStream.add(entity);
-      entityStore.put(streamId, eventStream);
-      return new Success();
-    }
-    return new Failure(
-        String.format("expected version: %d, actual: %d", expectedVersion, nextVersion));
+          // Concurrency check.
+          if ((expectedVersion == 0) || nextVersion == expectedVersion) {
+            var entity = EventRecord.fromEvent(streamId, event, expectedVersion);
+            List<EventRecord> eventStream = entityStore.get(streamId);
+            if (eventStream == null) {
+              eventStream = new ArrayList<>();
+            }
+            eventStream.add(entity);
+            entityStore.put(streamId, eventStream);
+            return new Success();
+          }
+          return new Failure(
+              String.format("expected version: %d, actual: %d", expectedVersion, nextVersion));
+        });
   }
 
   @Override
-  public int size() {
-    return entityStore.size();
+  public Mono<Integer> size() {
+    return Mono.just(entityStore.size());
   }
 
   @Override
-  public int streamSize(String streamId) {
-    return load(streamId).size();
+  public Mono<Integer> streamSize(String streamId) {
+    return load(streamId).map(EventStream::size);
   }
 
   @Override
-  public int getVersion(String streamId) {
+  public Mono<Integer> getVersion(String streamId) {
     List<EventRecord> eventStream = entityStore.get(streamId);
     if (eventStream == null || eventStream.isEmpty()) {
-      return 0;
+      return Mono.just(0);
     }
 
     eventStream.sort(Comparator.comparing(EventRecord::getVersion));
-    return eventStream.get(eventStream.size() - 1).getVersion();
+    return Mono.just(eventStream.get(eventStream.size() - 1).getVersion());
   }
 
   @Override
-  public int nextVersion(String streamId) {
-    int currentVersion = getVersion(streamId);
-    return ++currentVersion;
+  public Mono<Integer> nextVersion(String streamId) {
+    return getVersion(streamId).map(currentVersion -> ++currentVersion);
   }
 
   @Override
-  public OperationResult publish(String streamId, Event event) {
+  public Mono<OperationResult> publish(String streamId, Event event) {
     var appendResult = append(streamId, 0, event);
-    if (Success.matches(appendResult)) {
-      eventPublisher.publish(streamId, event);
-    }
-    return appendResult;
+    return appendResult.flatMap(result -> {
+      if (Success.matches(result)) {
+        eventPublisher.publish(streamId, event);
+      }
+      return appendResult;
+    });
   }
 
   @Override
-  public OperationResult publish(String streamId, int expectedVersion, List<Event> events) {
+  public Mono<OperationResult> publish(String streamId, int expectedVersion, List<Event> events) {
     var appendResult = append(streamId, expectedVersion, events);
-    if (Success.matches(appendResult)) {
-      eventPublisher.publish(streamId, events);
-    }
-    return appendResult;
+    return appendResult.flatMap(result -> {
+      if (Success.matches(result)) {
+        eventPublisher.publish(streamId, events);
+      }
+      return appendResult;
+    });
   }
 
   @Override
-  public OperationResult publish(String streamId, int expectedVersion, Event event) {
+  public Mono<OperationResult> publish(String streamId, int expectedVersion, Event event) {
     var appendResult = append(streamId, expectedVersion, event);
-    if (Success.matches(appendResult)) {
-      eventPublisher.publish(streamId, event);
-    }
-    return appendResult;
+    return appendResult.flatMap(result -> {
+      if (Success.matches(result)) {
+        eventPublisher.publish(streamId, event);
+      }
+      return appendResult;
+    });
   }
 }
