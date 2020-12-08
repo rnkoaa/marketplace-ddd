@@ -8,8 +8,12 @@ public interface Event {
   /**
    * @return time when event was created
    */
-  default Instant createdAt() {
+  default Instant getCreatedAt() {
     return Instant.now();
+  }
+
+  default long getVersion() {
+    return 0;
   }
 
 

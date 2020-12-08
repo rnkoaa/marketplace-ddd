@@ -16,6 +16,7 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.Success;
 import io.vavr.control.Try;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +34,6 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MongoEventStoreRepositoryImpl.class);
   public static final String COL_AGGREGATE_ID = "aggregateId";
-  public static final String COL_ID = "_id";
   public static final String COL_VERSION = "version";
   private final EventClassCache eventClassCache = EventClassCache.getInstance();
 
@@ -48,11 +48,6 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
 
   @Override
   public Mono<List<Event>> load(UUID aggregateId, int fromVersion) {
-    // {"$and": [{"aggregateId": {"$eq": UUID('246219a4-4266-440b-964e-f292baadf133')} }, {"version": {"$gte": 2}}]}
-//    FindPublisher<MongoEventEntity> findPublisher = eventCollection.find(Filters.and(
-//        eq(COL_AGGREGATE_ID, aggregateId),
-//        gte(COL_VERSION, fromVersion)
-//    ));
     return find(Filters.and(
         eq(COL_AGGREGATE_ID, aggregateId),
         gte(COL_VERSION, fromVersion)
@@ -73,7 +68,9 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
   private List<Event> convertToEvent(List<MongoEventEntity> eventEntities) {
     return eventEntities.stream()
         .flatMap(eventEntity -> convertToEvent(eventEntity).stream())
-        .collect(Collectors.toList());
+        .sorted(Comparator.comparing(Event::getVersion).thenComparing(Event::getCreatedAt))
+        .collect(Collectors.toList())
+        ;
   }
 
   private List<Event> convertToEvent(MongoEventEntity eventEntity) {
@@ -92,6 +89,14 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
   @Override
   public Mono<Optional<Boolean>> save(UUID aggregateId, Event event) {
     return save(aggregateId, event, 0);
+  }
+
+  @Override
+  public Mono<Optional<Boolean>> save(Event event) {
+    if (event.getAggregateId() == null) {
+      return Mono.just(Optional.of(false));
+    }
+    return save(event.getAggregateId(), event, 0);
   }
 
   @Override
@@ -115,23 +120,29 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
 
   @Override
   public Mono<Optional<Boolean>> save(UUID aggregateId, Event event, int expectedVersion) {
-    Mono<Integer> nextVersionPublisher = getVersion(aggregateId)
-        .map(it -> it + 1);
-    Integer nextVersion = nextVersionPublisher.block();
+    return getVersion(aggregateId)
+        .flatMap(currentVersion -> {
+          int nextVersion = currentVersion + 1;
+          if (expectedVersion == 0 || nextVersion == expectedVersion) {
+            Try<MongoEventEntity> mongoEventEntities = create(aggregateId, event, expectedVersion);
+            MongoEventEntity mongoEventEntity = mongoEventEntities
+                .getOrElseThrow(() -> new EventPersistenceException("failed to convert event to be persisted"));
+            Publisher<Success> insertOne = eventCollection.insertOne(mongoEventEntity);
+            return Mono.from(insertOne)
+                .map(success -> Optional.of(success == Success.SUCCESS));
+          }
+          LOGGER.info("expected version did not match current version: expected version: {}, current version: {}",
+              expectedVersion, nextVersion);
+          return Mono.just(Optional.of(false));
+        });
+  }
 
-//    // Concurrency check.
-    if ((expectedVersion == 0) || (nextVersion != null && nextVersion == expectedVersion)) {
-      Try<MongoEventEntity> mongoEventEntities = create(aggregateId, event, expectedVersion);
-      MongoEventEntity mongoEventEntity = mongoEventEntities
-          .getOrElseThrow(() -> new EventPersistenceException("failed to convert event to be persisted"));
-
-      Publisher<Success> insertOne = eventCollection.insertOne(mongoEventEntity);
-      return Mono.from(insertOne)
-          .map(success -> Optional.of(success == Success.SUCCESS));
+  @Override
+  public Mono<Optional<Boolean>> save(Event event, int version) {
+    if (event.getAggregateId() == null) {
+      return Mono.just(Optional.of(false));
     }
-    LOGGER.info("expected version did not match current version: expected version: {}, current version: {}",
-        expectedVersion, nextVersion);
-    return Mono.just(Optional.of(false));
+    return save(event.getAggregateId(), event, version);
   }
 
   private Try<MongoEventEntity> create(UUID aggregateId, Event event, int expectedVersion) {
@@ -140,7 +151,7 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
         .id(event.getId())
         .aggregateId(aggregateId)
         .version(expectedVersion)
-        .createdAt(event.createdAt())
+        .createdAt(event.getCreatedAt())
         .addEvents(e)
         .streamName("ClassifiedAd:" + aggregateId.toString())
         .build());
@@ -156,7 +167,7 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
         .id(events.get(0).getId())
         .aggregateId(aggregateId)
         .version(expectedVersion)
-        .createdAt(events.get(0).createdAt())
+        .createdAt(events.get(0).getCreatedAt())
         .addAllEvents(typedEvents)
         .streamName("ClassifiedAd:" + aggregateId.toString())
         .build();
@@ -189,19 +200,6 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
     Publisher<Long> countPublisher = eventCollection.countDocuments(eq(COL_AGGREGATE_ID, aggregateId));
     return Mono.from(countPublisher)
         .switchIfEmpty(Mono.just(0L));
-  }
-
-  private MongoEventEntity fromEvent(Event event, UUID aggregateId, int version) {
-
-    return ImmutableMongoEventEntity.builder()
-        .aggregateId(aggregateId)
-        .createdAt(event.createdAt())
-        .streamName(event.aggregateName())
-        //        .eventType(event.getClass().getCanonicalName())
-        //        .eventBody(serialize(event))
-        .id(event.getId())
-        .version(version)
-        .build();
   }
 
   private Try<String> serialize(Object object) {

@@ -73,7 +73,7 @@ public class EventStoreApplication {
             .streamName("ClassifiedAd:" + aggregateId)
             .aggregateId(testEvent.getAggregateId())
             .id(testEvent.getId())
-            .createdAt(testEvent.createdAt())
+            .createdAt(testEvent.getCreatedAt())
             .version(0)
             .build();
 

@@ -61,6 +61,30 @@ class MongoEventStoreRepositoryFunctionalSpec extends BaseMongoContainerSpec {
                 .verify()
     }
 
+    void "an event can be saved with the aggregateId if the event has the aggregateId"() {
+        when:
+        Mono<Optional<Boolean>> savedPublisher = eventStoreRepository.save(testCreatedEvent)
+
+        then:
+        StepVerifier.create(savedPublisher)
+                .assertNext {
+                    assert it.isPresent()
+                    assert it.get()
+                }
+                .expectComplete()
+                .verify()
+        when:
+        Mono<Long> docCount = eventStoreRepository.countEvents(testCreatedEvent.aggregateId)
+
+        then:
+        StepVerifier.create(docCount)
+                .assertNext {
+                    assert it == 1
+                }
+                .expectComplete()
+                .verify()
+    }
+
     void "invalid expected version for subsequent event of aggregate cannot be saved"() {
         when:
         Mono<Optional<Boolean>> savedPublisher = eventStoreRepository.save(testCreatedEvent.aggregateId,
