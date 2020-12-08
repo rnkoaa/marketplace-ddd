@@ -6,12 +6,25 @@ import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.eventstore.framework.event.EventStream;
 
 import java.util.List;
+import java.util.UUID;
+import javax.validation.constraints.NotNull;
 import reactor.core.publisher.Mono;
 
 public class MongoEventStoreImpl implements EventStore<Event> {
 
+  private final MongoEventStoreRepository eventStoreRepository;
+
+  public MongoEventStoreImpl(MongoEventStoreRepository eventStoreRepository) {
+    this.eventStoreRepository = eventStoreRepository;
+  }
+
   @Override
   public Mono<EventStream<Event>> load(String streamId) {
+    var aggregateInfo = getAggregateInfo(streamId);
+    if(aggregateInfo == null) {
+      return Mono.empty();
+    }
+    Mono<List<Event>> events = eventStoreRepository.load(aggregateInfo.aggregateId);
     return null;
   }
 
@@ -63,5 +76,22 @@ public class MongoEventStoreImpl implements EventStore<Event> {
   @Override
   public Mono<OperationResult> publish(String streamId, int expectedVersion, Event event) {
     return null;
+  }
+
+  /**
+   * @param streamId format (AggregateName:AggregateId)
+   * @return
+   */
+  private AggregateInfo getAggregateInfo(@NotNull String streamId) {
+    String[] split = streamId.split(":");
+    if (split.length != 2) {
+      return null;
+    }
+
+    return new AggregateInfo(split[0], UUID.fromString(split[1]));
+  }
+
+  static record AggregateInfo(String aggregateName, UUID aggregateId) {
+
   }
 }
