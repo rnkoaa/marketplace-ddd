@@ -53,7 +53,7 @@ public interface EventStore<T> {
    *
    * @return of the current eventstore based on the number of eventstreams
    */
-  Mono<Integer> size();
+  Mono<Long> size();
 
   /**
    * The size of the stream we are interested in
@@ -61,7 +61,7 @@ public interface EventStore<T> {
    * @param streamId id of the stream to query for size
    * @return size of the stream if it exists
    */
-  Mono<Integer> streamSize(String streamId);
+  Mono<Long> streamSize(String streamId);
 
   /**
    * The latest version of the stream we are interested in

@@ -50,7 +50,7 @@ class InMemoryEventStoreTest {
   @Test
   void emptyEventStoreWithoutEvents() {
     StepVerifier.create(eventStore.size())
-        .expectNext(0)
+        .expectNext(0L)
         .expectComplete()
         .verify();
   }
@@ -65,7 +65,7 @@ class InMemoryEventStoreTest {
     eventStore.append(streamId, 0, classifiedAdCreated).block();
 
     StepVerifier.create(eventStore.size())
-        .expectNext(1)
+        .expectNext(1L)
         .expectComplete()
         .verify();
 
@@ -119,7 +119,7 @@ class InMemoryEventStoreTest {
         .verify();
 
     StepVerifier.create(eventStore.size())
-        .expectNext(1)
+        .expectNext(1L)
         .expectComplete()
         .verify();
 
@@ -142,7 +142,7 @@ class InMemoryEventStoreTest {
     eventStore.append(streamId, 0, classifiedAdCreated).block();
 
     StepVerifier.create(eventStore.size())
-        .expectNext(1)
+        .expectNext(1L)
         .expectComplete()
         .verify();
   }
@@ -170,7 +170,7 @@ class InMemoryEventStoreTest {
         .block();
 //
     StepVerifier.create(eventStore.size())
-        .expectNext(2)
+        .expectNext(2L)
         .expectComplete()
         .verify();
   }
@@ -190,7 +190,7 @@ class InMemoryEventStoreTest {
         .block();
 
     StepVerifier.create(eventStore.size())
-        .expectNext(1)
+        .expectNext(1L)
         .expectComplete()
         .verify();
 
@@ -215,7 +215,7 @@ class InMemoryEventStoreTest {
     eventStore.publish(streamId, 0, classifiedAdCreated)
         .block();
     StepVerifier.create(eventStore.size())
-        .expectNext(1)
+        .expectNext(1L)
         .expectComplete()
         .verify();
 //

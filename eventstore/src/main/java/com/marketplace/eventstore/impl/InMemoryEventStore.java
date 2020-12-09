@@ -101,13 +101,13 @@ public class InMemoryEventStore implements EventStore<Event> {
   }
 
   @Override
-  public Mono<Integer> size() {
-    return Mono.just(entityStore.size());
+  public Mono<Long> size() {
+    return Mono.just((long) entityStore.size());
   }
 
   @Override
-  public Mono<Integer> streamSize(String streamId) {
-    return load(streamId).map(EventStream::size);
+  public Mono<Long> streamSize(String streamId) {
+    return load(streamId).map(eventStream -> (long) eventStream.size());
   }
 
   @Override
