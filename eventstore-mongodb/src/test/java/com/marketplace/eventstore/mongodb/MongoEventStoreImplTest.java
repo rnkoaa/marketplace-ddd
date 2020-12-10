@@ -64,7 +64,7 @@ class MongoEventStoreImplTest {
       Mono<EventStream<Event>> eventStreamMono = eventStore.load(validStreamId, fromVersion);
       StepVerifier.create(eventStreamMono)
           .assertNext(eventStream -> {
-            assertThat(eventStreasdkm).isNotNull();
+            assertThat(eventStream).isNotNull();
             assertThat(eventStream.size()).isEqualTo(2);
             assertThat(eventStream.getVersion()).isEqualTo(2);
             assertThat(eventStream.getId()).isEqualTo(validStreamId);
