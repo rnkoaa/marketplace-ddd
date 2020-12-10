@@ -8,6 +8,7 @@ import com.marketplace.eventstore.test.events.ImmutableTestTitleUpdatedEvent;
 import com.marketplace.eventstore.test.events.TestCreatedEvent;
 import com.marketplace.eventstore.test.events.TestTextUpdatedEvent;
 import com.marketplace.eventstore.test.events.TestTitleUpdatedEvent;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,12 +30,14 @@ public class TestEvents {
   public static TestCreatedEvent testCreatedEvent = ImmutableTestCreatedEvent.builder()
       .aggregateId(aggregateId)
       .id(createdEventId)
+      .createdAt(Instant.now())
       .build();
 
   public static TestTitleUpdatedEvent testTitleUpdatedEvent = ImmutableTestTitleUpdatedEvent
       .builder()
       .aggregateId(aggregateId)
       .id(titleUpdatedEventId)
+      .version(1)
       .title("first title")
       .build();
 
@@ -49,6 +52,7 @@ public class TestEvents {
       .builder()
       .aggregateId(aggregateId)
       .id(textUpdatedEventId)
+      .version(2)
       .text("item is being sold as is")
       .build();
 

@@ -17,6 +17,7 @@ public interface Event {
   }
 
 
+
   /**
    * @return the id of the current event
    */
@@ -30,7 +31,7 @@ public interface Event {
   /**
    * @return name of the class from which this aggregate was published from
    */
-  default String aggregateName() {
+  default String getAggregateName() {
     return getClass().getSimpleName();
   }
 }

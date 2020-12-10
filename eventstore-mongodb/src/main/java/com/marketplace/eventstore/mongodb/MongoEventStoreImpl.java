@@ -7,8 +7,11 @@ import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.eventstore.framework.event.EventStream;
 
 import com.marketplace.eventstore.framework.event.EventStreamImpl;
+import io.vavr.control.Try;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import reactor.core.publisher.Mono;
@@ -25,34 +28,51 @@ public class MongoEventStoreImpl implements EventStore<Event> {
 
   @Override
   public Mono<EventStream<Event>> load(String streamId) {
-    var aggregateInfo = getAggregateInfo(streamId);
-    if (aggregateInfo == null) {
-      return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));
-    }
-    return eventStoreRepository.load(aggregateInfo.aggregateId)
-        .map(events -> {
-          if (events.size() > 0) {
-            Event lastEvent = events.get(events.size() - 1);
-            return new EventStreamImpl(streamId, "", (int) lastEvent.getVersion(), events);
+    var tryAggregateInfo = Try.of(() -> getAggregateInfo(streamId));
+    Try<Mono<EventStream<Event>>> tryResult = tryAggregateInfo
+        .map(aggregateInfo -> {
+          if (aggregateInfo == null) {
+            return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));
           }
-          return new EventStreamImpl(streamId, "", 0, List.of());
+          return eventStoreRepository.load(aggregateInfo.aggregateId)
+              .map(events -> {
+                if (events.size() > 0) {
+                  // ensure the events are properly sorted.
+                  events = events.stream().sorted(Comparator.comparing(Event::getVersion).thenComparing(Event::getCreatedAt))
+                      .collect(Collectors.toUnmodifiableList());
+                  Event lastEvent = events.get(events.size() - 1);
+                  return new EventStreamImpl(streamId, lastEvent.getAggregateName(), (int) lastEvent.getVersion(), events);
+                }
+                return new EventStreamImpl(streamId, "", 0, List.of());
+              });
         });
+    if (tryResult.isSuccess()) {
+      return tryResult.get();
+    }
+    return Mono.error(tryResult.getCause());
   }
 
   @Override
   public Mono<EventStream<Event>> load(String streamId, int fromVersion) {
-    var aggregateInfo = getAggregateInfo(streamId);
-    if (aggregateInfo == null) {
-      return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));
-    }
-    return eventStoreRepository.load(aggregateInfo.aggregateId, fromVersion)
-        .map(events -> {
-          if (events.size() > 0) {
-            Event lastEvent = events.get(events.size() - 1);
-            return new EventStreamImpl(streamId, "", (int) lastEvent.getVersion(), events);
+    var tryAggregateInfo = Try.of(() -> getAggregateInfo(streamId));
+    Try<Mono<EventStream<Event>>> tryResult = tryAggregateInfo
+        .map(aggregateInfo -> {
+          if (aggregateInfo == null) {
+            return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));
           }
-          return new EventStreamImpl(streamId, "", 0, List.of());
+          return eventStoreRepository.load(aggregateInfo.aggregateId, fromVersion)
+              .map(events -> {
+                if (events.size() > 0) {
+                  Event lastEvent = events.get(events.size() - 1);
+                  return new EventStreamImpl(streamId, lastEvent.getAggregateName(), (int) lastEvent.getVersion(), events);
+                }
+                return new EventStreamImpl(streamId, "", 0, List.of());
+              });
         });
+    if (tryResult.isSuccess()) {
+      return tryResult.get();
+    }
+    return Mono.error(tryResult.getCause());
   }
 
   @Override

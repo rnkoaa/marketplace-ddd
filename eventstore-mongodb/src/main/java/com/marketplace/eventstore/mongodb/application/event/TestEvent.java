@@ -38,12 +38,8 @@ public class TestEvent implements Event {
     return new TestEvent(id, aggregateId, title, text);
   }
 
-  public String getAggregateName() {
-    return aggregateName;
-  }
-
   @Override
-  public String aggregateName() {
+  public String getAggregateName() {
     return "%s:%s".formatted(aggregateName, getAggregateId().toString());
   }
 
