@@ -61,7 +61,7 @@ class InMemoryEventStoreTest {
     String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
     var classifiedAdCreated = new ClassifiedAdCreated(ownerId1, classifiedAdId1);
 
-    String streamId = String.format("%s:%s", classifiedAdCreated.aggregateName(), classifiedAdId1);
+    String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
     eventStore.append(streamId, 0, classifiedAdCreated).block();
 
     StepVerifier.create(eventStore.size())
@@ -105,7 +105,7 @@ class InMemoryEventStoreTest {
     String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
     var classifiedAdCreated = new ClassifiedAdCreated(ownerId1, classifiedAdId1);
 
-    String streamId = String.format("%s:%s", classifiedAdCreated.aggregateName(), classifiedAdId1);
+    String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
 
     var classifiedAdTitleUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
     var appendResult =
@@ -138,7 +138,7 @@ class InMemoryEventStoreTest {
     String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
     var classifiedAdCreated = new ClassifiedAdCreated(ownerId1, classifiedAdId1);
 
-    String streamId = String.format("%s:%s", classifiedAdCreated.aggregateName(), classifiedAdId1);
+    String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
     eventStore.append(streamId, 0, classifiedAdCreated).block();
 
     StepVerifier.create(eventStore.size())

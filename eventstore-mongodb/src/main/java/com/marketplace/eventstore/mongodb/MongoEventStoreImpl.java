@@ -77,45 +77,31 @@ public class MongoEventStoreImpl implements EventStore<Event> {
 
   @Override
   public Mono<OperationResult> append(String streamId, int expectedVersion, List<Event> events) {
-    var aggregateInfo = getAggregateInfo(streamId);
-    if (aggregateInfo == null) {
-      return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));
-    }
-    return eventStoreRepository.save(aggregateInfo.aggregateId, events, expectedVersion)
-        .map(retVal -> {
-          if (retVal.isPresent()) {
-            return retVal.map(it -> {
-              if (it) {
+    return parseAggregateInfo(streamId)
+        .map(aggregateInfo -> eventStoreRepository.save(aggregateInfo.aggregateId, events, expectedVersion)
+            .map(retVal -> {
+              boolean saveStatus = retVal.orElse(false);
+              if (saveStatus) {
                 return new OperationResult.Success();
               }
               return new OperationResult.Failure("appending to stream failed. please try again");
-            });
-          }
-          return new OperationResult.Failure("appending to stream failed. please try again");
-        })
-        .map(res -> (OperationResult) res);
+            }))
+        .getOrElse(Mono.error(new IllegalArgumentException("unable to parse stream id")));
   }
 
   @Override
   public Mono<OperationResult> append(String streamId, int expectedVersion, Event event) {
-    var aggregateInfo = getAggregateInfo(streamId);
-    if (aggregateInfo == null) {
-      return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));
-//      return Mono.empty();
-    }
-    return eventStoreRepository.save(aggregateInfo.aggregateId, event, expectedVersion)
-        .map(retVal -> {
-          if (retVal.isPresent()) {
-            return retVal.map(it -> {
-              if (it) {
+    return parseAggregateInfo(streamId)
+        .map(aggregateInfo -> eventStoreRepository.save(aggregateInfo.aggregateId, event, expectedVersion)
+            .map(retVal -> {
+              boolean saveStatus = retVal.orElse(false);
+              if (saveStatus) {
                 return new OperationResult.Success();
               }
               return new OperationResult.Failure("appending to stream failed. please try again");
-            });
-          }
-          return new OperationResult.Failure("appending to stream failed. please try again");
-        })
-        .map(res -> (OperationResult) res);
+            }))
+        .getOrElse(Mono.error(new IllegalArgumentException("unable to parse stream id")));
+
   }
 
   @Override
@@ -125,22 +111,16 @@ public class MongoEventStoreImpl implements EventStore<Event> {
 
   @Override
   public Mono<Long> streamSize(String streamId) {
-    var aggregateInfo = getAggregateInfo(streamId);
-    if (aggregateInfo == null) {
-      return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));
-//      return Mono.empty();
-    }
-    return eventStoreRepository.countEvents(aggregateInfo.aggregateId);
+    return parseAggregateInfo(streamId)
+        .map(aggregateInfo -> eventStoreRepository.countEvents(aggregateInfo.aggregateId))
+        .getOrElse(Mono.error(new IllegalArgumentException("unable to process streamId into its parts")));
   }
 
   @Override
   public Mono<Integer> getVersion(String streamId) {
-    var aggregateInfo = getAggregateInfo(streamId);
-    if (aggregateInfo == null) {
-      return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));
-    }
-
-    return eventStoreRepository.getVersion(aggregateInfo.aggregateId);
+    return parseAggregateInfo(streamId)
+        .map(aggregateInfo -> eventStoreRepository.getVersion(aggregateInfo.aggregateId))
+        .getOrElse(Mono.error(new IllegalArgumentException("unable to process streamId into its parts")));
   }
 
   @Override
@@ -156,10 +136,6 @@ public class MongoEventStoreImpl implements EventStore<Event> {
 
   @Override
   public Mono<OperationResult> publish(String streamId, int expectedVersion, List<Event> events) {
-    var aggregateInfo = getAggregateInfo(streamId);
-    if (aggregateInfo == null) {
-      return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));
-    }
     return append(streamId, 0, events)
         .doOnNext(res -> {
           if (res instanceof OperationResult.Success) {
@@ -170,16 +146,16 @@ public class MongoEventStoreImpl implements EventStore<Event> {
 
   @Override
   public Mono<OperationResult> publish(String streamId, int expectedVersion, Event event) {
-    var aggregateInfo = getAggregateInfo(streamId);
-    if (aggregateInfo == null) {
-      return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));
-    }
     return append(streamId, 0, event)
         .doOnNext(res -> {
           if (res instanceof OperationResult.Success) {
             eventPublisher.publish(streamId, event);
           }
         });
+  }
+
+  private Try<AggregateInfo> parseAggregateInfo(String streamId) {
+    return Try.of(() -> getAggregateInfo(streamId));
   }
 
   /**
@@ -189,7 +165,7 @@ public class MongoEventStoreImpl implements EventStore<Event> {
   private AggregateInfo getAggregateInfo(@NotNull String streamId) {
     String[] split = streamId.split(":");
     if (split.length != 2) {
-      return null;
+      throw new IllegalArgumentException("Stream parts should be two");
     }
 
     return new AggregateInfo(split[0], UUID.fromString(split[1]));
