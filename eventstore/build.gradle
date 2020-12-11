@@ -13,6 +13,7 @@ dependencies {
     compileOnly 'org.immutables:value:2.8.2'
     annotationProcessor 'org.immutables:value:2.8.2'
 
+    implementation 'io.projectreactor:reactor-core:3.4.0'
     implementation("com.google.guava:guava:30.0-jre")
 
     testImplementation(platform("org.junit:junit-bom:${junitVersion}"))
@@ -20,6 +21,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core:${assertjVersion}")
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
     testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
+    testImplementation('io.projectreactor:reactor-test:3.4.0')
 
 }
 

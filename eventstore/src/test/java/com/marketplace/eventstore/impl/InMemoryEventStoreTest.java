@@ -1,23 +1,29 @@
 package com.marketplace.eventstore.impl;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import com.google.common.eventbus.EventBus;
+import com.marketplace.eventstore.framework.OperationResult;
 import com.marketplace.eventstore.framework.OperationResult.Success;
 import com.marketplace.eventstore.framework.event.Event;
 import com.marketplace.eventstore.framework.event.EventListener;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.eventstore.framework.event.EventStream;
-import com.marketplace.eventstore.impl.fixtures.classifiedad.*;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdCreated;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventListener;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventProcessor;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdTextUpdated;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdTitleUpdated;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @SuppressWarnings("UnstableApiUsage")
 class InMemoryEventStoreTest {
@@ -43,7 +49,10 @@ class InMemoryEventStoreTest {
 
   @Test
   void emptyEventStoreWithoutEvents() {
-    assertThat(eventStore.size()).isEqualTo(0);
+    StepVerifier.create(eventStore.size())
+        .expectNext(0L)
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -52,24 +61,42 @@ class InMemoryEventStoreTest {
     String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
     var classifiedAdCreated = new ClassifiedAdCreated(ownerId1, classifiedAdId1);
 
-    String streamId = String.format("%s:%s", classifiedAdCreated.aggregateName(), classifiedAdId1);
-    eventStore.append(streamId, 0, classifiedAdCreated);
+    String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
+    eventStore.append(streamId, 0, classifiedAdCreated).block();
 
-    assertThat(eventStore.size()).isEqualTo(1);
+    StepVerifier.create(eventStore.size())
+        .expectNext(1L)
+        .expectComplete()
+        .verify();
 
     var classifiedAdTextUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
+//
+    Mono<EventStream<Event>> eventStreamPublisher = eventStore.load(streamId);
+    StepVerifier.create(eventStreamPublisher)
+        .assertNext(eventStream -> {
+          assertThat(eventStream.getVersion()).isEqualTo(0);
+        })
+        .expectComplete()
+        .verify();
 
-    EventStream<Event> eventStream = eventStore.load(streamId);
-    assertThat(eventStream.getVersion()).isEqualTo(0);
+    Mono<OperationResult> appendResult = eventStreamPublisher.flatMap(eventStream -> {
+      int expectedVersion = eventStream.getVersion() + 1;
+      return eventStore.append(streamId, expectedVersion, classifiedAdTextUpdated);
+    });
 
-    int expectedVersion = eventStream.getVersion() + 1;
-    var appendResult = eventStore.append(streamId, expectedVersion, classifiedAdTextUpdated);
-    assertThat(eventStore.size()).isEqualTo(1);
-    assertThat(appendResult).isInstanceOf(Success.class);
+    StepVerifier.create(appendResult)
+        .assertNext(result -> {
+          assertThat(result).isInstanceOf(Success.class);
+        })
+        .expectComplete()
+        .verify();
 
-    eventStream = eventStore.load(streamId);
-    assertThat(eventStream.getVersion()).isEqualTo(1);
-    assertThat(eventStream.size()).isEqualTo(2);
+    StepVerifier.create(eventStore.load(streamId))
+        .assertNext(eventStream -> {
+          assertThat(eventStream.getVersion()).isEqualTo(1);
+        })
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -78,17 +105,31 @@ class InMemoryEventStoreTest {
     String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
     var classifiedAdCreated = new ClassifiedAdCreated(ownerId1, classifiedAdId1);
 
-    String streamId = String.format("%s:%s", classifiedAdCreated.aggregateName(), classifiedAdId1);
+    String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
 
     var classifiedAdTitleUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
-    var result =
+    var appendResult =
         eventStore.append(streamId, 0, List.of(classifiedAdCreated, classifiedAdTitleUpdated));
-    assertThat(result).isInstanceOf(Success.class);
-    assertThat(eventStore.size()).isEqualTo(1);
 
-    EventStream<Event> eventStream = eventStore.load(streamId);
-    assertThat(eventStream.size()).isEqualTo(2);
-    assertThat(eventStream.getVersion()).isEqualTo(1);
+    StepVerifier.create(appendResult)
+        .assertNext(result -> {
+          assertThat(result).isInstanceOf(Success.class);
+        })
+        .expectComplete()
+        .verify();
+
+    StepVerifier.create(eventStore.size())
+        .expectNext(1L)
+        .expectComplete()
+        .verify();
+
+    StepVerifier.create(eventStore.load(streamId))
+        .assertNext(eventStream -> {
+          assertThat(eventStream.size()).isEqualTo(2);
+          assertThat(eventStream.getVersion()).isEqualTo(1);
+        })
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -97,10 +138,13 @@ class InMemoryEventStoreTest {
     String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
     var classifiedAdCreated = new ClassifiedAdCreated(ownerId1, classifiedAdId1);
 
-    String streamId = String.format("%s:%s", classifiedAdCreated.aggregateName(), classifiedAdId1);
-    eventStore.append(streamId, 0, classifiedAdCreated);
+    String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
+    eventStore.append(streamId, 0, classifiedAdCreated).block();
 
-    assertThat(eventStore.size()).isEqualTo(1);
+    StepVerifier.create(eventStore.size())
+        .expectNext(1L)
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -111,21 +155,24 @@ class InMemoryEventStoreTest {
 
     String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId1);
 
-    var result =
-        eventStore.append(
-            streamId,
-            0,
-            createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1)));
+    eventStore.append(
+        streamId,
+        0,
+        createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1)))
+        .block();
 
     String streamId2 = String.format("%s:%s", "ClassifiedAd", classifiedAdId2);
-    result =
-        eventStore.append(
-            streamId2,
-            0,
-            createEventsAggregate(UUID.fromString(classifiedAdId2), UUID.fromString(ownerId1)));
 
-    assertThat(result).isInstanceOf(Success.class);
-    assertThat(eventStore.size()).isEqualTo(2);
+    eventStore.append(
+        streamId2,
+        0,
+        createEventsAggregate(UUID.fromString(classifiedAdId2), UUID.fromString(ownerId1)))
+        .block();
+//
+    StepVerifier.create(eventStore.size())
+        .expectNext(2L)
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -134,18 +181,26 @@ class InMemoryEventStoreTest {
     String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
 
     String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId1);
+//
+//    var result =
+    eventStore.append(
+        streamId,
+        0,
+        createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1)))
+        .block();
 
-    var result =
-        eventStore.append(
-            streamId,
-            0,
-            createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1)));
-    assertThat(result).isInstanceOf(Success.class);
-    assertThat(eventStore.size()).isEqualTo(1);
+    StepVerifier.create(eventStore.size())
+        .expectNext(1L)
+        .expectComplete()
+        .verify();
 
-    EventStream<Event> eventStream = eventStore.load(streamId);
-    assertThat(eventStream.size()).isEqualTo(2);
-    assertThat(eventStream.getVersion()).isEqualTo(1);
+    StepVerifier.create(eventStore.load(streamId))
+        .assertNext(eventStream -> {
+          assertThat(eventStream.size()).isEqualTo(2);
+          assertThat(eventStream.getVersion()).isEqualTo(1);
+        })
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -157,13 +212,20 @@ class InMemoryEventStoreTest {
 
     var classifiedAdCreated = new ClassifiedAdCreated(ownerId, classifiedAdId);
 
-    var result = eventStore.publish(streamId, 0, classifiedAdCreated);
-    assertThat(result).isInstanceOf(Success.class);
-    assertThat(eventStore.size()).isEqualTo(1);
-
-    EventStream<Event> eventStream = eventStore.load(streamId);
-    assertThat(eventStream.size()).isEqualTo(1);
-    assertThat(eventStream.getVersion()).isEqualTo(0);
+    eventStore.publish(streamId, 0, classifiedAdCreated)
+        .block();
+    StepVerifier.create(eventStore.size())
+        .expectNext(1L)
+        .expectComplete()
+        .verify();
+//
+    StepVerifier.create(eventStore.load(streamId))
+        .assertNext(eventStream -> {
+          assertThat(eventStream.size()).isEqualTo(2);
+          assertThat(eventStream.getVersion()).isEqualTo(0);
+        })
+        .expectComplete()
+        .verify();
 
     verify(eventProcessor, times(1)).create(classifiedAdCreated);
   }

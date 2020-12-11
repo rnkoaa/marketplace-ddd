@@ -34,7 +34,7 @@ public class ClassifiedAdTextUpdated implements Event {
   }
 
   @Override
-  public String aggregateName() {
+  public String getAggregateName() {
     return ClassifiedAd.class.getSimpleName();
   }
 }

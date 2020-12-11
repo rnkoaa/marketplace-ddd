@@ -12,20 +12,23 @@ import org.bson.codecs.configuration.CodecRegistry
 import org.bson.codecs.pojo.PojoCodecProvider
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.utility.DockerImageName
+import spock.lang.Shared
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders
 
 abstract class AbstractContainerInitializerSpec extends BaseFunctionalSpec {
 
     private static final int MONGO_PORT = 27017
-    static MongoConfig mongoConfig;
-    static MongoClient mongoClient;
+    @Shared
+    MongoConfig mongoConfig;
+    @Shared
+    MongoClient mongoClient;
 
     static final MongoDBContainer mongoDBContainer =
             new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"))
                     .withExposedPorts(MONGO_PORT);
 
-    void setupSpec() {
+    def setupSpec() {
         mongoDBContainer.start()
         String hosts = mongoDBContainer.getHost();
         int port = mongoDBContainer.getMappedPort(27017);
