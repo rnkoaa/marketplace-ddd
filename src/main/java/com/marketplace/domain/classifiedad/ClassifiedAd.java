@@ -3,6 +3,7 @@ package com.marketplace.domain.classifiedad;
 import com.marketplace.domain.InvalidStateException;
 import com.marketplace.domain.PictureId;
 import com.marketplace.domain.PictureSize;
+import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.events.ClassifiedAdCreated;
 import com.marketplace.domain.classifiedad.events.ClassifiedAdPictureResized;
 import com.marketplace.domain.classifiedad.events.ClassifiedAdPriceUpdated;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
 
@@ -47,6 +49,19 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
    */
   public ClassifiedAd() {
     pictures = new ArrayList<>();
+  }
+
+  public ClassifiedAd(CreateClassifiedAd createClassifiedAd) {
+    this.pictures = new ArrayList<>();
+    ClassifiedAdId classifiedAdId = createClassifiedAd.getClassifiedAdId()
+        .map(ClassifiedAdId::from)
+        .orElse(ClassifiedAdId.newClassifedAdId());
+    apply(ImmutableClassifiedAdCreated.builder()
+        .id(idGenerator.newUUID())
+        .aggregateId(classifiedAdId.id())
+        .aggregateName(AGGREGATE_NAME)
+        .ownerId(createClassifiedAd.getOwnerId())
+        .build());
   }
 
   public ClassifiedAd(ClassifiedAdId id, UserId ownerId) {
@@ -209,7 +224,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
   @Override
   public void when(VersionedEvent event) {
     if (event instanceof ClassifiedAdCreated e) {
-      this.id = ClassifiedAdId.from(e.getId());
+      this.id = ClassifiedAdId.from(e.getAggregateId());
       this.ownerId = new UserId(e.getOwnerId());
       this.state = ClassifiedAdState.INACTIVE;
     } else if (event instanceof ClassifiedAdTextUpdated e) {
@@ -259,4 +274,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
     }
   }
 
+  public void setState(ClassifiedAdState state) {
+    this.state = state;
+  }
 }

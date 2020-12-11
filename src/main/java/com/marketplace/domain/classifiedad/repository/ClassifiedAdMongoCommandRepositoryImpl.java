@@ -32,7 +32,10 @@ public class ClassifiedAdMongoCommandRepositoryImpl implements ClassifiedAdComma
   @Override
   public Optional<ClassifiedAd> load(ClassifiedAdId id) {
     Optional<ClassifiedAdEntity> found = mongoTemplate.findById(id.id(), collectionName, ClassifiedAdEntity.class);
-    return found.map(ClassifiedAdEntity::toClassifiedAd);
+    return found.map(it -> {
+      System.out.println(it);
+      return it.toClassifiedAd();
+    });
   }
 
   @Override

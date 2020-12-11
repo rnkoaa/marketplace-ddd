@@ -1,5 +1,6 @@
 package com.marketplace.domain.classifiedad.command;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.command.Command;
@@ -16,6 +17,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableCreateClassifiedAd.class)
 public interface CreateClassifiedAd extends Command {
 
+  @JsonProperty("classified_ad_id")
   Optional<UUID> getClassifiedAdId();
 
   Optional<String> getText();
@@ -24,11 +26,13 @@ public interface CreateClassifiedAd extends Command {
 
   Optional<PriceDto> getPrice();
 
+  @JsonProperty("owner")
   UUID getOwnerId();
 
+  @JsonProperty("approver")
   Optional<UUID> getApprovedBy();
 
-  List<PictureDto> getPictures();
+  Optional<List<PictureDto>> getPictures();
 
   Optional<ClassifiedAdState> getState();
 

@@ -13,7 +13,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableAddPictureToClassifiedAd.class)
 public interface AddPictureToClassifiedAd extends Command {
 
-  UUID getId();
+  UUID getClassifiedAdId();
 
   String getUri();
 

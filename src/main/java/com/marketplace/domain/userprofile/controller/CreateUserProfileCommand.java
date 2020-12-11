@@ -12,15 +12,15 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableCreateUserProfileCommand.class)
 public abstract class CreateUserProfileCommand {
 
-  abstract String getFirstName();
+  public abstract String getFirstName();
 
-  abstract String getLastName();
+  public abstract String getLastName();
 
-  abstract String getMiddleName();
+  public abstract String getMiddleName();
 
-  abstract String getDisplayName();
+  public abstract String getDisplayName();
 
-  abstract String getPhotoUrl();
+  public abstract String getPhotoUrl();
 
   @JsonIgnore
   public DisplayName displayName() {

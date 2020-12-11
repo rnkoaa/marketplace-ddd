@@ -14,7 +14,7 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 public class ClassifiedAdCommandRepositoryTest extends BaseMongoRepositoryTest {
-    String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
+    String insertId = "87a7fef0-1527-4a47-b196-504d9f9ce0fe";
 
     @Test
     void insertedItemCanBeShownToExist() throws IOException {
@@ -22,8 +22,7 @@ public class ClassifiedAdCommandRepositoryTest extends BaseMongoRepositoryTest {
 
         assertThat(createAdDto).isNotNull();
         assertThat(createAdDto.getOwnerId()).isNotNull();
-        var classifiedAd = new ClassifiedAd(ClassifiedAdId.fromString(insertId),
-                new UserId(createAdDto.getOwnerId()));
+        var classifiedAd = new ClassifiedAd(createAdDto);
         classifiedAd.updateTitle(new ClassifiedAdTitle("Snow Blower for sale"));
         classifiedAd.updateText(new ClassifiedAdText("Snow Blower for sale for Cheap"));
         classifiedAd.updatePrice(new Price(Money.fromDecimal(4.59, "USD")));

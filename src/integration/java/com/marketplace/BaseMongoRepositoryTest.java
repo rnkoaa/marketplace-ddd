@@ -3,6 +3,7 @@ package com.marketplace;
 import com.marketplace.common.config.MongoConfig;
 import com.marketplace.config.ApplicationConfig;
 import com.marketplace.config.ConfigLoader;
+import com.marketplace.config.ImmutableApplicationConfig;
 import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
 import com.marketplace.context.mongo.MongoConfigModule;
@@ -39,7 +40,8 @@ public abstract class BaseMongoRepositoryTest extends AbstractContainerInitializ
     String hosts = mongoDBContainer.getHost();
     int port = mongoDBContainer.getMappedPort(27017);
     mongoConfig = new MongoConfig(hosts, "test_db", port);
-    config.setMongo(mongoConfig);
+    config = ImmutableApplicationConfig.copyOf(config)
+        .withMongo(mongoConfig);
     mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
     classifiedAdCollection = MongoConfigModule.provideMongoDatabase(mongoClient, mongoConfig)
         .getCollection(ClassifiedAd.class.getSimpleName().toLowerCase(), ClassifiedAd.class);

@@ -70,7 +70,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
       try {
         byte[] body = request.bodyAsBytes();
         var updateDto = objectMapper.readValue(body, UpdateClassifiedAd.class);
-        updateDto = ImmutableUpdateClassifiedAd.copyOf(updateDto).withId(UUID.fromString(classifiedAdId));
+        updateDto = ImmutableUpdateClassifiedAd.copyOf(updateDto).withClassifiedAdId(UUID.fromString(classifiedAdId));
         var commandResult = classifiedAdController.updateClassifiedAd(updateDto);
         return processResponse(response, commandResult);
       } catch (JsonMappingException ex) {

@@ -52,7 +52,7 @@ public class ClassifiedAdService {
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAd command) {
-    Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getId()));
+    Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getClassifiedAdId()));
     return mayBe.map(classifiedAd -> {
       command.getOwnerId().ifPresent(ownerId -> classifiedAd.updateOwner(new UserId(ownerId)));
       command.getTitle().ifPresent(title -> classifiedAd.updateTitle(new ClassifiedAdTitle(title)));
@@ -77,7 +77,7 @@ public class ClassifiedAdService {
   }
 
   public AddPictureResponse handle(AddPictureToClassifiedAd addPictureToClassifiedAd) {
-    Optional<ClassifiedAd> load = classifiedAdCommandRepository.load(new ClassifiedAdId(addPictureToClassifiedAd.getId()));
+    Optional<ClassifiedAd> load = classifiedAdCommandRepository.load(new ClassifiedAdId(addPictureToClassifiedAd.getClassifiedAdId()));
 
     return load.map(classifiedAd -> {
 

@@ -36,6 +36,10 @@ public class ClassifiedAdEntity implements MongoEntity {
   private Price price;
   private ClassifiedAdState state;
 
+  // for mongo entity
+  public ClassifiedAdEntity() {
+  }
+
   public ClassifiedAdEntity(ClassifiedAd classifiedAd) {
     this.id = classifiedAd.getId().id();
     this.owner = classifiedAd.getOwnerId().id();
@@ -86,6 +90,70 @@ public class ClassifiedAdEntity implements MongoEntity {
       classifiedAd.requestToPublish();
     }
     return classifiedAd;
+  }
+
+  public UUID getId() {
+    return id;
+  }
+
+  public UUID getOwner() {
+    return owner;
+  }
+
+  public UUID getApprovedBy() {
+    return approvedBy;
+  }
+
+  public String getText() {
+    return text;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public List<PictureEntity> getPictures() {
+    return pictures;
+  }
+
+  public Price getPrice() {
+    return price;
+  }
+
+  public ClassifiedAdState getState() {
+    return state;
+  }
+
+  public void setId(UUID id) {
+    this.id = id;
+  }
+
+  public void setOwner(UUID owner) {
+    this.owner = owner;
+  }
+
+  public void setApprovedBy(UUID approvedBy) {
+    this.approvedBy = approvedBy;
+  }
+
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public void setPictures(List<PictureEntity> pictures) {
+    this.pictures = pictures;
+  }
+
+  public void setPrice(Price price) {
+    this.price = price;
+  }
+
+  public void setState(ClassifiedAdState state) {
+    this.state = state;
   }
 
   @Override
