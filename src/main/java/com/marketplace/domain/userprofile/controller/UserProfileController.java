@@ -1,36 +1,37 @@
 package com.marketplace.domain.userprofile.controller;
 
+import java.util.Optional;
 import javax.inject.Inject;
 
 public class UserProfileController {
 
-    private final UserProfileService userProfileService;
+  private final UserProfileService userProfileService;
 
-    @Inject
-    public UserProfileController(UserProfileService userProfileService) {
-        this.userProfileService = userProfileService;
-    }
+  @Inject
+  public UserProfileController(UserProfileService userProfileService) {
+    this.userProfileService = userProfileService;
+  }
 
-    public CreateUserProfileResult createUserProfile(CreateUserProfileCommand command) {
+  public Optional<CreateUserProfileResult> createUserProfile(CreateUserProfileCommand command) {
 
-        var createResult = userProfileService.handle(command);
-        return createResult.result;
-    }
+    var createResult = userProfileService.handle(command);
+    return createResult.getResult();
+  }
 
-    public UpdateUserProfileResult updateUserFullName(UpdateUserFullNameCommand command) {
+  public Optional<UpdateUserProfileResult> updateUserFullName(UpdateUserFullNameCommand command) {
 
-        var updateResult = userProfileService.handle(command);
-        return updateResult.result;
-    }
+    var updateResult = userProfileService.handle(command);
+    return updateResult.getResult();
+  }
 
-    public UpdateUserProfileResult updateUserDisplayName(UpdateUserDisplayNameCommand command) {
-        var updateResult = userProfileService.handle(command);
-        return updateResult.result;
-    }
+  public Optional<UpdateUserProfileResult> updateUserDisplayName(UpdateUserDisplayNameCommand command) {
+    var updateResult = userProfileService.handle(command);
+    return updateResult.getResult();
+  }
 
-    public UpdateUserProfileResult updateUserProfile(UpdateUserProfileCommand command) {
+  public Optional<UpdateUserProfileResult> updateUserProfile(UpdateUserProfileCommand command) {
 
-        var updateResult = userProfileService.handle(command);
-        return updateResult.result;
-    }
+    var updateResult = userProfileService.handle(command);
+    return updateResult.getResult();
+  }
 }

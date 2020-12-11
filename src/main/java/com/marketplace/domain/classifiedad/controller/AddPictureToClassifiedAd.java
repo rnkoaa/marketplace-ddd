@@ -1,19 +1,25 @@
 package com.marketplace.domain.classifiedad.controller;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.command.Command;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import java.util.Optional;
 import java.util.UUID;
+import org.immutables.value.Value;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class AddPictureToClassifiedAd implements Command {
-    private UUID id;
-    private String uri;
-    private int height;
-    private int width;
-    private int order;
+@Value.Immutable
+@JsonSerialize(as = ImmutableAddPictureToClassifiedAd.class)
+@JsonDeserialize(as = ImmutableAddPictureToClassifiedAd.class)
+public interface AddPictureToClassifiedAd extends Command {
+
+  UUID getId();
+
+  String getUri();
+
+  int getHeight();
+
+  int getWidth();
+
+  Optional<Integer> getOrder();
 }

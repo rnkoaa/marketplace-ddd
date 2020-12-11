@@ -1,14 +1,17 @@
 package com.marketplace.domain.classifiedad;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
 
-@Value
-@AllArgsConstructor
-public class CommandHandlerResult<T> {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Optional;
+import org.immutables.value.Value;
 
-    public T result;
-    boolean successful;
-    String message;
+@Value.Immutable
+public interface CommandHandlerResult<T> {
+
+  Optional<T> getResult();
+
+  @JsonProperty("successful")
+  boolean isSuccessful();
+
+  Optional<String> getMessage();
 }

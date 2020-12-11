@@ -1,9 +1,9 @@
 package com.marketplace.framework;
 
-import com.marketplace.event.Event;
+import com.marketplace.event.VersionedEvent;
 
 @FunctionalInterface
 public interface EventApplier {
 
-    void apply(Event event);
+    void apply(VersionedEvent event);
 }

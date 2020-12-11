@@ -1,31 +1,19 @@
 package com.marketplace.domain.classifiedad.events;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.marketplace.event.Event;
-import lombok.Builder;
-import lombok.Value;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.marketplace.event.VersionedEvent;
 import java.util.UUID;
+import org.immutables.value.Value.Immutable;
 
-@Value
-@Builder
-@JsonDeserialize(builder = PictureAddedToAClassifiedAd.PictureAddedToAClassifiedAdBuilder.class)
-public class PictureAddedToAClassifiedAd implements Event {
-    UUID classifiedAdId;
-    UUID pictureId;
-    String url;
-    int height;
-    int width;
-    int order;
-
-    @Override
-    public UUID getId() {
-        return classifiedAdId;
-    }
-
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class PictureAddedToAClassifiedAdBuilder {
-
-    }
+@Immutable
+@JsonDeserialize(as = ImmutablePictureAddedToAClassifiedAd.class)
+@JsonSerialize(as = ImmutablePictureAddedToAClassifiedAd.class)
+public interface PictureAddedToAClassifiedAd extends VersionedEvent {
+    UUID getClassifiedAdId();
+    UUID getPictureId();
+    String getUrl();
+    int getHeight();
+    int getWidth();
+    int getOrder();
 }

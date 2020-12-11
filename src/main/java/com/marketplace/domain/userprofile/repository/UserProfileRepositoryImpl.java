@@ -34,7 +34,7 @@ public class UserProfileRepositoryImpl implements UserProfileRepository {
 
     @Override
     public UserProfile add(UserProfile entity) {
-        var userProfileEntity = new UserProfileEntity(entity);
+        var userProfileEntity = UserProfileEntity.create(entity);
         var save = mongoTemplate.add(userProfileEntity, entity.getId().id(), collectionName, UserProfileEntity.class);
         if (save != null) {
             return entity;

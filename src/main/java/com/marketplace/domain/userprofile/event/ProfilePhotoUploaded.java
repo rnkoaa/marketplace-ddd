@@ -1,25 +1,20 @@
 package com.marketplace.domain.userprofile.event;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.marketplace.domain.classifiedad.events.ClassifiedAdCreated;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.event.Event;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Value;
 
+import com.marketplace.event.VersionedEvent;
 import java.util.UUID;
+import org.immutables.value.Value.Immutable;
 
-@Value
-@Builder(toBuilder = true)
-@JsonDeserialize(builder = ClassifiedAdCreated.ClassifiedAdCreatedBuilder.class)
-@AllArgsConstructor
-public class ProfilePhotoUploaded implements Event {
-    UUID userId;
-    String photoUrl;
+@Immutable
+@JsonDeserialize(as = ImmutableProfilePhotoUploaded.class)
+@JsonSerialize(as = ImmutableProfilePhotoUploaded.class)
+public interface ProfilePhotoUploaded extends VersionedEvent {
 
-    @Override
-    public UUID getId() {
-        return userId;
-    }
+  UUID getUserId();
+
+  String getPhotoUrl();
 
 }

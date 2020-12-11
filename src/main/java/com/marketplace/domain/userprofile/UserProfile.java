@@ -1,66 +1,112 @@
 package com.marketplace.domain.userprofile;
 
+import com.marketplace.domain.shared.IdGenerator;
+import com.marketplace.domain.shared.IdGeneratorImpl;
 import com.marketplace.domain.shared.UserId;
+import com.marketplace.domain.userprofile.event.ImmutableProfilePhotoUploaded;
+import com.marketplace.domain.userprofile.event.ImmutableUserDisplayNameUpdated;
+import com.marketplace.domain.userprofile.event.ImmutableUserFullNameUpdated;
+import com.marketplace.domain.userprofile.event.ImmutableUserRegistered;
 import com.marketplace.domain.userprofile.event.ProfilePhotoUploaded;
 import com.marketplace.domain.userprofile.event.UserDisplayNameUpdated;
 import com.marketplace.domain.userprofile.event.UserFullNameUpdated;
 import com.marketplace.domain.userprofile.event.UserRegistered;
-import com.marketplace.event.Event;
 import com.marketplace.event.EventId;
+import com.marketplace.event.VersionedEvent;
 import com.marketplace.framework.AggregateRoot;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
-@Getter
-@ToString
-@EqualsAndHashCode(callSuper = false)
-public class UserProfile extends AggregateRoot<EventId, Event> {
-    private UserId id;
-    private FullName fullName;
-    private DisplayName displayName;
-    private String photoUrl;
+public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
 
-    public UserProfile(UserId id, FullName fullName, DisplayName displayName) {
-        apply(new UserRegistered(id.id(),
-                fullName.firstName(),
-                fullName.middleName(),
-                fullName.lastName(),
-                displayName.value()));
-    }
+  private static final IdGenerator idGenerator = new IdGeneratorImpl();
+  private static final String AGGREGATE_NAME = UserProfile.class.getSimpleName();
+  private UserId id;
+  private FullName fullName;
+  private DisplayName displayName;
+  private String photoUrl;
 
-    public void updateUserFullName(FullName fullName){
-        apply(new UserFullNameUpdated(id.id(), fullName.firstName(), fullName.middleName(), fullName.lastName()));
-    }
+  public UserId getId() {
+    return id;
+  }
 
-    public void updateDisplayName(DisplayName displayName){
-        apply(new UserDisplayNameUpdated(id.id(), displayName.value()));
-    }
+  public FullName getFullName() {
+    return fullName;
+  }
 
-    public void updatePhoto(String uri){
-        apply(new ProfilePhotoUploaded(id.id(), uri));
-    }
+  public DisplayName getDisplayName() {
+    return displayName;
+  }
 
-    @Override
-    public void ensureValidState(Event event) {
+  public String getPhotoUrl() {
+    return photoUrl;
+  }
+
+  public UserProfile(UserId id, FullName fullName, DisplayName displayName) {
+    apply(ImmutableUserRegistered.builder()
+        .id(idGenerator.newUUID())
+        .aggregateId(id.id())
+        .aggregateName(AGGREGATE_NAME)
+        .firstName(fullName.firstName())
+        .lastName(fullName.lastName())
+        .middleName(fullName.middleName())
+        .displayName(displayName.value())
+        .build());
+  }
+
+
+  public void updateUserFullName(FullName fullName) {
+    apply(ImmutableUserFullNameUpdated.builder()
+        .id(idGenerator.newUUID())
+        .aggregateId(id.id())
+        .aggregateName(AGGREGATE_NAME)
+        .userId(id.id())
+        .firstName(fullName.firstName())
+        .middleName(fullName.middleName())
+        .lastName(fullName.lastName())
+        .build());
+  }
+
+  public void updateDisplayName(DisplayName displayName) {
+    apply(ImmutableUserDisplayNameUpdated.builder()
+        .id(idGenerator.newUUID())
+        .aggregateId(id.id())
+        .aggregateName(AGGREGATE_NAME)
+        .userId(id.id())
+        .displayName(displayName.value())
+        .build());
+  }
+
+
+  public void updatePhoto(String uri) {
+    apply(ImmutableProfilePhotoUploaded.builder()
+        .id(idGenerator.newUUID())
+        .aggregateId(id.id())
+        .aggregateName(AGGREGATE_NAME)
+        .userId(id.id())
+        .photoUrl(uri)
+        .build());
+  }
+
+  @Override
+  public void ensureValidState(VersionedEvent event) {
 //        boolean valid = id != null && displayName != null && fullName != null;
 //        if (!valid) {
 //            throw new IllegalArgumentException("state is not valid while processing event " + event.getClass());
 //        }
-    }
+  }
 
-    @Override
-    public void when(Event event) {
-        if (event instanceof UserRegistered e) {
-            this.id = new UserId(e.getId());
-            this.displayName = new DisplayName(e.getDisplayName());
-            this.fullName = new FullName(e.getFirstName(), e.getMiddleName(), e.getLastName());
-        } else if (event instanceof ProfilePhotoUploaded e) {
-            this.photoUrl = e.getPhotoUrl();
-        } else if (event instanceof UserFullNameUpdated e) {
-            this.fullName = new FullName(e.getFirstName(), e.getMiddleName(), e.getLastName());
-        } else if (event instanceof UserDisplayNameUpdated e) {
-            this.displayName = new DisplayName(e.getDisplayName());
-        }
+  @Override
+  public void when(VersionedEvent event) {
+    if (event instanceof UserRegistered e) {
+      this.id = new UserId(e.getId());
+      this.displayName = new DisplayName(e.getDisplayName());
+      this.fullName = new FullName(e.getFirstName(), e.getMiddleName().orElse(""), e.getLastName());
+    } else if (event instanceof ProfilePhotoUploaded e) {
+      this.photoUrl = e.getPhotoUrl();
+    } else if (event instanceof UserFullNameUpdated e) {
+      this.fullName = new FullName(e.getFirstName(), e.getMiddleName().orElse(""), e.getLastName());
+    } else if (event instanceof UserDisplayNameUpdated e) {
+      this.displayName = new DisplayName(e.getDisplayName());
     }
+  }
+
 }

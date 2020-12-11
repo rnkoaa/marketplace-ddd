@@ -51,35 +51,53 @@ public class ClassifiedAdController {
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> updateClassifiedAdOwner(UUID classifiedAdId, UUID ownerId) {
-    return classifiedAdService.handle(new UpdateClassifiedAdOwner(classifiedAdId, ownerId));
+    return classifiedAdService.handle(ImmutableUpdateClassifiedAdOwner.builder()
+        .ownerId(ownerId)
+        .id(classifiedAdId)
+        .build());
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> updateClassifiedTitle(UUID classifiedAdId, String title) {
-    return classifiedAdService.handle(new UpdateClassifiedAdTitle(classifiedAdId, title));
+    return classifiedAdService.handle(ImmutableUpdateClassifiedAdTitle.builder()
+        .classifiedAdId(classifiedAdId)
+        .title(title)
+        .build());
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> updateClassifiedText(UUID classifiedAdId, String text) {
-    return classifiedAdService.handle(new UpdateClassifiedAdText(classifiedAdId, text));
+    return classifiedAdService.handle(ImmutableUpdateClassifiedAdText.builder()
+        .classifiedAdId(classifiedAdId)
+        .text(text).build());
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> approveClassifiedAd(UUID classifiedAdId, UUID approvedBy) {
-    return classifiedAdService.handle(new ApproveClassifiedAd(classifiedAdId, approvedBy));
+    return classifiedAdService.handle(ImmutableApproveClassifiedAd.builder()
+        .classifiedAdId(classifiedAdId)
+        .approverId(approvedBy)
+        .build());
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> publishClassifiedAd(UUID classifiedAdId) {
-    return classifiedAdService.handle(new PublishClassifiedAd(classifiedAdId));
+    return classifiedAdService.handle(ImmutablePublishClassifiedAd.builder()
+        .classifiedAdId(classifiedAdId)
+        .build());
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> updateClassifiedAdPrice(
       UUID classifiedAdId,
       BigDecimal amount,
       String currencyCode) {
-    return classifiedAdService.handle(new UpdateClassifiedAdPrice(classifiedAdId, amount, currencyCode));
+    return classifiedAdService.handle(ImmutableUpdateClassifiedAdPrice.builder()
+        .classifiedAdId(classifiedAdId)
+        .amount(amount)
+        .currency(currencyCode)
+        .build());
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> addPictures(UUID classifiedAdId, List<PictureDto> pictures) {
-    var command = new
-        AddPicturesToClassifiedAd(classifiedAdId, pictures);
-    return classifiedAdService.handle(command);
+    return classifiedAdService.handle(ImmutableAddPicturesToClassifiedAd.builder()
+        .classifiedAdId(classifiedAdId)
+        .addAllPictures(pictures)
+        .build());
   }
 }

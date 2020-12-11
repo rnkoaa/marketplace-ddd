@@ -1,43 +1,43 @@
 package com.marketplace.framework;
 
-import com.marketplace.event.Event;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-
+import com.marketplace.event.VersionedEvent;
 import java.util.ArrayList;
 import java.util.List;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 
-public abstract class AggregateRoot<T, U extends Event> implements InternalEventHandler<U>, EventApplier{
-    @BsonIgnore
-    private final List<Event> changes;
+public abstract class AggregateRoot<T, U extends VersionedEvent> implements InternalEventHandler<U>, EventApplier {
 
-    protected AggregateRoot() {
-        this.changes = new ArrayList<>();
-    }
+  @BsonIgnore
+  private final List<VersionedEvent> changes;
 
-    public void apply(Event event) {
-        when(event);
-        ensureValidState(event);
-        changes.add(event);
-    }
+  protected AggregateRoot() {
+    this.changes = new ArrayList<>();
+  }
 
-    public abstract void ensureValidState(Event event);
+  public void apply(VersionedEvent event) {
+    when(event);
+    ensureValidState(event);
+    changes.add(event);
+  }
 
-    public void clearChanges() {
-        changes.clear();
-    }
+  public abstract void ensureValidState(VersionedEvent event);
 
-    public List<Event> getChanges() {
-        return changes;
-    }
+  public void clearChanges() {
+    changes.clear();
+  }
 
-    public abstract void when(Event event);
+  public List<VersionedEvent> getChanges() {
+    return changes;
+  }
 
-    protected void applyToEntity(InternalEventHandler<Event> entity, Event event) {
-        entity.handle(event);
-    }
+  public abstract void when(VersionedEvent event);
 
-    @Override
-    public void handle(Event event) {
-        when(event);
-    }
+  protected void applyToEntity(InternalEventHandler<VersionedEvent> entity, VersionedEvent event) {
+    entity.handle(event);
+  }
+
+  @Override
+  public void handle(VersionedEvent event) {
+    when(event);
+  }
 }

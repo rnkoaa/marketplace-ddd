@@ -10,27 +10,29 @@ import com.marketplace.domain.classifiedad.events.ClassifiedAdSentForReview;
 import com.marketplace.domain.classifiedad.events.ClassifiedAdTextUpdated;
 import com.marketplace.domain.classifiedad.events.ClassifiedAdTitleChanged;
 import com.marketplace.domain.classifiedad.events.ClassifiedApproved;
+import com.marketplace.domain.classifiedad.events.ImmutableClassifiedAdCreated;
+import com.marketplace.domain.classifiedad.events.ImmutableClassifiedAdPriceUpdated;
+import com.marketplace.domain.classifiedad.events.ImmutableClassifiedAdSentForReview;
+import com.marketplace.domain.classifiedad.events.ImmutableClassifiedAdTextUpdated;
+import com.marketplace.domain.classifiedad.events.ImmutableClassifiedAdTitleChanged;
+import com.marketplace.domain.classifiedad.events.ImmutableClassifiedApproved;
+import com.marketplace.domain.classifiedad.events.ImmutablePictureAddedToAClassifiedAd;
 import com.marketplace.domain.classifiedad.events.PictureAddedToAClassifiedAd;
+import com.marketplace.domain.shared.IdGenerator;
+import com.marketplace.domain.shared.IdGeneratorImpl;
 import com.marketplace.domain.shared.UserId;
-import com.marketplace.event.Event;
 import com.marketplace.event.EventId;
+import com.marketplace.event.VersionedEvent;
 import com.marketplace.framework.AggregateRoot;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-@Setter
-@Getter
-@ToString
-@EqualsAndHashCode(callSuper = false)
-public class ClassifiedAd extends AggregateRoot<EventId, Event> {
+public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
 
+  private final IdGenerator idGenerator = new IdGeneratorImpl();
+  private static final String AGGREGATE_NAME = ClassifiedAd.class.getSimpleName();
   private ClassifiedAdId id;
   private final List<Picture> pictures;
   private UserId ownerId;
@@ -40,22 +42,62 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
   private UserId approvedBy;
   private ClassifiedAdState state;
 
-
   /**
    * this is for jackson deserialization
    */
   public ClassifiedAd() {
     pictures = new ArrayList<>();
-//        apply();
   }
 
   public ClassifiedAd(ClassifiedAdId id, UserId ownerId) {
     this.pictures = new ArrayList<>();
-    apply(new ClassifiedAdCreated(id.id(), ownerId.id()));
+    apply(ImmutableClassifiedAdCreated.builder()
+        .id(idGenerator.newUUID())
+        .aggregateId(id.id())
+        .aggregateName(AGGREGATE_NAME)
+        .ownerId(ownerId.id())
+        .build());
+  }
+
+  public ClassifiedAdId getId() {
+    return id;
+  }
+
+  public List<Picture> getPictures() {
+    return pictures;
+  }
+
+  public UserId getOwnerId() {
+    return ownerId;
+  }
+
+  public ClassifiedAdTitle getTitle() {
+    return title;
+  }
+
+  public ClassifiedAdText getText() {
+    return text;
+  }
+
+  public Price getPrice() {
+    return price;
+  }
+
+  public UserId getApprovedBy() {
+    return approvedBy;
+  }
+
+  public ClassifiedAdState getState() {
+    return state;
   }
 
   public void updateTitle(ClassifiedAdTitle title) {
-    apply(new ClassifiedAdTitleChanged(id.id(), title.toString()));
+    apply(ImmutableClassifiedAdTitleChanged.builder()
+        .id(idGenerator.newUUID())
+        .aggregateId(this.id.id())
+        .aggregateName(AGGREGATE_NAME)
+        .title(title.toString())
+        .build());
   }
 
   public void updateOwner(UserId userId) {
@@ -63,48 +105,71 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
   }
 
   public void updateText(ClassifiedAdText text) {
-    apply(new ClassifiedAdTextUpdated(id.id(), text.toString()));
+    apply(ImmutableClassifiedAdTextUpdated.builder()
+        .id(idGenerator.newUUID())
+        .aggregateId(id.id())
+        .aggregateName(AGGREGATE_NAME)
+        .text(text.toString())
+        .build());
   }
 
   public void approve(UserId approvedBy) {
-    apply(ClassifiedApproved.builder()
-        .id(id.id())
+    apply(ImmutableClassifiedApproved.builder()
+        .id(idGenerator.newUUID())
+        .aggregateName(AGGREGATE_NAME)
+        .aggregateId(id.id())
         .userId(approvedBy.id())
         .build());
   }
 
   public void updatePrice(Price price) {
-    apply(new ClassifiedAdPriceUpdated(id.id(), price.money().amount(), price.money().currencyCode()));
+    apply(ImmutableClassifiedAdPriceUpdated.builder()
+        .id(idGenerator.newUUID())
+        .aggregateId(id.id())
+        .aggregateName(AGGREGATE_NAME)
+        .price(price.money().amount())
+        .currency(price.money().currencyCode())
+        .build());
   }
 
   public void requestToPublish() {
-    apply(new ClassifiedAdSentForReview(id.id()));
+    apply(ImmutableClassifiedAdSentForReview.builder()
+        .id(idGenerator.newUUID())
+        .aggregateId(id.id())
+        .aggregateName(AGGREGATE_NAME)
+        .build());
   }
 
   public PictureId addPicture(PictureId id, String uri, PictureSize size, int order) {
     int newPictureOrder = (order > 0) ? order : ((pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1);
     var pictureId = (id != null) ? id : PictureId.newPictureId();
-    apply(PictureAddedToAClassifiedAd.builder()
-        .classifiedAdId(this.id.id())
+    apply(ImmutablePictureAddedToAClassifiedAd.builder()
+        .id(idGenerator.newUUID())
+        .aggregateName(AGGREGATE_NAME)
+        .aggregateId(id.id())
         .pictureId(pictureId.id())
         .url(uri)
         .height(size.height())
         .width(size.width())
         .order(newPictureOrder)
+        .classifiedAdId(id.id())
         .build());
     return pictureId;
   }
 
   public PictureId addPicture(String uri, PictureSize size, int order) {
     int newPictureOrder = (order > 0) ? order : ((pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1);
-    var pictureId = UUID.randomUUID();
-    apply(PictureAddedToAClassifiedAd.builder()
-        .classifiedAdId(this.id.id())
+    var pictureId = idGenerator.newUUID();
+    apply(ImmutablePictureAddedToAClassifiedAd.builder()
+        .id(idGenerator.newUUID())
+        .aggregateName(AGGREGATE_NAME)
+        .aggregateId(id.id())
         .pictureId(pictureId)
         .url(uri)
         .height(size.height())
         .width(size.width())
         .order(newPictureOrder)
+        .classifiedAdId(id.id())
         .build());
     return new PictureId(pictureId);
   }
@@ -142,15 +207,15 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
   }
 
   @Override
-  public void when(Event event) {
+  public void when(VersionedEvent event) {
     if (event instanceof ClassifiedAdCreated e) {
       this.id = ClassifiedAdId.from(e.getId());
-      this.ownerId = new UserId(e.getUserId());
+      this.ownerId = new UserId(e.getOwnerId());
       this.state = ClassifiedAdState.INACTIVE;
     } else if (event instanceof ClassifiedAdTextUpdated e) {
       this.text = new ClassifiedAdText(e.getText());
     } else if (event instanceof ClassifiedAdPriceUpdated e) {
-      this.price = new Price(new Money(e.getPrice(), e.getCurrencyCode()));
+      this.price = new Price(new Money(e.getPrice(), e.getCurrency()));
     } else if (event instanceof ClassifiedAdTitleChanged e) {
       this.title = new ClassifiedAdTitle(e.getTitle());
     } else if (event instanceof ClassifiedAdSentForReview e) {
@@ -169,7 +234,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
   }
 
   @Override
-  public void ensureValidState(Event event) {
+  public void ensureValidState(VersionedEvent event) {
     var valid = id != null && ownerId != null;
 
     boolean foundBadPictures = /*pictures.size() == 0 ||*/ pictures.stream().anyMatch(p -> !p.hasCorrectSize());
@@ -190,7 +255,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, Event> {
           && !foundBadPictures;
     };
     if (!valid) {
-      throw new InvalidStateException("post checks failed in state while processing event " + event.name());
+      throw new InvalidStateException("post checks failed in state while processing event " + event.getClass().getSimpleName());
     }
   }
 

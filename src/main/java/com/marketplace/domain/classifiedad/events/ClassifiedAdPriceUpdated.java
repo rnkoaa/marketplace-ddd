@@ -1,44 +1,21 @@
 package com.marketplace.domain.classifiedad.events;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.marketplace.event.Event;
-import lombok.Builder;
-import lombok.Value;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.marketplace.event.VersionedEvent;
 import java.math.BigDecimal;
 import java.util.UUID;
+import org.immutables.value.Value.Immutable;
 
-@Value
-@Builder
-@JsonDeserialize(builder = ClassifiedAdPriceUpdated.ClassifiedAdPriceUpdatedBuilder.class)
-public class ClassifiedAdPriceUpdated implements Event {
-    UUID id;
-    BigDecimal price;
+@Immutable
+@JsonSerialize(as = ImmutableClassifiedAdPriceUpdated.class)
+@JsonDeserialize(as = ImmutableClassifiedAdPriceUpdated.class)
+public interface ClassifiedAdPriceUpdated extends VersionedEvent {
 
-    String currencyCode;
+  UUID getId();
 
-    public ClassifiedAdPriceUpdated(UUID id, BigDecimal price, String currencyCode) {
-        this.id = id;
-        this.price = price;
-        this.currencyCode = currencyCode;
-    }
+  BigDecimal getPrice();
 
-    @Override
-    public UUID getId() {
-        return id;
-    }
+  String getCurrency();
 
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public String getCurrencyCode() {
-        return currencyCode;
-    }
-
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class ClassifiedAdPriceUpdatedBuilder {
-
-    }
 }

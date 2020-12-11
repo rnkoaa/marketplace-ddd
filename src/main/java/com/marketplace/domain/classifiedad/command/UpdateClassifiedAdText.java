@@ -2,26 +2,19 @@ package com.marketplace.domain.classifiedad.command;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.command.Command;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.UUID;
+import org.immutables.value.Value.Immutable;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@JsonDeserialize(builder = UpdateClassifiedAdText.UpdateClassifiedAdTextBuilder.class)
-public class UpdateClassifiedAdText implements Command {
+@Immutable
+@JsonDeserialize(as = ImmutableUpdateClassifiedAdText.class)
+@JsonSerialize(as = ImmutableUpdateClassifiedAdText.class)
+public interface UpdateClassifiedAdText extends Command {
 
-  private UUID id;
-  private String text;
+  UUID getClassifiedAdId();
 
-  @JsonPOJOBuilder(withPrefix = "")
-  public static class UpdateClassifiedAdTextBuilder {
+  String getText();
 
-  }
 }
