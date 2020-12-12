@@ -1,5 +1,7 @@
 package com.marketplace.context.mongo;
 
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+
 import com.marketplace.common.config.MongoConfig;
 import com.marketplace.config.ApplicationConfig;
 import com.marketplace.context.mongo.codec.DisplayNameCodecProviderImpl;
@@ -13,15 +15,12 @@ import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import dagger.Module;
 import dagger.Provides;
+import javax.inject.Singleton;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.UuidCodecProvider;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
-
-import javax.inject.Singleton;
-
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 
 @Module
 public class MongoConfigModule {

@@ -10,9 +10,9 @@ import com.marketplace.context.mongo.MongoConfigModule;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.reactivestreams.client.MongoClient;
+import com.mongodb.reactivestreams.client.MongoCollection;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,11 +51,11 @@ public abstract class BaseMongoRepositoryTest extends AbstractContainerInitializ
 
   @AfterEach
   public void cleanup() {
-    DeleteResult deleteResult = classifiedAdCollection.deleteMany(new Document());
-    if (deleteResult.wasAcknowledged()) {
-      System.out.println("delete was acknowledged.");
-    }
-    System.out.println("Number of records deleted: " + deleteResult.getDeletedCount());
+//    DeleteResult deleteResult = classifiedAdCollection.deleteMany(new Document());
+//    if (deleteResult.wasAcknowledged()) {
+//      System.out.println("delete was acknowledged.");
+//    }
+//    System.out.println("Number of records deleted: " + deleteResult.getDeletedCount());
   }
 
 }
