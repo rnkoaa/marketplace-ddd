@@ -1,31 +1,40 @@
 package com.marketplace.domain.userprofile.controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.immutables.value.Value;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class CreateUserProfileCommand {
-    private String firstName;
-    private String lastName;
-    private String middleName;
-    private String displayName;
-    private String photoUrl;
+@Value.Immutable
+@JsonDeserialize(as = ImmutableCreateUserProfileCommand.class)
+@JsonSerialize(as = ImmutableCreateUserProfileCommand.class)
+public abstract class CreateUserProfileCommand {
 
-    @JsonIgnore
-    public DisplayName displayName() {
-        return new DisplayName(displayName);
-    }
+  @JsonProperty("first_name")
+  public abstract String getFirstName();
 
-    @JsonIgnore
-    public FullName fullName() {
-        return new FullName(firstName, middleName, lastName);
-    }
+  @JsonProperty("last_name")
+  public abstract String getLastName();
+
+  @JsonProperty("middle_name")
+  public abstract String getMiddleName();
+
+  @JsonProperty("display_name")
+  public abstract String getDisplayName();
+
+  @JsonProperty("photo_url")
+  public abstract String getPhotoUrl();
+
+  @JsonIgnore
+  public DisplayName displayName() {
+    return new DisplayName(getDisplayName());
+  }
+
+  @JsonIgnore
+  public FullName fullName() {
+    return new FullName(getFirstName(), getMiddleName(), getLastName());
+  }
 }

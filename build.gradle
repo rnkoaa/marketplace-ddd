@@ -65,14 +65,22 @@ dependencies {
     compile project(":config")
     compile project(":common")
     compile project(":libs:mongo-config-commons")
+    compile project(":eventstore")
+    compile project(":eventstore-mongodb")
 
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("org.slf4j:slf4j-log4j12:1.7.30")
 
     implementation("com.sparkjava:spark-core:2.9.3")
 
-    compileOnly('org.projectlombok:lombok:1.18.16')
-    annotationProcessor('org.projectlombok:lombok:1.18.16')
+//    compileOnly('org.projectlombok:lombok:1.18.16')
+//    annotationProcessor('org.projectlombok:lombok:1.18.16')
+
+    compileOnly 'org.immutables:value:2.8.8'
+    annotationProcessor 'org.immutables:value:2.8.8'
+
+    // some functional implementations
+    implementation('io.vavr:vavr:1.0.0-alpha-3')
 
     // Runtime reflections
     implementation("org.reflections:reflections:0.9.12")

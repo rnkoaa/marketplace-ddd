@@ -2,28 +2,23 @@ package com.marketplace.domain.classifiedad.events;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.event.Event;
-import lombok.Builder;
-import lombok.Value;
-
+import com.marketplace.event.VersionedEvent;
 import java.util.UUID;
+import org.immutables.value.Value.Immutable;
 
-@Value
-@Builder
-@JsonDeserialize(builder = ClassifiedAdPictureResized.ClassifiedAdPictureResizedBuilder.class)
-public class ClassifiedAdPictureResized implements Event {
-    UUID classifiedAdId;
-    UUID pictureId;
-    int height;
-    int width;
+@Immutable
+@JsonDeserialize(as = ImmutableClassifiedAdPictureResized.class)
+@JsonSerialize(as = ImmutableClassifiedAdPictureResized.class)
+public interface ClassifiedAdPictureResized extends VersionedEvent {
 
-    @Override
-    public UUID getId() {
-        return getClassifiedAdId();
-    }
+  UUID getClassifiedAdId();
 
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class ClassifiedAdPictureResizedBuilder {
+  UUID getPictureId();
 
-    }
+  int getHeight();
+
+  int getWidth();
+
 }

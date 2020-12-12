@@ -8,9 +8,12 @@ import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import com.marketplace.domain.classifiedad.ClassifiedAdText;
 import com.marketplace.domain.classifiedad.ClassifiedAdTitle;
 import com.marketplace.domain.classifiedad.Price;
+import com.marketplace.domain.classifiedad.command.ImmutablePictureDto;
+import com.marketplace.domain.classifiedad.command.ImmutablePriceDto;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PriceDto;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryEntity;
+import com.marketplace.domain.classifiedad.query.ImmutableClassifiedAdQueryEntity;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.framework.Strings;
 import com.marketplace.mongo.entity.MongoEntity;
@@ -19,16 +22,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class ClassifiedAdEntity implements MongoEntity {
 
   @Id
@@ -40,6 +35,10 @@ public class ClassifiedAdEntity implements MongoEntity {
   private List<PictureEntity> pictures;
   private Price price;
   private ClassifiedAdState state;
+
+  // for mongo entity
+  public ClassifiedAdEntity() {
+  }
 
   public ClassifiedAdEntity(ClassifiedAd classifiedAd) {
     this.id = classifiedAd.getId().id();
@@ -93,13 +92,77 @@ public class ClassifiedAdEntity implements MongoEntity {
     return classifiedAd;
   }
 
+  public UUID getId() {
+    return id;
+  }
+
+  public UUID getOwner() {
+    return owner;
+  }
+
+  public UUID getApprovedBy() {
+    return approvedBy;
+  }
+
+  public String getText() {
+    return text;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public List<PictureEntity> getPictures() {
+    return pictures;
+  }
+
+  public Price getPrice() {
+    return price;
+  }
+
+  public ClassifiedAdState getState() {
+    return state;
+  }
+
+  public void setId(UUID id) {
+    this.id = id;
+  }
+
+  public void setOwner(UUID owner) {
+    this.owner = owner;
+  }
+
+  public void setApprovedBy(UUID approvedBy) {
+    this.approvedBy = approvedBy;
+  }
+
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public void setPictures(List<PictureEntity> pictures) {
+    this.pictures = pictures;
+  }
+
+  public void setPrice(Price price) {
+    this.price = price;
+  }
+
+  public void setState(ClassifiedAdState state) {
+    this.state = state;
+  }
+
   @Override
   public String getCollection() {
     return ClassifiedAd.class.getSimpleName().toLowerCase();
   }
 
   public ClassifiedAdQueryEntity toClassifiedAdReadEntity() {
-    var builder = ClassifiedAdQueryEntity.builder();
+    var builder = ImmutableClassifiedAdQueryEntity.builder();
     builder
         .id(id)
         .text(text).title(title)
@@ -108,13 +171,13 @@ public class ClassifiedAdEntity implements MongoEntity {
 
     if (price != null) {
       builder.price(
-          PriceDto.builder().currencyCode(price.money().currencyCode())
+          ImmutablePriceDto.builder().currencyCode(price.money().currencyCode())
               .amount(price.money().amount())
               .build());
     }
     if (pictures != null && pictures.size() > 0) {
       List<PictureDto> pictureDtos = pictures.stream()
-          .map(pic -> PictureDto.builder()
+          .map(pic -> ImmutablePictureDto.builder()
               .height(pic.getHeight())
               .width(pic.getWidth())
               .uri(pic.getUri())
@@ -122,7 +185,7 @@ public class ClassifiedAdEntity implements MongoEntity {
               .id(pic.getId())
               .build())
           .collect(Collectors.toList());
-      builder.pictures(pictureDtos);
+      builder.addAllPrictures(pictureDtos);
     }
     if (approvedBy != null) {
       builder.approver(approvedBy);

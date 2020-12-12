@@ -1,18 +1,20 @@
 package com.marketplace.domain.userprofile.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.UUID;
+import org.immutables.value.Value.Immutable;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class UpdateUserProfileCommand {
-    private UUID id;
-    private String photoUrl;
+@Immutable
+@JsonDeserialize(as = ImmutableUpdateUserProfileCommand.class)
+@JsonSerialize(as = ImmutableUpdateUserProfileCommand.class)
+public interface UpdateUserProfileCommand {
+
+  @JsonProperty("user_id")
+  UUID getUserId();
+
+  @JsonProperty("photo_url")
+  String getPhotoUrl();
 
 }

@@ -1,23 +1,24 @@
 package com.marketplace.domain.userprofile.event;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.event.Event;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import com.marketplace.event.VersionedEvent;
+import java.util.Optional;
 import java.util.UUID;
+import org.immutables.value.Value.Immutable;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UserFullNameUpdated implements Event {
-    private UUID userId;
-    private String firstName;
-    private String lastName;
-    private String middleName;
+@Immutable
+@JsonDeserialize(as = ImmutableUserFullNameUpdated.class)
+@JsonSerialize(as = ImmutableUserFullNameUpdated.class)
+public interface UserFullNameUpdated extends VersionedEvent {
 
-    @Override
-    public UUID getId() {
-       return userId;
-    }
+  UUID getUserId();
+
+  String getFirstName();
+
+  String getLastName();
+
+  Optional<String> getMiddleName();
 }

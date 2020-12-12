@@ -1,32 +1,34 @@
 package com.marketplace.server;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
+
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.domain.classifiedad.CommandHandlerResult;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
+import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
-import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryEntity;
-import com.marketplace.framework.Strings;
-import spark.Request;
-import spark.Route;
-
+import com.marketplace.domain.classifiedad.controller.UpdateClassifiedAdResponse;
+import io.vavr.control.Try;
+import java.io.IOException;
+import java.util.Map;
+import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
-import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 @Singleton
 @Named
 public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClassifiedAdCommandSparkRoutes.class);
   public static final String HEADER_CONTENT_TYPE = "Content-Type";
   public static final String NO_CONTENT = "";
   private final ObjectMapper objectMapper;
@@ -43,21 +45,20 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
       byte[] body = request.bodyAsBytes();
       CreateClassifiedAd createAdDto = objectMapper.readValue(body, CreateClassifiedAd.class);
       CommandHandlerResult<CreateAdResponse> ad = classifiedAdController.createAd(createAdDto);
-      if (ad.isSuccessful()) {
-        var createAdResponse = ad.result;
+      if (ad.isSuccessful() && ad.getResult().isPresent()) {
+        var createAdResponse = ad.getResult();
         response.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
         response.type(MEDIA_APPLICATION_JSON);
         response.status(201);
-        response.header("Location", String.format("/classified_ad/%s", createAdResponse.getId().toString()));
+        response.header("Location", String.format("/classified_ad/%s", createAdResponse.get().toString()));
         return NO_CONTENT;
       } else {
         Map<String, Object> resMessage = Map.of(
             "status", ad.isSuccessful(),
             "message", ad.getMessage()
         );
-        String s = objectMapper.writeValueAsString(resMessage);
         response.status(404);
-        return s;
+        return serializeResponse(resMessage);
       }
     };
   }
@@ -69,20 +70,9 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
       try {
         byte[] body = request.bodyAsBytes();
         var updateDto = objectMapper.readValue(body, UpdateClassifiedAd.class);
-        updateDto.setId(UUID.fromString(classifiedAdId));
+        updateDto = ImmutableUpdateClassifiedAd.copyOf(updateDto).withClassifiedAdId(UUID.fromString(classifiedAdId));
         var commandResult = classifiedAdController.updateClassifiedAd(updateDto);
-        if (commandResult.isSuccessful()) {
-          response.status(204);
-          return NO_CONTENT;
-        } else {
-          Map<String, Object> resMessage = Map.of(
-              "status", commandResult.isSuccessful(),
-              "message", commandResult.getMessage()
-          );
-          String s = objectMapper.writeValueAsString(resMessage);
-          response.status(404);
-          return s;
-        }
+        return processResponse(response, commandResult);
       } catch (JsonMappingException ex) {
         response.status(502);
       }
@@ -94,29 +84,18 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
       var updateClassifiedAd = read(req);
-      if (Strings.isNullOrEmpty(updateClassifiedAd.getTitle())) {
+      return updateClassifiedAd.getTitle().map(title -> {
+        var commandResult = classifiedAdController
+            .updateClassifiedTitle(UUID.fromString(classifiedAdId), title);
+        return processUpdateResponse(res, commandResult);
+      }).orElseGet(() -> {
         Map<String, Object> resMessage = Map.of(
             "status", false,
             "message", "title is required to change ownership of ad"
         );
         res.status(404);
-        return objectMapper.writeValueAsString(resMessage);
-      }
-
-      var commandResult = classifiedAdController
-          .updateClassifiedTitle(UUID.fromString(classifiedAdId), updateClassifiedAd.getTitle());
-      if (commandResult.isSuccessful()) {
-        res.status(204);
-        return NO_CONTENT;
-      } else {
-        Map<String, Object> resMessage = Map.of(
-            "status", commandResult.isSuccessful(),
-            "message", commandResult.getMessage()
-        );
-        String s = objectMapper.writeValueAsString(resMessage);
-        res.status(404);
-        return s;
-      }
+        return serializeResponse(resMessage);
+      });
     };
   }
 
@@ -124,29 +103,18 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
       var updateClassifiedAd = read(req);
-      if (updateClassifiedAd.getOwnerId() == null) {
+      return updateClassifiedAd.getOwnerId().map(ownerId -> {
+        var commandResult = classifiedAdController
+            .updateClassifiedAdOwner(UUID.fromString(classifiedAdId), ownerId);
+        return processUpdateResponse(res, commandResult);
+      }).orElseGet(() -> {
         Map<String, Object> resMessage = Map.of(
             "status", false,
             "message", "ownerId is required to change ownership of ad"
         );
         res.status(404);
-        return objectMapper.writeValueAsString(resMessage);
-      }
-
-      var commandResult = classifiedAdController
-          .updateClassifiedAdOwner(UUID.fromString(classifiedAdId), updateClassifiedAd.getOwnerId());
-      if (commandResult.isSuccessful()) {
-        res.status(204);
-        return NO_CONTENT;
-      } else {
-        Map<String, Object> resMessage = Map.of(
-            "status", commandResult.isSuccessful(),
-            "message", commandResult.getMessage()
-        );
-        String s = objectMapper.writeValueAsString(resMessage);
-        res.status(404);
-        return s;
-      }
+        return serializeResponse(resMessage);
+      });
     };
   }
 
@@ -154,31 +122,21 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
       var updateClassifiedAd = read(req);
-      if (updateClassifiedAd.getPrice() == null) {
-        Map<String, Object> resMessage = Map.of(
-            "status", false,
-            "message", "price is required to change price of ad"
-        );
-        res.status(404);
-        return objectMapper.writeValueAsString(resMessage);
-      }
-
-      var commandResult = classifiedAdController
-          .updateClassifiedAdPrice(UUID.fromString(classifiedAdId),
-              updateClassifiedAd.getPrice().getAmount(),
-              updateClassifiedAd.getPrice().getCurrencyCode());
-      if (commandResult.isSuccessful()) {
-        res.status(204);
-        return NO_CONTENT;
-      } else {
-        Map<String, Object> resMessage = Map.of(
-            "status", commandResult.isSuccessful(),
-            "message", commandResult.getMessage()
-        );
-        String s = objectMapper.writeValueAsString(resMessage);
-        res.status(404);
-        return s;
-      }
+      return updateClassifiedAd.getPrice()
+          .map(priceDto -> {
+            var commandResult = classifiedAdController
+                .updateClassifiedAdPrice(UUID.fromString(classifiedAdId),
+                    priceDto.getAmount(),
+                    priceDto.getCurrencyCode());
+            return processUpdateResponse(res, commandResult);
+          }).orElseGet(() -> {
+            Map<String, Object> resMessage = Map.of(
+                "status", false,
+                "message", "price is required to change price of ad"
+            );
+            res.status(404);
+            return serializeResponse(resMessage);
+          });
     };
   }
 
@@ -186,29 +144,20 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
       var updateClassifiedAd = read(req);
-      if (Strings.isNullOrEmpty(updateClassifiedAd.getText())) {
-        Map<String, Object> resMessage = Map.of(
-            "status", false,
-            "message", "text is required to change text of ad"
-        );
-        res.status(404);
-        return objectMapper.writeValueAsString(resMessage);
-      }
-
-      var commandResult = classifiedAdController
-          .updateClassifiedText(UUID.fromString(classifiedAdId), updateClassifiedAd.getText());
-      if (commandResult.isSuccessful()) {
-        res.status(204);
-        return NO_CONTENT;
-      } else {
-        Map<String, Object> resMessage = Map.of(
-            "status", commandResult.isSuccessful(),
-            "message", commandResult.getMessage()
-        );
-        String s = objectMapper.writeValueAsString(resMessage);
-        res.status(404);
-        return s;
-      }
+      return updateClassifiedAd.getText()
+          .map(text -> {
+            var commandResult = classifiedAdController
+                .updateClassifiedText(UUID.fromString(classifiedAdId), text);
+            return processUpdateResponse(res, commandResult);
+          })
+          .orElseGet(() -> {
+            Map<String, Object> resMessage = Map.of(
+                "status", false,
+                "message", "text is required to change text of ad"
+            );
+            res.status(404);
+            return serializeResponse(resMessage);
+          });
     };
   }
 
@@ -216,30 +165,36 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
       var updateClassifiedAd = read(req);
-      if (updateClassifiedAd.getApprovedBy() == null) {
-        Map<String, Object> resMessage = Map.of(
-            "status", false,
-            "message", "approver is required "
-        );
-        res.status(404);
-        return objectMapper.writeValueAsString(resMessage);
-      }
+      return updateClassifiedAd.getApprovedBy()
+          .map(approvedBy -> {
+            var commandResult = classifiedAdController
+                .approveClassifiedAd(UUID.fromString(classifiedAdId), approvedBy);
+            return processUpdateResponse(res, commandResult);
+          }).orElseGet(() -> {
 
-      var commandResult = classifiedAdController
-          .approveClassifiedAd(UUID.fromString(classifiedAdId), updateClassifiedAd.getApprovedBy());
-      if (commandResult.isSuccessful()) {
-        res.status(204);
-        return NO_CONTENT;
-      } else {
-        Map<String, Object> resMessage = Map.of(
-            "status", commandResult.isSuccessful(),
-            "message", commandResult.getMessage()
-        );
-        String s = objectMapper.writeValueAsString(resMessage);
-        res.status(404);
-        return s;
-      }
+            Map<String, Object> resMessage = Map.of(
+                "status", false,
+                "message", "approver is required "
+            );
+            res.status(404);
+            return Try.of(() -> objectMapper.writeValueAsString(resMessage))
+                .get();
+          });
     };
+  }
+
+  private String processUpdateResponse(Response res, CommandHandlerResult<UpdateClassifiedAdResponse> commandResult) {
+    if (commandResult.isSuccessful()) {
+      res.status(204);
+      return NO_CONTENT;
+    } else {
+      Map<String, Object> resMessage = Map.of(
+          "status", commandResult.isSuccessful(),
+          "message", commandResult.getMessage()
+      );
+      res.status(404);
+      return serializeResponse(resMessage);
+    }
   }
 
   public Route publishClassifiedAd() {
@@ -247,49 +202,47 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
       String classifiedAdId = getClassifiedIdFromRequest(req);
       var commandResult = classifiedAdController
           .publishClassifiedAd(UUID.fromString(classifiedAdId));
-      if (commandResult.isSuccessful()) {
-        res.status(204);
-        return NO_CONTENT;
-      } else {
-        Map<String, Object> resMessage = Map.of(
-            "status", commandResult.isSuccessful(),
-            "message", commandResult.getMessage()
-        );
-        String s = objectMapper.writeValueAsString(resMessage);
-        res.status(404);
-        return s;
-      }
+      return processResponse(res, commandResult);
     };
+  }
+
+  private Object processResponse(Response res, CommandHandlerResult<UpdateClassifiedAdResponse> commandResult) {
+    if (commandResult.isSuccessful()) {
+      res.status(204);
+      return NO_CONTENT;
+    } else {
+      Map<String, Object> resMessage = Map.of(
+          "status", commandResult.isSuccessful(),
+          "message", commandResult.getMessage()
+      );
+      res.status(404);
+      return serializeResponse(resMessage);
+    }
   }
 
   public Route addPictureToClassifiedAd() {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
       var updateClassifiedAd = read(req);
-      if (updateClassifiedAd.getPictures() == null || updateClassifiedAd.getPictures().size() == 0) {
-        Map<String, Object> resMessage = Map.of(
-            "status", false,
-            "message", "at least add a picture to be added to classifiedAd"
-        );
-        String s = objectMapper.writeValueAsString(resMessage);
-        res.status(404);
-        return s;
-      }
-
-      var commandResult = classifiedAdController.addPictures(UUID.fromString(classifiedAdId), updateClassifiedAd.getPictures());
-      if (commandResult.isSuccessful()) {
-        res.status(204);
-        return NO_CONTENT;
-      } else {
-        Map<String, Object> resMessage = Map.of(
-            "status", commandResult.isSuccessful(),
-            "message", commandResult.getMessage()
-        );
-        String s = objectMapper.writeValueAsString(resMessage);
-        res.status(404);
-        return s;
-      }
+      return updateClassifiedAd.getPictures()
+          .map(pictureDtos -> {
+            var commandResult = classifiedAdController.addPictures(UUID.fromString(classifiedAdId), pictureDtos);
+            return processResponse(res, commandResult);
+          }).orElseGet(() -> {
+            Map<String, Object> resMessage = Map.of(
+                "status", false,
+                "message", "at least add a picture to be added to classifiedAd"
+            );
+            res.status(404);
+            return serializeResponse(resMessage);
+          });
     };
+  }
+
+  public String serializeResponse(Object object) {
+    return Try.of(() -> objectMapper.writeValueAsString(object))
+        .onFailure(ex -> LOGGER.info("error while serialing object with message {}", ex.getMessage()))
+        .getOrElse("");
   }
 
   private UpdateClassifiedAd read(Request req) throws IOException {

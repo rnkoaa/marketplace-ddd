@@ -1,50 +1,62 @@
 package com.marketplace.domain.classifiedad.command;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.command.Command;
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
+import org.immutables.value.Value;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UpdateClassifiedAd implements Command {
+@Value.Immutable
+@JsonSerialize(as = ImmutableUpdateClassifiedAd.class)
+@JsonDeserialize(as = ImmutableUpdateClassifiedAd.class)
+public interface UpdateClassifiedAd extends Command {
 
-  private UUID id;
-  private String text;
-  private String title;
-  private PriceDto price;
-  private UUID ownerId;
-  private UUID approvedBy;
-  private List<PictureDto> pictures;
-  private ClassifiedAdState state;
+  @JsonProperty("classified_ad_id")
+  UUID getClassifiedAdId();
+
+  Optional<String> getText();
+
+  Optional<String> getTitle();
+
+  Optional<PriceDto> getPrice();
+
+  @JsonProperty("owner")
+  Optional<UUID> getOwnerId();
+
+  @JsonProperty("approver")
+  Optional<UUID> getApprovedBy();
+
+  Optional<List<PictureDto>> getPictures();
+
+  Optional<ClassifiedAdState> getState();
 
 
-  @Data
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @Builder
-  public static class PictureDto {
-    private UUID id;
-    private int order;
-    private String uri;
-    private int width;
-    private int height;
+  @Value.Immutable
+  interface PictureDto {
+
+    UUID getId();
+
+    int getOrder();
+
+    String getUri();
+
+    int getWidth();
+
+    int getHeight();
   }
 
-  @Data
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @Builder
-  public static class PriceDto {
 
-    private String currencyCode;
-    private BigDecimal amount;
+  @Value.Immutable
+  interface PriceDto {
+
+    String getCurrencyCode();
+
+    BigDecimal getAmount();
   }
 }

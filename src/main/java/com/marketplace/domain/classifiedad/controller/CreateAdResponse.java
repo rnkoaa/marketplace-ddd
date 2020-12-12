@@ -1,15 +1,16 @@
 package com.marketplace.domain.classifiedad.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.UUID;
+import org.immutables.value.Value;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class CreateAdResponse {
-    private UUID ownerId;
-    private UUID id;
+@Value.Immutable
+@JsonDeserialize(as = ImmutableCreateAdResponse.class)
+@JsonSerialize(as = ImmutableCreateAdResponse.class)
+public interface CreateAdResponse {
+
+   UUID getOwnerId();
+
+   UUID getClassifiedAdId();
 }

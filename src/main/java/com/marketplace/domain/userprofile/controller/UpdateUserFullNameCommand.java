@@ -1,26 +1,29 @@
 package com.marketplace.domain.userprofile.controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.domain.userprofile.FullName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.UUID;
+import org.immutables.value.Value.Immutable;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-@Builder
-public class UpdateUserFullNameCommand {
-    private UUID id;
-    private String firstName;
-    private String lastName;
-    private String middleName;
 
-    @JsonIgnore
-    public FullName fullName(){
-        return new FullName(firstName, middleName, lastName);
-    }
+@Immutable
+@JsonDeserialize(as = ImmutableUpdateUserFullNameCommand.class)
+@JsonSerialize(as = ImmutableUpdateUserFullNameCommand.class)
+public abstract class UpdateUserFullNameCommand {
+
+  abstract UUID getUserId();
+
+  abstract String getFirstName();
+
+  abstract String getLastName();
+
+  abstract String getMiddleName();
+
+  @JsonIgnore
+  public FullName fullName() {
+    return new FullName(getFirstName(), getMiddleName(), getLastName());
+  }
 }

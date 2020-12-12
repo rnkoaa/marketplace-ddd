@@ -1,17 +1,18 @@
 package com.marketplace.domain.classifiedad.command;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.command.Command;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Value;
 
 import java.util.UUID;
+import org.immutables.value.Value.Immutable;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UpdateClassifiedAdOwner implements Command {
-   private UUID id;
-   private UUID ownerId;
+@Immutable
+@JsonDeserialize(as = ImmutableUpdateClassifiedAdOwner.class)
+@JsonSerialize(as = ImmutableUpdateClassifiedAdOwner.class)
+public interface UpdateClassifiedAdOwner extends Command {
+
+  UUID getId();
+
+  UUID getOwnerId();
 }

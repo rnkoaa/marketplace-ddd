@@ -4,27 +4,28 @@ import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PriceDto;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.immutables.value.Value.Immutable;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class ClassifiedAdQueryEntity {
+@Immutable
+public interface ClassifiedAdQueryEntity {
 
-  private UUID id;
-  private UUID ownerId;
-  private UUID approver;
-  private String title;
-  private String text;
-  private PriceDto price;
-  private List<PictureDto> pictures;
-  private ClassifiedAdState state;
+  UUID getId();
 
+  UUID getOwnerId();
+
+  Optional<UUID> getApprover();
+
+  Optional<String> getTitle();
+
+  Optional<String> getText();
+
+  Optional<PriceDto> getPrice();
+
+  List<PictureDto> getPrictures();
+
+  ClassifiedAdState getState();
 
 
 }

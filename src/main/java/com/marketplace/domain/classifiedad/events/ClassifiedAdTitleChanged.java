@@ -1,36 +1,18 @@
 package com.marketplace.domain.classifiedad.events;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.marketplace.event.Event;
-import lombok.Builder;
-import lombok.Value;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.marketplace.event.VersionedEvent;
 import java.util.UUID;
+import org.immutables.value.Value.Immutable;
 
-@Value
-@Builder
-@JsonDeserialize(builder = ClassifiedAdTitleChanged.ClassifiedAdTitleChangedBuilder.class)
-public class ClassifiedAdTitleChanged implements Event {
-    UUID id;
-    String title;
+@Immutable
+@JsonDeserialize(as = ImmutableClassifiedAdTitleChanged.class)
+@JsonSerialize(as = ImmutableClassifiedAdTitleChanged.class)
+public interface ClassifiedAdTitleChanged extends VersionedEvent {
 
-    public ClassifiedAdTitleChanged(UUID id, String title) {
-        this.id = id;
-        this.title = title;
-    }
+  UUID getId();
 
-    @Override
-    public UUID getId() {
-        return id;
-    }
+  String getTitle();
 
-    public String getTitle() {
-        return title;
-    }
-
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class ClassifiedAdTitleChangedBuilder {
-
-    }
 }

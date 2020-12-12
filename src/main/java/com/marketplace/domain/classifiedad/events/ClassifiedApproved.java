@@ -2,26 +2,19 @@ package com.marketplace.domain.classifiedad.events;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.marketplace.event.Event;
-import lombok.Builder;
-import lombok.Value;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.marketplace.event.VersionedEvent;
+import com.marketplace.eventstore.framework.event.Event;
 import java.util.UUID;
+import org.immutables.value.Value.Immutable;
 
-@Value
-@Builder
-@JsonDeserialize(builder = ClassifiedApproved.ClassifiedApprovedBuilder.class)
-public class ClassifiedApproved implements Event {
-    UUID id;
-    UUID userId;
+@Immutable
+@JsonSerialize(as = ImmutableClassifiedApproved.class)
+@JsonDeserialize(as = ImmutableClassifiedApproved.class)
+public interface ClassifiedApproved extends VersionedEvent {
 
-    @Override
-    public UUID getId() {
-        return null;
-    }
+  UUID getId();
 
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class ClassifiedApprovedBuilder {
+  UUID getUserId();
 
-    }
 }

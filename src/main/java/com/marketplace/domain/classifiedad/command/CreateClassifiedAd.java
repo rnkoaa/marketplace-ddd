@@ -1,41 +1,40 @@
 package com.marketplace.domain.classifiedad.command;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.command.Command;
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
-import lombok.*;
-
-import java.math.BigDecimal;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PriceDto;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import org.immutables.value.Value;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@JsonDeserialize(builder = CreateClassifiedAd.CreateClassifiedAdBuilder.class)
-public class CreateClassifiedAd implements Command {
+@Value.Immutable
+@JsonSerialize(as = ImmutableCreateClassifiedAd.class)
+@JsonDeserialize(as = ImmutableCreateClassifiedAd.class)
+public interface CreateClassifiedAd extends Command {
 
-  private UUID id;
-  private String text;
-  private String title;
-  private PriceUpdate price;
-  private UUID ownerId;
-  private UUID approvedBy;
-  private ClassifiedAdState state;
+  @JsonProperty("classified_ad_id")
+  Optional<UUID> getClassifiedAdId();
+
+  Optional<String> getText();
+
+  Optional<String> getTitle();
+
+  Optional<PriceDto> getPrice();
+
+  @JsonProperty("owner")
+  UUID getOwnerId();
+
+  @JsonProperty("approver")
+  Optional<UUID> getApprovedBy();
+
+  Optional<List<PictureDto>> getPictures();
+
+  Optional<ClassifiedAdState> getState();
 
 
-  @JsonPOJOBuilder(withPrefix = "")
-  public static class CreateClassifiedAdBuilder {
-
-  }
-
-  @Data
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class PriceUpdate {
-
-    private String currencyCode;
-    private BigDecimal bigDecimal;
-  }
 }
