@@ -2,8 +2,8 @@
 POST http://localhost:8080/classified_ad
 
 {
-"id": "da31260e-b943-425f-8563-ddb6a911662d",
-"owner_id": "ae48b592-9526-4952-81fc-584af8a46565"
+"classified_ad_id": "da31260e-b943-425f-8563-ddb6a911662d",
+"owner": "ae48b592-9526-4952-81fc-584af8a46565"
 }
 
 ###
@@ -45,7 +45,7 @@ PUT http://localhost:8080/classified_ad/da31260e-b943-425f-8563-ddb6a911662d/app
 Content-Type: application/json
 
 {
-  "approved_by": "ae48b592-9526-4952-81fc-584af8a46565"
+  "approver": "ae48b592-9526-4952-81fc-584af8a46565"
 }
 
 ### approve

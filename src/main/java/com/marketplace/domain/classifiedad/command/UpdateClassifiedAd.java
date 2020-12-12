@@ -18,7 +18,7 @@ import org.immutables.value.Value;
 public interface UpdateClassifiedAd extends Command {
 
   @JsonProperty("classified_ad_id")
-  UUID getClassifiedAdId();
+  Optional<UUID> getClassifiedAdId();
 
   Optional<String> getText();
 
@@ -36,13 +36,20 @@ public interface UpdateClassifiedAd extends Command {
 
   Optional<ClassifiedAdState> getState();
 
-
   @Value.Immutable
+  @JsonSerialize(as = ImmutablePictureDto.class)
+  @JsonDeserialize(as = ImmutablePictureDto.class)
   interface PictureDto {
 
-    UUID getId();
+    @Value.Default
+    default UUID getId() {
+      return UUID.randomUUID();
+    }
 
-    int getOrder();
+    @Value.Default
+    default int getOrder() {
+      return 0;
+    }
 
     String getUri();
 
@@ -53,8 +60,11 @@ public interface UpdateClassifiedAd extends Command {
 
 
   @Value.Immutable
+  @JsonSerialize(as = ImmutablePriceDto.class)
+  @JsonDeserialize(as = ImmutablePriceDto.class)
   interface PriceDto {
 
+    @JsonProperty("currency_code")
     String getCurrencyCode();
 
     BigDecimal getAmount();
