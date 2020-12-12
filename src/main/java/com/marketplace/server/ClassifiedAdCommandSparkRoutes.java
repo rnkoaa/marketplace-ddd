@@ -2,7 +2,6 @@ package com.marketplace.server;
 
 import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.domain.classifiedad.CommandHandlerResult;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
@@ -12,7 +11,6 @@ import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.controller.UpdateClassifiedAdResponse;
 import io.vavr.control.Try;
-import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -67,23 +65,17 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
     return (request, response) -> {
       String classifiedAdId = getClassifiedIdFromRequest(request);
       response.type("application/json");
-      try {
-        byte[] body = request.bodyAsBytes();
-        var updateDto = objectMapper.readValue(body, UpdateClassifiedAd.class);
-        updateDto = ImmutableUpdateClassifiedAd.copyOf(updateDto).withClassifiedAdId(UUID.fromString(classifiedAdId));
-        var commandResult = classifiedAdController.updateClassifiedAd(updateDto);
-        return processResponse(response, commandResult);
-      } catch (JsonMappingException ex) {
-        response.status(502);
-      }
-      return null;
+      var updateDto = read(classifiedAdId, request);
+      updateDto = ImmutableUpdateClassifiedAd.copyOf(updateDto).withClassifiedAdId(UUID.fromString(classifiedAdId));
+      var commandResult = classifiedAdController.updateClassifiedAd(updateDto);
+      return processResponse(response, commandResult);
     };
   }
 
   public Route updateClassifiedAdTitle() {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(req);
+      var updateClassifiedAd = read(classifiedAdId, req);
       return updateClassifiedAd.getTitle().map(title -> {
         var commandResult = classifiedAdController
             .updateClassifiedTitle(UUID.fromString(classifiedAdId), title);
@@ -102,7 +94,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
   public Route updateClassifiedAdOwner() {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(req);
+      var updateClassifiedAd = read(classifiedAdId, req);
       return updateClassifiedAd.getOwnerId().map(ownerId -> {
         var commandResult = classifiedAdController
             .updateClassifiedAdOwner(UUID.fromString(classifiedAdId), ownerId);
@@ -121,7 +113,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
   public Route updateClassifiedAdPrice() {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(req);
+      var updateClassifiedAd = read(classifiedAdId, req);
       return updateClassifiedAd.getPrice()
           .map(priceDto -> {
             var commandResult = classifiedAdController
@@ -143,7 +135,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
   public Route updateClassifiedAdText() {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(req);
+      var updateClassifiedAd = read(classifiedAdId, req);
       return updateClassifiedAd.getText()
           .map(text -> {
             var commandResult = classifiedAdController
@@ -164,7 +156,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
   public Route approveClassifiedAd() {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(req);
+      var updateClassifiedAd = read(classifiedAdId, req);
       return updateClassifiedAd.getApprovedBy()
           .map(approvedBy -> {
             var commandResult = classifiedAdController
@@ -223,7 +215,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
   public Route addPictureToClassifiedAd() {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(req);
+      var updateClassifiedAd = read(classifiedAdId, req);
       return updateClassifiedAd.getPictures()
           .map(pictureDtos -> {
             var commandResult = classifiedAdController.addPictures(UUID.fromString(classifiedAdId), pictureDtos);
@@ -245,9 +237,17 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
         .getOrElse("");
   }
 
-  private UpdateClassifiedAd read(Request req) throws IOException {
+  private UpdateClassifiedAd read(String classifiedAdId, Request req) {
     byte[] bytes = req.bodyAsBytes();
-    return objectMapper.readValue(bytes, UpdateClassifiedAd.class);
+    UpdateClassifiedAd updateClassifiedAd = Try.of(() -> objectMapper.readValue(bytes, UpdateClassifiedAd.class))
+        .onFailure(ex -> {
+          System.out.println("error deserializing update request object with error ");
+          System.out.println(ex.getMessage());
+          LOGGER.info("error deserializing update request object with error {}", ex.getMessage());
+        })
+        .getOrElseThrow(() -> new IllegalArgumentException("failed to deserialize request body"));
+    return ImmutableUpdateClassifiedAd.copyOf(updateClassifiedAd)
+        .withClassifiedAdId(UUID.fromString(classifiedAdId));
   }
 
 }

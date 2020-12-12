@@ -11,6 +11,7 @@ import com.marketplace.domain.shared.UserId;
 import com.marketplace.framework.Strings;
 
 import java.util.List;
+import java.util.UUID;
 import javax.inject.Inject;
 import java.util.Optional;
 
@@ -28,9 +29,7 @@ public class ClassifiedAdService {
 
     var ownerId = new UserId(command.getOwnerId());
     var classifiedAd = new ClassifiedAd(classifiedAdId, ownerId);
-
     command.getTitle().ifPresent(title -> classifiedAd.updateTitle(new ClassifiedAdTitle(title)));
-
     command.getText().ifPresent(text -> classifiedAd.updateText(new ClassifiedAdText(text)));
 
     var saved = classifiedAdCommandRepository.add(classifiedAd);
@@ -52,31 +51,33 @@ public class ClassifiedAdService {
   }
 
   public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAd command) {
-    Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getClassifiedAdId()));
-    return mayBe.map(classifiedAd -> {
-      command.getOwnerId().ifPresent(ownerId -> classifiedAd.updateOwner(new UserId(ownerId)));
-      command.getTitle().ifPresent(title -> classifiedAd.updateTitle(new ClassifiedAdTitle(title)));
-      command.getText().ifPresent(text -> classifiedAd.updateText(new ClassifiedAdText(text)));
-      command.getPrice().ifPresent(priceDto -> {
-        var money = new Money(priceDto.getAmount(), priceDto.getCurrencyCode(), new DefaultCurrencyLookup());
-        var price = new Price(money);
-        classifiedAd.updatePrice(price);
-      });
+    Optional<UUID> mayBeClassifiedAdId = command.getClassifiedAdId();
+    return mayBeClassifiedAdId
+        .flatMap(classifiedAdId -> classifiedAdCommandRepository.load(new ClassifiedAdId(classifiedAdId)))
+        .map(classifiedAd -> {
+          command.getOwnerId().ifPresent(ownerId -> classifiedAd.updateOwner(new UserId(ownerId)));
+          command.getTitle().ifPresent(title -> classifiedAd.updateTitle(new ClassifiedAdTitle(title)));
+          command.getText().ifPresent(text -> classifiedAd.updateText(new ClassifiedAdText(text)));
+          command.getPrice().ifPresent(priceDto -> {
+            var money = new Money(priceDto.getAmount(), priceDto.getCurrencyCode(), new DefaultCurrencyLookup());
+            var price = new Price(money);
+            classifiedAd.updatePrice(price);
+          });
 
-      command.getApprovedBy().ifPresent(approver -> classifiedAd.approve(new UserId(approver)));
+          command.getApprovedBy().ifPresent(approver -> classifiedAd.approve(new UserId(approver)));
 
-      return classifiedAdCommandRepository.add(classifiedAd);
-    }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-        .result(ImmutableUpdateClassifiedAdResponse.builder()
-            .id(classifiedAd.getId().id())
-            .ownerId(classifiedAd.getOwnerId().id())
-            .build())
-        .isSuccessful(true)
-        .build()
-    ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-        .isSuccessful(false)
-        .message("classifiedAd not found to be updated")
-        .build());
+          return classifiedAdCommandRepository.add(classifiedAd);
+        }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
+            .result(ImmutableUpdateClassifiedAdResponse.builder()
+                .id(classifiedAd.getId().id())
+                .ownerId(classifiedAd.getOwnerId().id())
+                .build())
+            .isSuccessful(true)
+            .build()
+        ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
+            .isSuccessful(false)
+            .message("classifiedAd not found to be updated")
+            .build());
   }
 
   public AddPictureResponse handle(AddPictureToClassifiedAd addPictureToClassifiedAd) {
