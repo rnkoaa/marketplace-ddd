@@ -13,27 +13,30 @@ import dagger.Component;
 import javax.inject.Singleton;
 
 @Component(modules = {
-        SparkServerModule.class,
-        ApplicationModule.class,
-        MongoConfigModule.class,
-        ObjectMapperModule.class
+    SparkServerModule.class,
+    ApplicationModule.class,
+    MongoConfigModule.class,
+    ObjectMapperModule.class,
+//    EventStoreModule.class,
+//    GuavaEventPublisherModule.class
 })
 @Singleton
 public interface ApplicationContext {
 
-    SparkServer getServer();
+  SparkServer getServer();
 
-    ClassifiedAdCommandRepository getClassifiedAdRepository();
+  ClassifiedAdCommandRepository getClassifiedAdRepository();
 
-    UserProfileRepository getUserProfileRepository();
+  UserProfileRepository getUserProfileRepository();
 
-    ClassifiedAdService getClassifiedAdService();
+  ClassifiedAdService getClassifiedAdService();
 
-    @Component.Builder
-    interface Builder {
-        ApplicationContext build();
+  @Component.Builder
+  interface Builder {
 
-        @BindsInstance
-        Builder config(ApplicationConfig config);
-    }
+    ApplicationContext build();
+
+    @BindsInstance
+    Builder config(ApplicationConfig config);
+  }
 }

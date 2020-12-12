@@ -45,7 +45,7 @@ public class EventStoreApplication {
   private static final ObjectMapper objectMapper = new ObjectMapperBuilder().build();
 
   public static void main(String[] args) throws InterruptedException {
-    MongoConfig mongoConfig = new MongoConfig("localhost", "eventstore", 27017);
+    MongoConfig mongoConfig = new MongoConfig("localhost", "marketplace_ddd", "eventstore", 27017);
     MongoClient mongoClient = createClient(mongoConfig, provideCodecRegistry());
     MongoDatabase db =
         mongoClient
@@ -116,7 +116,7 @@ public class EventStoreApplication {
                     //            eq("_id", UUID.fromString("09398a4a-59ef-4fd7-90cf-15a861b1903c"))
                     eq("aggregateId", aggregateId)
                     //            eq("aggregateId", Filters"246219a4-4266-440b-964e-f292baadf133")
-                    ),
+                ),
                 group(null, Accumulators.max("version", "$version"))),
             Document.class);
     return aggregatePublisher;

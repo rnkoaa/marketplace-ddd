@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class MongoConfig {
   private String hosts = "localhost";
   private String database = "test_db";
+  private String eventStore = "event_store";
   int port = 27017;
 
   public String getConnectionString() {

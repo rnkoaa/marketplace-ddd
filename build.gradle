@@ -99,7 +99,8 @@ dependencies {
     implementation("com.google.dagger:dagger:2.29.1")
     annotationProcessor 'com.google.dagger:dagger-compiler:2.29.1'
 
-    implementation("org.mongodb:mongodb-driver-sync:4.1.1")
+    implementation('org.mongodb:mongodb-driver-reactivestreams:1.13.1')
+//    implementation("org.mongodb:mongodb-driver-sync:4.1.1")
 
     testImplementation(platform("org.junit:junit-bom:${junitVersion}"))
     testImplementation('org.junit.jupiter:junit-jupiter')
