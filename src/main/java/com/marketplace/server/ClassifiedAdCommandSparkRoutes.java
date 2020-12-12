@@ -206,8 +206,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
     };
   }
 
-  private Object processResponse(Response res, CommandHandlerResult<UpdateClassifiedAdResponse> commandResult)
-      throws com.fasterxml.jackson.core.JsonProcessingException {
+  private Object processResponse(Response res, CommandHandlerResult<UpdateClassifiedAdResponse> commandResult) {
     if (commandResult.isSuccessful()) {
       res.status(204);
       return NO_CONTENT;
@@ -216,9 +215,8 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
           "status", commandResult.isSuccessful(),
           "message", commandResult.getMessage()
       );
-      String s = objectMapper.writeValueAsString(resMessage);
       res.status(404);
-      return s;
+      return serializeResponse(resMessage);
     }
   }
 
@@ -226,18 +224,18 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
     return (req, res) -> {
       String classifiedAdId = getClassifiedIdFromRequest(req);
       var updateClassifiedAd = read(req);
-      if (updateClassifiedAd.getPictures() == null || updateClassifiedAd.getPictures().size() == 0) {
-        Map<String, Object> resMessage = Map.of(
-            "status", false,
-            "message", "at least add a picture to be added to classifiedAd"
-        );
-        String s = objectMapper.writeValueAsString(resMessage);
-        res.status(404);
-        return s;
-      }
-
-      var commandResult = classifiedAdController.addPictures(UUID.fromString(classifiedAdId), updateClassifiedAd.getPictures());
-      return processResponse(res, commandResult);
+      return updateClassifiedAd.getPictures()
+          .map(pictureDtos -> {
+            var commandResult = classifiedAdController.addPictures(UUID.fromString(classifiedAdId), pictureDtos);
+            return processResponse(res, commandResult);
+          }).orElseGet(() -> {
+            Map<String, Object> resMessage = Map.of(
+                "status", false,
+                "message", "at least add a picture to be added to classifiedAd"
+            );
+            res.status(404);
+            return serializeResponse(resMessage);
+          });
     };
   }
 

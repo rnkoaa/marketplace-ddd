@@ -44,6 +44,7 @@ public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
     apply(ImmutableUserRegistered.builder()
         .id(idGenerator.newUUID())
         .aggregateId(id.id())
+        .userId(id.id())
         .aggregateName(AGGREGATE_NAME)
         .firstName(fullName.firstName())
         .lastName(fullName.lastName())
@@ -97,7 +98,7 @@ public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
   @Override
   public void when(VersionedEvent event) {
     if (event instanceof UserRegistered e) {
-      this.id = new UserId(e.getId());
+      this.id = new UserId(e.getAggregateId());
       this.displayName = new DisplayName(e.getDisplayName());
       this.fullName = new FullName(e.getFirstName(), e.getMiddleName().orElse(""), e.getLastName());
     } else if (event instanceof ProfilePhotoUploaded e) {

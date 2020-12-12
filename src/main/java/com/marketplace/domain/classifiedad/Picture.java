@@ -63,6 +63,7 @@ public class Picture extends Entity<EventId, VersionedEvent> {
   public void resize(PictureSize newSize) {
     apply(ImmutableClassifiedAdPictureResized.builder()
         .id(idGenerator.newUUID())
+        .aggregateId(this.parentId.id())
         .classifiedAdId(this.parentId.id())
         .pictureId(this.id.id())
         .height(newSize.height())

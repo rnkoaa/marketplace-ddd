@@ -12,9 +12,9 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableAddPictureResponse.class)
 public interface AddPictureResponse {
 
-  UUID getClassifiedAdId();
+  Optional<UUID> getClassifiedAdId();
 
-  UUID getId();
+  Optional<UUID> getId();
 
   boolean status();
 

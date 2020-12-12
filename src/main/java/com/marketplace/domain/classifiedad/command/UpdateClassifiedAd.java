@@ -32,7 +32,7 @@ public interface UpdateClassifiedAd extends Command {
   @JsonProperty("approver")
   Optional<UUID> getApprovedBy();
 
-  List<PictureDto> getPictures();
+  Optional<List<PictureDto>> getPictures();
 
   Optional<ClassifiedAdState> getState();
 

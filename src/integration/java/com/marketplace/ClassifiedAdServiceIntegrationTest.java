@@ -44,7 +44,8 @@ public class ClassifiedAdServiceIntegrationTest extends BaseMongoRepositoryTest 
 
     AddPictureResponse addPictureResponse = classifiedAdService.handle(addPictureToClassifiedAd);
     assertThat(addPictureResponse).isNotNull();
-    assertThat(addPictureResponse.getClassifiedAdId()).isEqualByComparingTo(createResponse.getResult().get().getClassifiedAdId());
+    assertThat(addPictureResponse.getClassifiedAdId()).isPresent();
+    assertThat(addPictureResponse.getClassifiedAdId().get()).isEqualByComparingTo(createResponse.getResult().get().getClassifiedAdId());
 //        controller.addPicture(addPictureToClassifiedAd);
 //
 //        assert repository != null;
@@ -121,9 +122,12 @@ public class ClassifiedAdServiceIntegrationTest extends BaseMongoRepositoryTest 
         .withClassifiedAdId(ad.getResult().get().getClassifiedAdId());
     AddPictureResponse addPictureResponse = classifiedAdService.handle(addPictureToClassifiedAd);
 
+    assertThat(addPictureResponse.getClassifiedAdId()).isPresent();
+    assertThat(addPictureResponse.getId()).isPresent();
+
     ResizeClassifiedAdPicture resizePictureCommand = ImmutableResizeClassifiedAdPicture.copyOf(LoadResizePicture.load())
         .withClassifiedAdId(ad.getResult().get().getClassifiedAdId())
-        .withId(addPictureResponse.getId());
+        .withId(addPictureResponse.getId().get());
     classifiedAdService.handle(resizePictureCommand);
 
     Optional<ClassifiedAd> load = classifiedAdService.findById(new ClassifiedAdId(ad.getResult().get().getClassifiedAdId()));

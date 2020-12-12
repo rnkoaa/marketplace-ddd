@@ -59,28 +59,4 @@ public class PictureEntityCodec implements Codec<ImmutablePictureEntity> {
     return ImmutablePictureEntity.class;
   }
 
-  /**
-   *  Codec<Document> documentCodec = codecRegistry.get(Document.class);
-   *     Document document = documentCodec.decode(reader, decoderContext);
-   *     String eventBody = document.getString("eventBody");
-   *     String eventType = document.getString("eventType");
-   *     int sequenceId = document.getInteger("sequenceId", 0);
-   *
-   *     return ImmutableTypedEvent.builder()
-   *         .sequenceId(sequenceId)
-   *         .eventBody(eventBody)
-   *         .type(eventType)
-   *         .build();
-   *   }
-   *
-   *   @Override
-   *   public void encode(BsonWriter writer, ImmutableTypedEvent value, EncoderContext encoderContext) {
-   *     Codec<Document> documentCodec = codecRegistry.get(Document.class);
-   *     Document document = new Document();
-   *     document.put("sequenceId", value.getSequenceId());
-   *     document.put("eventBody", value.getEventBody());
-   *     document.put("eventType", value.getType());
-   *     documentCodec.encode(writer, document, encoderContext);
-   *   }
-   */
 }

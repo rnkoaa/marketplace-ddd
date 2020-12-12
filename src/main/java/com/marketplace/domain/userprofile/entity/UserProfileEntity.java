@@ -4,8 +4,10 @@ import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
+import com.marketplace.domain.userprofile.entity.ImmutableUserProfileEntity.Builder;
 import com.marketplace.framework.Strings;
 import com.marketplace.mongo.entity.MongoEntity;
+import java.util.Optional;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
 import javax.persistence.Entity;
@@ -18,28 +20,31 @@ import org.immutables.value.Value.Immutable;
 public abstract class UserProfileEntity implements MongoEntity {
 
   @Id
-  abstract UUID getId();
+  public abstract UUID getId();
 
-  abstract String getFirstName();
+  public abstract String getFirstName();
 
-  abstract String getMiddleName();
+  public abstract String getMiddleName();
 
-  abstract String getLastName();
+  public abstract String getLastName();
 
-  abstract String getDisplayName();
+  public abstract String getDisplayName();
 
-  abstract String getPhotoUrl();
+  public abstract Optional<String> getPhotoUrl();
 
   public static UserProfileEntity create(UserProfile entity) {
-    return ImmutableUserProfileEntity.builder()
+    var userProfileEntityBuilder = ImmutableUserProfileEntity.builder()
         .id(entity.getId().id())
         .firstName(entity.getFullName().firstName())
         .lastName(entity.getFullName().lastName())
         .middleName(entity.getFullName().middleName())
-        .displayName(entity.getDisplayName().value())
-        .photoUrl(entity.getPhotoUrl())
+        .displayName(entity.getDisplayName().value());
 
-        .build();
+    if (!Strings.isNullOrEmpty(entity.getPhotoUrl())) {
+      userProfileEntityBuilder.photoUrl(entity.getPhotoUrl());
+    }
+
+    return userProfileEntityBuilder.build();
   }
 
   @BsonIgnore
@@ -56,21 +61,21 @@ public abstract class UserProfileEntity implements MongoEntity {
     UserProfile userProfile = new UserProfile(UserId.from(userProfileEntity.getId()),
         userProfileEntity.fullName(),
         userProfileEntity.displayName());
-    if (!Strings.isNullOrEmpty(userProfileEntity.getPhotoUrl())) {
-      userProfile.updatePhoto(userProfileEntity.getPhotoUrl());
-    }
+    userProfileEntity.getPhotoUrl().ifPresent(userProfile::updatePhoto);
     return userProfile;
   }
 
   public static UserProfileEntity from(UserProfile userProfile) {
-    return ImmutableUserProfileEntity.builder()
+    Builder builder = ImmutableUserProfileEntity.builder()
         .id(userProfile.getId().id())
         .firstName(userProfile.getFullName().firstName())
         .middleName(userProfile.getFullName().middleName())
         .lastName(userProfile.getFullName().lastName())
-        .displayName(userProfile.getDisplayName().value())
-        .photoUrl(userProfile.getPhotoUrl())
-        .build();
+        .displayName(userProfile.getDisplayName().value());
+    if (!Strings.isNullOrEmpty(userProfile.getPhotoUrl())) {
+      builder.photoUrl(userProfile.getPhotoUrl());
+    }
+    return builder.build();
   }
 
   // TODO use compile time error to validate that BsonIgnore is required here

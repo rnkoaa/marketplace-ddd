@@ -67,7 +67,10 @@ public class ClassifiedAdService {
 
       return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-        .result(ImmutableUpdateClassifiedAdResponse.builder().build())
+        .result(ImmutableUpdateClassifiedAdResponse.builder()
+            .id(classifiedAd.getId().id())
+            .ownerId(classifiedAd.getOwnerId().id())
+            .build())
         .isSuccessful(true)
         .build()
     ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
@@ -88,6 +91,7 @@ public class ClassifiedAdService {
 
       return ImmutableAddPictureResponse.builder()
           .id(pictureId.id())
+          .status(true)
           .classifiedAdId(savedClassifiedAd.getId().id())
           .build();
     }).orElse(ImmutableAddPictureResponse
@@ -108,8 +112,9 @@ public class ClassifiedAdService {
       return ImmutableResizePictureResponse.builder()
           .classifiedAdId(savedClassifiedAd.getId().id())
           .id(pictureId.id())
+          .status(true)
           .build();
-    }).orElse(ImmutableResizePictureResponse.builder()
+    }).orElseGet(() -> ImmutableResizePictureResponse.builder()
         .status(false)
         .message("classifiedAd not found to be updated")
         .build());
@@ -127,7 +132,10 @@ public class ClassifiedAdService {
       }
       return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-        .result(ImmutableUpdateClassifiedAdResponse.builder().build())
+        .result(ImmutableUpdateClassifiedAdResponse.builder()
+            .ownerId(classifiedAd.getOwnerId().id())
+            .id(classifiedAd.getId().id())
+            .build())
         .isSuccessful(true)
         .build()
     ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
@@ -146,7 +154,10 @@ public class ClassifiedAdService {
       // TODO - throw illegalArgumentException
       return null;
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-        .result(ImmutableUpdateClassifiedAdResponse.builder().build())
+        .result(ImmutableUpdateClassifiedAdResponse.builder()
+            .ownerId(classifiedAd.getOwnerId().id())
+            .id(classifiedAd.getId().id())
+            .build())
         .isSuccessful(true)
         .build()
     ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
@@ -166,7 +177,10 @@ public class ClassifiedAdService {
         return null;
       }
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-        .result(ImmutableUpdateClassifiedAdResponse.builder().build())
+        .result(ImmutableUpdateClassifiedAdResponse.builder()
+            .ownerId(classifiedAd.getOwnerId().id())
+            .id(classifiedAd.getId().id())
+            .build())
         .isSuccessful(true)
         .build()
     ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
@@ -185,7 +199,10 @@ public class ClassifiedAdService {
       // TODO - throw illegalArgumentException
       return null;
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-        .result(ImmutableUpdateClassifiedAdResponse.builder().build())
+        .result(ImmutableUpdateClassifiedAdResponse.builder()
+            .ownerId(classifiedAd.getOwnerId().id())
+            .id(classifiedAd.getId().id())
+            .build())
         .isSuccessful(true)
         .build()
     ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
@@ -200,7 +217,10 @@ public class ClassifiedAdService {
       classifiedAd.requestToPublish();
       return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-        .result(ImmutableUpdateClassifiedAdResponse.builder().build())
+        .result(ImmutableUpdateClassifiedAdResponse.builder()
+            .ownerId(classifiedAd.getOwnerId().id())
+            .id(classifiedAd.getId().id())
+            .build())
         .isSuccessful(true)
         .build()
     ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
@@ -216,7 +236,10 @@ public class ClassifiedAdService {
       classifiedAd.updatePrice(price);
       return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-        .result(ImmutableUpdateClassifiedAdResponse.builder().build())
+        .result(ImmutableUpdateClassifiedAdResponse.builder()
+            .ownerId(classifiedAd.getOwnerId().id())
+            .id(classifiedAd.getId().id())
+            .build())
         .isSuccessful(true)
         .build()
     ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
@@ -237,7 +260,10 @@ public class ClassifiedAdService {
       });
       return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-        .result(ImmutableUpdateClassifiedAdResponse.builder().build())
+        .result(ImmutableUpdateClassifiedAdResponse.builder()
+            .ownerId(classifiedAd.getOwnerId().id())
+            .id(classifiedAd.getId().id())
+            .build())
         .isSuccessful(true)
         .build()
     ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()

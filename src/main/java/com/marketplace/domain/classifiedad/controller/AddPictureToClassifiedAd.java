@@ -1,5 +1,6 @@
 package com.marketplace.domain.classifiedad.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.command.Command;
@@ -13,6 +14,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableAddPictureToClassifiedAd.class)
 public interface AddPictureToClassifiedAd extends Command {
 
+  @JsonProperty("classified_ad_id")
   UUID getClassifiedAdId();
 
   String getUri();
