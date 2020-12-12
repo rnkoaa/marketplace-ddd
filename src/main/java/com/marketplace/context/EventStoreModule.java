@@ -17,6 +17,7 @@ import dagger.Module;
 import dagger.Provides;
 import javax.inject.Singleton;
 
+@Module
 //@Module(includes = {
 //    MongoConfigModule.class,
 //    ObjectMapperModule.class,
@@ -24,8 +25,8 @@ import javax.inject.Singleton;
 //})
 public abstract class EventStoreModule {
 
-//  @Provides
-//  @Singleton
+  @Provides
+  @Singleton
   public static MongoEventStoreRepository provideEventStoreRepository(
       ObjectMapper objectMapper,
       MongoConfig mongoConfig,
@@ -35,8 +36,8 @@ public abstract class EventStoreModule {
     return new MongoEventStoreRepositoryImpl(objectMapper, eventstore);
   }
 
-//  @Provides
-//  @Singleton
+  @Provides
+  @Singleton
   public static EventStore<Event> eventStore(MongoEventStoreRepository eventStoreRepository, EventPublisher<Event> eventPublisher) {
     return new MongoEventStoreImpl(eventStoreRepository, eventPublisher);
   }

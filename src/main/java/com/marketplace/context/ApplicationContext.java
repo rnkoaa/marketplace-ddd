@@ -17,8 +17,8 @@ import javax.inject.Singleton;
     ApplicationModule.class,
     MongoConfigModule.class,
     ObjectMapperModule.class,
-//    EventStoreModule.class,
-//    GuavaEventPublisherModule.class
+    EventStoreModule.class,
+    GuavaEventPublisherModule.class
 })
 @Singleton
 public interface ApplicationContext {

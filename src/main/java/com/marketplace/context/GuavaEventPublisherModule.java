@@ -6,10 +6,10 @@ import dagger.Binds;
 import dagger.Module;
 import javax.inject.Singleton;
 
-//@Module
+@Module
 public abstract class GuavaEventPublisherModule {
 
-//  @Binds
-//  @Singleton
+  @Binds
+  @Singleton
   abstract EventPublisher<Event> provideEventPublisher(GuavaEventPublisher eventPublisher);
 }
