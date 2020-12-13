@@ -58,6 +58,8 @@ class CreateClassifiedAdFromEventsTest {
     assertThat(classifiedAd.getPictures()).isNotEmpty().hasSize(1);
     assertThat(classifiedAd.getPictures().get(0).getSize().width()).isEqualTo(900);
     assertThat(classifiedAd.getPictures().get(0).getSize().height()).isEqualTo(800);
+    assertThat(classifiedAd.getText().value()).startsWith("3.0GHz 6‑core 8th‑generation Intel Core i5 ");
+    assertThat(classifiedAd.getTitle().value()).startsWith("2020 Mac Mini 3.0GHz 6‑core 16GB 512GB SSD ");
 
     assertThat(classifiedAd.getVersion()).isEqualTo(6);
     assertThat(classifiedAd.getChanges()).isEmpty();
