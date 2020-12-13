@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,7 +35,7 @@ class UserProfileRepositoryImplTest {
                 new DisplayName("user"));
         UserProfileEntity entity = UserProfileEntity.from(userProfile);
         Mockito.when(mongoTemplate.add(any(UserProfileEntity.class), any(), any(String.class), any()))
-                .thenReturn(entity);
+            .thenReturn(Mono.just(entity));
         UserProfile savedUserProfile = userProfileRepository.add(userProfile);
 
         assertThat(savedUserProfile).isNotNull();
@@ -47,9 +48,9 @@ class UserProfileRepositoryImplTest {
                 new DisplayName("user"));
         UserProfileEntity entity = UserProfileEntity.from(userProfile);
         Mockito.when(mongoTemplate.add(any(UserProfileEntity.class), any(), any(String.class), any()))
-                .thenReturn(entity);
+                .thenReturn(Mono.just(entity));
         Mockito.when(mongoTemplate.findById(any(), any(String.class), any()))
-                .thenReturn(Optional.of(entity));
+                .thenReturn(Mono.just(Optional.of(entity)));
         UserProfile savedUserProfile = userProfileRepository.add(userProfile);
 
         assertThat(savedUserProfile).isNotNull();

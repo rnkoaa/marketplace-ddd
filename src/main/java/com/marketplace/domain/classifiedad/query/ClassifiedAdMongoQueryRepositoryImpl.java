@@ -3,6 +3,7 @@ package com.marketplace.domain.classifiedad.query;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.entity.ClassifiedAdEntity;
 import com.marketplace.domain.repository.MongoTemplate;
+import java.util.Objects;
 import org.bson.conversions.Bson;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import reactor.core.publisher.Mono;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -29,28 +31,35 @@ public class ClassifiedAdMongoQueryRepositoryImpl implements ClassifiedAdMongoQu
 
   @Override
   public Optional<ClassifiedAdQueryEntity> findById(UUID id) {
-    Optional<ClassifiedAdEntity> found =
+    Mono<Optional<ClassifiedAdEntity>> found =
         mongoTemplate.findById(id, collectionName, ClassifiedAdEntity.class);
-    return found.map(ClassifiedAdEntity::toClassifiedAdReadEntity);
+    Optional<ClassifiedAdEntity> foundEntity = found.block();
+    Objects.requireNonNull(foundEntity);
+    return foundEntity.map(ClassifiedAdEntity::toClassifiedAdReadEntity);
   }
 
   @Override
   public List<ClassifiedAdQueryEntity> findAll() {
-    List<ClassifiedAdEntity> all = mongoTemplate.findAll(collectionName, ClassifiedAdEntity.class);
-    return convert(all);
+    Mono<List<ClassifiedAdEntity>> found = mongoTemplate.findAll(collectionName, ClassifiedAdEntity.class);
+    List<ClassifiedAdEntity> foundEntity = found.block();
+    Objects.requireNonNull(foundEntity);
+    return convert(foundEntity);
   }
 
   @Override
   public List<ClassifiedAdQueryEntity> findByOwner(UUID ownerId) {
-    List<ClassifiedAdEntity> all =
-        mongoTemplate.findByQuery(collectionName, eq("owner", ownerId), ClassifiedAdEntity.class);
-    return convert(all);
+    Mono<List<ClassifiedAdEntity>> found = mongoTemplate.findByQuery(collectionName, eq("owner", ownerId), ClassifiedAdEntity.class);
+    List<ClassifiedAdEntity> foundEntity = found.block();
+    Objects.requireNonNull(foundEntity);
+    return convert(foundEntity);
   }
 
   @Override
   public List<ClassifiedAdQueryEntity> find(Bson filter) {
-    var all = mongoTemplate.findByQuery(collectionName, filter, ClassifiedAdEntity.class);
-    return convert(all);
+    Mono<List<ClassifiedAdEntity>> found = mongoTemplate.findByQuery(collectionName, filter, ClassifiedAdEntity.class);
+    List<ClassifiedAdEntity> foundEntity = found.block();
+    Objects.requireNonNull(foundEntity);
+    return convert(foundEntity);
   }
 
   List<ClassifiedAdQueryEntity> convert(List<ClassifiedAdEntity> entities) {

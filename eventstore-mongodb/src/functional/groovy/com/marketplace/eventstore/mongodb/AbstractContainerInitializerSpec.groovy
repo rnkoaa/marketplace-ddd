@@ -32,7 +32,7 @@ abstract class AbstractContainerInitializerSpec extends BaseFunctionalSpec {
         mongoDBContainer.start()
         String hosts = mongoDBContainer.getHost();
         int port = mongoDBContainer.getMappedPort(27017);
-        mongoConfig = new MongoConfig(hosts, "eventstore", port);
+        mongoConfig = new MongoConfig(hosts, "testdb", "eventstore", port);
         mongoClient = createClient(mongoConfig, provideCodecRegistry());
     }
 

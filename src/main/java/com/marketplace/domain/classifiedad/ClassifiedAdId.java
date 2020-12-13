@@ -2,33 +2,33 @@ package com.marketplace.domain.classifiedad;
 
 import java.util.UUID;
 
-public record ClassifiedAdId(UUID id) {
-    public ClassifiedAdId {
-        if (id == null) {
-            throw new IllegalArgumentException("id cannot be null");
-        }
-    }
+public record ClassifiedAdId(UUID value) {
 
-    public ClassifiedAdId() {
-        this(UUID.randomUUID());
+  public ClassifiedAdId {
+    if (value == null) {
+      throw new IllegalArgumentException("id cannot be null");
     }
+  }
 
-    public static ClassifiedAdId newClassifedAdId() {
-        return new ClassifiedAdId(UUID.randomUUID());
-    }
+  public ClassifiedAdId() {
+    this(UUID.randomUUID());
+  }
 
-    public static ClassifiedAdId from(UUID value) {
-        return new ClassifiedAdId(value);
-    }
+  public static ClassifiedAdId newClassifedAdId() {
+    return new ClassifiedAdId(UUID.randomUUID());
+  }
 
-    @Override
-    public String toString() {
-        return id.toString();
-    }
+  public static ClassifiedAdId from(UUID value) {
+    return new ClassifiedAdId(value);
+  }
 
-    public static ClassifiedAdId fromString(String uuid) {
-        var id = UUID.fromString(uuid);
-        return new ClassifiedAdId(id);
-    }
+  @Override
+  public String toString() {
+    return value.toString();
+  }
+
+  public static ClassifiedAdId fromString(String value) {
+    return new ClassifiedAdId(UUID.fromString(value));
+  }
 
 }

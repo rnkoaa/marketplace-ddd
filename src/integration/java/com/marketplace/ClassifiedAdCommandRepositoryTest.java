@@ -31,8 +31,9 @@ public class ClassifiedAdCommandRepositoryTest extends BaseMongoRepositoryTest {
 
         ClassifiedAd savedClassifiedAd = classifiedAdCommandRepository.add(classifiedAd);
 
+        assertThat(savedClassifiedAd).isNotNull();
         assertThat(savedClassifiedAd.getId()).isNotNull();
-        assertThat(savedClassifiedAd.getId().id()).isNotNull()
+        assertThat(savedClassifiedAd.getId().value()).isNotNull()
                 .isEqualByComparingTo(UUID.fromString(insertId));
 
         Optional<ClassifiedAd> load = classifiedAdCommandRepository.load(ClassifiedAdId.fromString(insertId));

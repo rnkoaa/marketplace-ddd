@@ -10,10 +10,10 @@ import java.io.IOException;
 public class UserIdSerializer extends JsonSerializer<UserId> {
     @Override
     public void serialize(UserId userId, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        if (userId.id() == null) {
+        if (userId.value() == null) {
             gen.writeString("");
             return;
         }
-        gen.writeString(userId.id().toString());
+        gen.writeString(userId.value().toString());
     }
 }

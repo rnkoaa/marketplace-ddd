@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
 
@@ -58,7 +57,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
         .orElse(ClassifiedAdId.newClassifedAdId());
     apply(ImmutableClassifiedAdCreated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(classifiedAdId.id())
+        .aggregateId(classifiedAdId.value())
         .aggregateName(AGGREGATE_NAME)
         .ownerId(createClassifiedAd.getOwnerId())
         .build());
@@ -68,9 +67,9 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
     this.pictures = new ArrayList<>();
     apply(ImmutableClassifiedAdCreated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.id())
+        .aggregateId(id.value())
         .aggregateName(AGGREGATE_NAME)
-        .ownerId(ownerId.id())
+        .ownerId(ownerId.value())
         .build());
   }
 
@@ -109,7 +108,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
   public void updateTitle(ClassifiedAdTitle title) {
     apply(ImmutableClassifiedAdTitleChanged.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(this.id.id())
+        .aggregateId(this.id.value())
         .aggregateName(AGGREGATE_NAME)
         .title(title.toString())
         .build());
@@ -122,7 +121,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
   public void updateText(ClassifiedAdText text) {
     apply(ImmutableClassifiedAdTextUpdated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.id())
+        .aggregateId(id.value())
         .aggregateName(AGGREGATE_NAME)
         .text(text.toString())
         .build());
@@ -132,15 +131,15 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
     apply(ImmutableClassifiedApproved.builder()
         .id(idGenerator.newUUID())
         .aggregateName(AGGREGATE_NAME)
-        .aggregateId(id.id())
-        .userId(approvedBy.id())
+        .aggregateId(id.value())
+        .userId(approvedBy.value())
         .build());
   }
 
   public void updatePrice(Price price) {
     apply(ImmutableClassifiedAdPriceUpdated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.id())
+        .aggregateId(id.value())
         .aggregateName(AGGREGATE_NAME)
         .price(price.money().amount())
         .currency(price.money().currencyCode())
@@ -150,7 +149,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
   public void requestToPublish() {
     apply(ImmutableClassifiedAdSentForReview.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.id())
+        .aggregateId(id.value())
         .aggregateName(AGGREGATE_NAME)
         .build());
   }
@@ -161,13 +160,13 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
     apply(ImmutablePictureAddedToAClassifiedAd.builder()
         .id(idGenerator.newUUID())
         .aggregateName(AGGREGATE_NAME)
-        .aggregateId(id.id())
-        .pictureId(pictureId.id())
+        .aggregateId(id.value())
+        .pictureId(pictureId.value())
         .url(uri)
         .height(size.height())
         .width(size.width())
         .order(newPictureOrder)
-        .classifiedAdId(id.id())
+        .classifiedAdId(id.value())
         .build());
     return pictureId;
   }
@@ -178,13 +177,13 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
     apply(ImmutablePictureAddedToAClassifiedAd.builder()
         .id(idGenerator.newUUID())
         .aggregateName(AGGREGATE_NAME)
-        .aggregateId(id.id())
+        .aggregateId(id.value())
         .pictureId(pictureId)
         .url(uri)
         .height(size.height())
         .width(size.width())
         .order(newPictureOrder)
-        .classifiedAdId(id.id())
+        .classifiedAdId(id.value())
         .build());
     return new PictureId(pictureId);
   }

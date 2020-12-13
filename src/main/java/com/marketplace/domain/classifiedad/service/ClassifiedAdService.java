@@ -41,7 +41,7 @@ public class ClassifiedAdService {
     }
     var classifiedAdResponse = ImmutableCreateAdResponse.builder()
         .ownerId(command.getOwnerId())
-        .classifiedAdId(classifiedAdId.id())
+        .classifiedAdId(classifiedAdId.value())
         .build();
 
     return ImmutableCommandHandlerResult.<CreateAdResponse>builder()
@@ -69,8 +69,8 @@ public class ClassifiedAdService {
           return classifiedAdCommandRepository.add(classifiedAd);
         }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
             .result(ImmutableUpdateClassifiedAdResponse.builder()
-                .id(classifiedAd.getId().id())
-                .ownerId(classifiedAd.getOwnerId().id())
+                .id(classifiedAd.getId().value())
+                .ownerId(classifiedAd.getOwnerId().value())
                 .build())
             .isSuccessful(true)
             .build()
@@ -91,9 +91,9 @@ public class ClassifiedAdService {
       var savedClassifiedAd = classifiedAdCommandRepository.add(classifiedAd);
 
       return ImmutableAddPictureResponse.builder()
-          .id(pictureId.id())
+          .id(pictureId.value())
           .status(true)
-          .classifiedAdId(savedClassifiedAd.getId().id())
+          .classifiedAdId(savedClassifiedAd.getId().value())
           .build();
     }).orElse(ImmutableAddPictureResponse
         .builder()
@@ -111,8 +111,8 @@ public class ClassifiedAdService {
       var pictureId = classifiedAd.resizePicture(new PictureId(pictureDto.getId()), pictureSize);
       var savedClassifiedAd = classifiedAdCommandRepository.add(classifiedAd);
       return ImmutableResizePictureResponse.builder()
-          .classifiedAdId(savedClassifiedAd.getId().id())
-          .id(pictureId.id())
+          .classifiedAdId(savedClassifiedAd.getId().value())
+          .id(pictureId.value())
           .status(true)
           .build();
     }).orElseGet(() -> ImmutableResizePictureResponse.builder()
@@ -134,8 +134,8 @@ public class ClassifiedAdService {
       return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
         .result(ImmutableUpdateClassifiedAdResponse.builder()
-            .ownerId(classifiedAd.getOwnerId().id())
-            .id(classifiedAd.getId().id())
+            .ownerId(classifiedAd.getOwnerId().value())
+            .id(classifiedAd.getId().value())
             .build())
         .isSuccessful(true)
         .build()
@@ -156,8 +156,8 @@ public class ClassifiedAdService {
       return null;
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
         .result(ImmutableUpdateClassifiedAdResponse.builder()
-            .ownerId(classifiedAd.getOwnerId().id())
-            .id(classifiedAd.getId().id())
+            .ownerId(classifiedAd.getOwnerId().value())
+            .id(classifiedAd.getId().value())
             .build())
         .isSuccessful(true)
         .build()
@@ -179,8 +179,8 @@ public class ClassifiedAdService {
       }
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
         .result(ImmutableUpdateClassifiedAdResponse.builder()
-            .ownerId(classifiedAd.getOwnerId().id())
-            .id(classifiedAd.getId().id())
+            .ownerId(classifiedAd.getOwnerId().value())
+            .id(classifiedAd.getId().value())
             .build())
         .isSuccessful(true)
         .build()
@@ -201,8 +201,8 @@ public class ClassifiedAdService {
       return null;
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
         .result(ImmutableUpdateClassifiedAdResponse.builder()
-            .ownerId(classifiedAd.getOwnerId().id())
-            .id(classifiedAd.getId().id())
+            .ownerId(classifiedAd.getOwnerId().value())
+            .id(classifiedAd.getId().value())
             .build())
         .isSuccessful(true)
         .build()
@@ -219,8 +219,8 @@ public class ClassifiedAdService {
       return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
         .result(ImmutableUpdateClassifiedAdResponse.builder()
-            .ownerId(classifiedAd.getOwnerId().id())
-            .id(classifiedAd.getId().id())
+            .ownerId(classifiedAd.getOwnerId().value())
+            .id(classifiedAd.getId().value())
             .build())
         .isSuccessful(true)
         .build()
@@ -238,8 +238,8 @@ public class ClassifiedAdService {
       return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
         .result(ImmutableUpdateClassifiedAdResponse.builder()
-            .ownerId(classifiedAd.getOwnerId().id())
-            .id(classifiedAd.getId().id())
+            .ownerId(classifiedAd.getOwnerId().value())
+            .id(classifiedAd.getId().value())
             .build())
         .isSuccessful(true)
         .build()
@@ -262,8 +262,8 @@ public class ClassifiedAdService {
       return classifiedAdCommandRepository.add(classifiedAd);
     }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
         .result(ImmutableUpdateClassifiedAdResponse.builder()
-            .ownerId(classifiedAd.getOwnerId().id())
-            .id(classifiedAd.getId().id())
+            .ownerId(classifiedAd.getOwnerId().value())
+            .id(classifiedAd.getId().value())
             .build())
         .isSuccessful(true)
         .build()

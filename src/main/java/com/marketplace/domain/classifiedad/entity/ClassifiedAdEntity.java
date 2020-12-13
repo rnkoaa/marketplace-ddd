@@ -11,7 +11,6 @@ import com.marketplace.domain.classifiedad.Price;
 import com.marketplace.domain.classifiedad.command.ImmutablePictureDto;
 import com.marketplace.domain.classifiedad.command.ImmutablePriceDto;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PriceDto;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryEntity;
 import com.marketplace.domain.classifiedad.query.ImmutableClassifiedAdQueryEntity;
 import com.marketplace.domain.shared.UserId;
@@ -41,12 +40,12 @@ public class ClassifiedAdEntity implements MongoEntity {
   }
 
   public ClassifiedAdEntity(ClassifiedAd classifiedAd) {
-    this.id = classifiedAd.getId().id();
-    this.owner = classifiedAd.getOwnerId().id();
+    this.id = classifiedAd.getId().value();
+    this.owner = classifiedAd.getOwnerId().value();
     this.price = classifiedAd.getPrice();
     this.state = classifiedAd.getState();
     if (classifiedAd.getApprovedBy() != null) {
-      this.approvedBy = classifiedAd.getApprovedBy().id();
+      this.approvedBy = classifiedAd.getApprovedBy().value();
     }
     if (classifiedAd.getTitle() != null) {
       this.title = classifiedAd.getTitle().value();

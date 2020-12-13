@@ -24,8 +24,8 @@ public interface PictureEntity {
     return ImmutablePictureEntity.builder()
         .height(picture.getSize().height())
         .width(picture.getSize().width())
-        .id(picture.getId().id())
-        .parentId(picture.getParentId().id())
+        .id(picture.getId().value())
+        .parentId(picture.getParentId().value())
         .uri(picture.getUri())
         .order(picture.getOrder())
         .build();

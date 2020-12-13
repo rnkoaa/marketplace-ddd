@@ -34,7 +34,7 @@ public abstract class UserProfileEntity implements MongoEntity {
 
   public static UserProfileEntity create(UserProfile entity) {
     var userProfileEntityBuilder = ImmutableUserProfileEntity.builder()
-        .id(entity.getId().id())
+        .id(entity.getId().value())
         .firstName(entity.getFullName().firstName())
         .lastName(entity.getFullName().lastName())
         .middleName(entity.getFullName().middleName())
@@ -67,7 +67,7 @@ public abstract class UserProfileEntity implements MongoEntity {
 
   public static UserProfileEntity from(UserProfile userProfile) {
     Builder builder = ImmutableUserProfileEntity.builder()
-        .id(userProfile.getId().id())
+        .id(userProfile.getId().value())
         .firstName(userProfile.getFullName().firstName())
         .middleName(userProfile.getFullName().middleName())
         .lastName(userProfile.getFullName().lastName())

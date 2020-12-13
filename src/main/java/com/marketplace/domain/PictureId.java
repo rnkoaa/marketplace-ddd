@@ -2,24 +2,24 @@ package com.marketplace.domain;
 
 import java.util.UUID;
 
-public record PictureId(UUID id) {
-    public PictureId {
-        if (id == null) {
-            throw new IllegalArgumentException("id cannot be null");
-        }
-    }
+public record PictureId(UUID value) {
 
-    public static PictureId newPictureId() {
-       return new PictureId(UUID.randomUUID());
+  public PictureId {
+    if (value == null) {
+      throw new IllegalArgumentException("value cannot be null");
     }
+  }
 
-    @Override
-    public String toString() {
-        return id.toString();
-    }
+  public static PictureId newPictureId() {
+    return new PictureId(UUID.randomUUID());
+  }
 
-    public static PictureId fromString(String uuid) {
-        var id = UUID.fromString(uuid);
-        return new PictureId(id);
-    }
+  @Override
+  public String toString() {
+    return value.toString();
+  }
+
+  public static PictureId fromString(String value) {
+    return new PictureId(UUID.fromString(value));
+  }
 }

@@ -43,8 +43,8 @@ public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
   public UserProfile(UserId id, FullName fullName, DisplayName displayName) {
     apply(ImmutableUserRegistered.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.id())
-        .userId(id.id())
+        .aggregateId(id.value())
+        .userId(id.value())
         .aggregateName(AGGREGATE_NAME)
         .firstName(fullName.firstName())
         .lastName(fullName.lastName())
@@ -57,9 +57,9 @@ public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
   public void updateUserFullName(FullName fullName) {
     apply(ImmutableUserFullNameUpdated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.id())
+        .aggregateId(id.value())
         .aggregateName(AGGREGATE_NAME)
-        .userId(id.id())
+        .userId(id.value())
         .firstName(fullName.firstName())
         .middleName(fullName.middleName())
         .lastName(fullName.lastName())
@@ -69,9 +69,9 @@ public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
   public void updateDisplayName(DisplayName displayName) {
     apply(ImmutableUserDisplayNameUpdated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.id())
+        .aggregateId(id.value())
         .aggregateName(AGGREGATE_NAME)
-        .userId(id.id())
+        .userId(id.value())
         .displayName(displayName.value())
         .build());
   }
@@ -80,9 +80,9 @@ public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
   public void updatePhoto(String uri) {
     apply(ImmutableProfilePhotoUploaded.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.id())
+        .aggregateId(id.value())
         .aggregateName(AGGREGATE_NAME)
-        .userId(id.id())
+        .userId(id.value())
         .photoUrl(uri)
         .build());
   }

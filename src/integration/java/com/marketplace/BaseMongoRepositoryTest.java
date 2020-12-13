@@ -39,7 +39,7 @@ public abstract class BaseMongoRepositoryTest extends AbstractContainerInitializ
 
     String hosts = mongoDBContainer.getHost();
     int port = mongoDBContainer.getMappedPort(27017);
-    mongoConfig = new MongoConfig(hosts, "test_db", port);
+    mongoConfig = new MongoConfig(hosts, "test_db", "event_store", port);
     config = ImmutableApplicationConfig.copyOf(config)
         .withMongo(mongoConfig);
     mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
