@@ -10,7 +10,9 @@ import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.controller.UpdateClassifiedAdResponse;
+import com.marketplace.eventstore.framework.event.Event;
 import io.vavr.control.Try;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -29,12 +31,11 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
   private static final Logger LOGGER = LoggerFactory.getLogger(ClassifiedAdCommandSparkRoutes.class);
   public static final String HEADER_CONTENT_TYPE = "Content-Type";
   public static final String NO_CONTENT = "";
-  private final ObjectMapper objectMapper;
   private final ClassifiedAdController classifiedAdController;
 
   @Inject
   public ClassifiedAdCommandSparkRoutes(ObjectMapper objectMapper, ClassifiedAdController classifiedAdController) {
-    this.objectMapper = objectMapper;
+    super(objectMapper);
     this.classifiedAdController = classifiedAdController;
   }
 
@@ -231,12 +232,6 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
     };
   }
 
-  public String serializeResponse(Object object) {
-    return Try.of(() -> objectMapper.writeValueAsString(object))
-        .onFailure(ex -> LOGGER.info("error while serialing object with message {}", ex.getMessage()))
-        .getOrElse("");
-  }
-
   private UpdateClassifiedAd read(String classifiedAdId, Request req) {
     byte[] bytes = req.bodyAsBytes();
     UpdateClassifiedAd updateClassifiedAd = Try.of(() -> objectMapper.readValue(bytes, UpdateClassifiedAd.class))
@@ -250,4 +245,8 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
         .withClassifiedAdId(UUID.fromString(classifiedAdId));
   }
 
+  public Route createClassifiedAdFromEvents() {
+//    byte[] bytes = req.bodyAsBytes();
+    return null;
+  }
 }

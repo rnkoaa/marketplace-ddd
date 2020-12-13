@@ -27,6 +27,10 @@ public class SparkServer {
         "/classified_ad",
         MEDIA_APPLICATION_JSON,
         classifiedAdCommandSparkRoutes.createClassifiedAdRoute());
+    Spark.post(
+        "/classified_ad/events",
+        MEDIA_APPLICATION_JSON,
+        classifiedAdCommandSparkRoutes.createClassifiedAdFromEvents());
 
     Spark.put(
         "/classified_ad/:classifiedAdId",
@@ -72,6 +76,9 @@ public class SparkServer {
 
     Spark.get(
         "/classified_ad/:classifiedAdId", classifiedAdQuerySparkRoutes.findClassifiedAdById());
+
+    Spark.get(
+        "/classified_ad/:classifiedAdId/events", classifiedAdQuerySparkRoutes.findClassifiedAdEventsById());
 
 
     Spark.get("/classified_ad/myads", classifiedAdQuerySparkRoutes.findAll());

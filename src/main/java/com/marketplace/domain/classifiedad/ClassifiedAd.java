@@ -24,6 +24,7 @@ import com.marketplace.domain.shared.IdGeneratorImpl;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.event.EventId;
 import com.marketplace.event.VersionedEvent;
+import com.marketplace.eventstore.framework.event.Event;
 import com.marketplace.framework.AggregateRoot;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,7 +36,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
   private final IdGenerator idGenerator = new IdGeneratorImpl();
   private static final String AGGREGATE_NAME = ClassifiedAd.class.getSimpleName();
   private ClassifiedAdId id;
-  private final List<Picture> pictures;
+  private final List<Picture> pictures = new ArrayList<>();
   private UserId ownerId;
   private ClassifiedAdTitle title;
   private ClassifiedAdText text;
@@ -47,11 +48,9 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
    * this is for jackson deserialization
    */
   public ClassifiedAd() {
-    pictures = new ArrayList<>();
   }
 
   public ClassifiedAd(CreateClassifiedAd createClassifiedAd) {
-    this.pictures = new ArrayList<>();
     ClassifiedAdId classifiedAdId = createClassifiedAd.getClassifiedAdId()
         .map(ClassifiedAdId::from)
         .orElse(ClassifiedAdId.newClassifedAdId());
@@ -64,13 +63,27 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
   }
 
   public ClassifiedAd(ClassifiedAdId id, UserId ownerId) {
-    this.pictures = new ArrayList<>();
     apply(ImmutableClassifiedAdCreated.builder()
         .id(idGenerator.newUUID())
         .aggregateId(id.value())
         .aggregateName(AGGREGATE_NAME)
         .ownerId(ownerId.value())
         .build());
+  }
+
+  public ClassifiedAd(List<Event> events) {
+    if (events == null || events.isEmpty()) {
+      throw new IllegalArgumentException("Cannot create classified ad with empty events");
+    }
+    events.stream().map(event -> (VersionedEvent) event)
+        .forEach(event -> {
+          when(event);
+          incrementVersion();
+        });
+  }
+
+  public static ClassifiedAd of(List<Event> events) {
+    return new ClassifiedAd(events);
   }
 
   public ClassifiedAdId getId() {
