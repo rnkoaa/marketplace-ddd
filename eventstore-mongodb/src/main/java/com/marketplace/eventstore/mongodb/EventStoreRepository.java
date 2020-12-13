@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 public interface EventStoreRepository<T, U> {
 
-  Mono<List<Event>> load(U aggregateId, int fromVersion);
+  Mono<List<Event>> load(U aggregateId, long fromVersion);
 
   Mono<List<Event>> load(U aggregateId);
 
@@ -16,13 +16,13 @@ public interface EventStoreRepository<T, U> {
 
   Mono<Optional<Boolean>> save(T event);
 
-  Mono<Optional<Boolean>> save(U aggregateId, List<T> events, int version);
+  Mono<Optional<Boolean>> save(U aggregateId, List<T> events, long version);
 
-  Mono<Optional<Boolean>> save(U aggregateId, T event, int version);
+  Mono<Optional<Boolean>> save(U aggregateId, T event, long version);
 
-  Mono<Optional<Boolean>> save(T event, int version);
+  Mono<Optional<Boolean>> save(T event, long version);
 
-  Mono<Integer> getVersion(U aggregateId);
+  Mono<Long> getVersion(U aggregateId);
 
   Mono<Long> countEvents(UUID aggregateId);
 }

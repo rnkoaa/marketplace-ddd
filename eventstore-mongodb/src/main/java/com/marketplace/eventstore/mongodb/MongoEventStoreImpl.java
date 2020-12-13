@@ -53,7 +53,7 @@ public class MongoEventStoreImpl implements EventStore<Event> {
   }
 
   @Override
-  public Mono<EventStream<Event>> load(String streamId, int fromVersion) {
+  public Mono<EventStream<Event>> load(String streamId, long fromVersion) {
     var tryAggregateInfo = Try.of(() -> getAggregateInfo(streamId));
     Try<Mono<EventStream<Event>>> tryResult = tryAggregateInfo
         .map(aggregateInfo -> {
@@ -76,7 +76,7 @@ public class MongoEventStoreImpl implements EventStore<Event> {
   }
 
   @Override
-  public Mono<OperationResult> append(String streamId, int expectedVersion, List<Event> events) {
+  public Mono<OperationResult> append(String streamId, long expectedVersion, List<Event> events) {
     return parseAggregateInfo(streamId)
         .map(aggregateInfo -> eventStoreRepository.save(aggregateInfo.aggregateId, events, expectedVersion)
             .map(retVal -> {
@@ -90,7 +90,7 @@ public class MongoEventStoreImpl implements EventStore<Event> {
   }
 
   @Override
-  public Mono<OperationResult> append(String streamId, int expectedVersion, Event event) {
+  public Mono<OperationResult> append(String streamId, long expectedVersion, Event event) {
     return parseAggregateInfo(streamId)
         .map(aggregateInfo -> eventStoreRepository.save(aggregateInfo.aggregateId, event, expectedVersion)
             .map(retVal -> {
@@ -117,14 +117,14 @@ public class MongoEventStoreImpl implements EventStore<Event> {
   }
 
   @Override
-  public Mono<Integer> getVersion(String streamId) {
+  public Mono<Long> getVersion(String streamId) {
     return parseAggregateInfo(streamId)
         .map(aggregateInfo -> eventStoreRepository.getVersion(aggregateInfo.aggregateId))
         .getOrElse(Mono.error(new IllegalArgumentException("unable to process streamId into its parts")));
   }
 
   @Override
-  public Mono<Integer> nextVersion(String streamId) {
+  public Mono<Long> nextVersion(String streamId) {
     return getVersion(streamId)
         .map(res -> res + 1);
   }
@@ -135,7 +135,7 @@ public class MongoEventStoreImpl implements EventStore<Event> {
   }
 
   @Override
-  public Mono<OperationResult> publish(String streamId, int expectedVersion, List<Event> events) {
+  public Mono<OperationResult> publish(String streamId, long expectedVersion, List<Event> events) {
     return append(streamId, 0, events)
         .doOnNext(res -> {
           if (res instanceof OperationResult.Success) {
@@ -145,7 +145,7 @@ public class MongoEventStoreImpl implements EventStore<Event> {
   }
 
   @Override
-  public Mono<OperationResult> publish(String streamId, int expectedVersion, Event event) {
+  public Mono<OperationResult> publish(String streamId, long expectedVersion, Event event) {
     return append(streamId, 0, event)
         .doOnNext(res -> {
           if (res instanceof OperationResult.Success) {

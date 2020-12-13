@@ -37,7 +37,7 @@ public class TestEvents {
       .builder()
       .aggregateId(aggregateId)
       .id(titleUpdatedEventId)
-      .version(1)
+      .version(1L)
       .title("first title")
       .build();
 
@@ -52,7 +52,7 @@ public class TestEvents {
       .builder()
       .aggregateId(aggregateId)
       .id(textUpdatedEventId)
-      .version(2)
+      .version(2L)
       .text("item is being sold as is")
       .build();
 

@@ -22,7 +22,6 @@ import com.marketplace.domain.classifiedad.events.PictureAddedToAClassifiedAd;
 import com.marketplace.domain.shared.IdGenerator;
 import com.marketplace.domain.shared.IdGeneratorImpl;
 import com.marketplace.domain.shared.UserId;
-import com.marketplace.event.EventId;
 import com.marketplace.event.VersionedEvent;
 import com.marketplace.eventstore.framework.event.Event;
 import com.marketplace.framework.AggregateRoot;
@@ -30,8 +29,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
+public class ClassifiedAd extends AggregateRoot<VersionedEvent> {
 
   private final IdGenerator idGenerator = new IdGeneratorImpl();
   private static final String AGGREGATE_NAME = ClassifiedAd.class.getSimpleName();
@@ -167,9 +167,10 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
         .build());
   }
 
-  public PictureId addPicture(PictureId id, String uri, PictureSize size, int order) {
-    int newPictureOrder = (order > 0) ? order : ((pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1);
-    var pictureId = (id != null) ? id : PictureId.newPictureId();
+  public PictureId addPicture(PictureId picId, String uri, PictureSize size, int order) {
+    int newPictureOrder = order > 0 ? order : pictures.size() <= 0 ? 0 : pictures.size() + 1;
+    var pictureId = (picId != null) ? picId : PictureId.newPictureId();
+
     apply(ImmutablePictureAddedToAClassifiedAd.builder()
         .id(idGenerator.newUUID())
         .aggregateName(AGGREGATE_NAME)
@@ -185,7 +186,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
   }
 
   public PictureId addPicture(String uri, PictureSize size, int order) {
-    int newPictureOrder = (order > 0) ? order : ((pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1);
+    int newPictureOrder = order > 0 ? order : pictures.size() <= 0 ? 0 : pictures.size() + 1;
     var pictureId = idGenerator.newUUID();
     apply(ImmutablePictureAddedToAClassifiedAd.builder()
         .id(idGenerator.newUUID())
@@ -258,6 +259,11 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
       var optionalPicture = findPicture(new PictureId(e.getPictureId()));
       optionalPicture.ifPresent(picture -> applyToEntity(picture, e));
     }
+  }
+
+  @Override
+  public UUID getAggregateId() {
+    return id.value();
   }
 
   @Override

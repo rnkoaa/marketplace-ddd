@@ -17,7 +17,7 @@ public interface MongoEventEntity {
 
   List<TypedEvent> getEvents();
 
-  int getVersion();
+  long getVersion();
 
   Instant getCreatedAt();
 }

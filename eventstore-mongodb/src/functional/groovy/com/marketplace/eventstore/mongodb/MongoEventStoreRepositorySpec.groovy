@@ -85,7 +85,7 @@ class MongoEventStoreRepositorySpec extends BaseMongoContainerSpec {
         then:
         StepVerifier.create(documentCount)
                 .assertNext {
-                    assert it == 3
+                    assert it == 3L
                 }
                 .expectComplete()
                 .verify()
@@ -102,7 +102,7 @@ class MongoEventStoreRepositorySpec extends BaseMongoContainerSpec {
         StepVerifier.create(documentMono)
                 .assertNext {
                     assert it != null
-                    assert it["version"] == 2
+                    assert it["version"] == 2L
                 }
                 .expectComplete()
                 .verify()

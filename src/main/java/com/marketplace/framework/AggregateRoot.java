@@ -3,9 +3,10 @@ package com.marketplace.framework;
 import com.marketplace.event.VersionedEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
-public abstract class AggregateRoot<T, U extends VersionedEvent> implements InternalEventHandler<U>, EventApplier {
+public abstract class AggregateRoot<U extends VersionedEvent> implements InternalEventHandler<U>, EventApplier {
 
   @BsonIgnore
   private final List<VersionedEvent> changes;
@@ -51,4 +52,6 @@ public abstract class AggregateRoot<T, U extends VersionedEvent> implements Inte
   public void handle(VersionedEvent event) {
     when(event);
   }
+
+  public abstract UUID getAggregateId();
 }

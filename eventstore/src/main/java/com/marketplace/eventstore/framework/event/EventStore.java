@@ -24,7 +24,7 @@ public interface EventStore<T> {
    * @param fromVersion load events from the eventstore excluding all events prior to this version
    * @return an {@link EventStream} of events. If there are no events, the stream will be empty
    */
-  Mono<EventStream<T>> load(String streamId, int fromVersion);
+  Mono<EventStream<T>> load(String streamId, long fromVersion);
 
   /**
    * Adds a list of events to the end of the event stream
@@ -35,7 +35,7 @@ public interface EventStore<T> {
    * @param events          the events to be appended
    * @return a {@link Success } if the append was successfull and a {@link Failure} if the append operation failed.
    */
-  Mono<OperationResult> append(String streamId, int expectedVersion, List<T> events);
+  Mono<OperationResult> append(String streamId, long expectedVersion, List<T> events);
 
   /**
    * Adds an event to the end of the event stream
@@ -46,7 +46,7 @@ public interface EventStore<T> {
    * @param event           the events to be appended
    * @return a {@link Success } if the append was successfull and a {@link Failure} if the append operation failed.
    */
-  Mono<OperationResult> append(String streamId, int expectedVersion, T event);
+  Mono<OperationResult> append(String streamId, long expectedVersion, T event);
 
   /**
    * The size of the event store, how many streams do we have, that is how many aggregates do we have
@@ -69,9 +69,9 @@ public interface EventStore<T> {
    * @param streamId id of the stream to query for version
    * @return size of the stream if it exists
    */
-  Mono<Integer> getVersion(String streamId);
+  Mono<Long> getVersion(String streamId);
 
-  Mono<Integer> nextVersion(String streamId);
+  Mono<Long> nextVersion(String streamId);
 
   /**
    * publish the event to the event store then publish to any subscribers
@@ -91,7 +91,7 @@ public interface EventStore<T> {
    * @param events          the events to be appended
    * @return a {@link Success } if the append was successfull and a {@link Failure} if the append operation failed.
    */
-  Mono<OperationResult> publish(String streamId, int expectedVersion, List<T> events);
+  Mono<OperationResult> publish(String streamId, long expectedVersion, List<T> events);
 
   /**
    * Appends an event to the end of the event stream then subsequently publishes the event to any subscriber,
@@ -102,5 +102,5 @@ public interface EventStore<T> {
    * @param event           the events to be appended
    * @return a {@link Success } if the append was successfull and a {@link Failure} if the append operation failed.
    */
-  Mono<OperationResult> publish(String streamId, int expectedVersion, T event);
+  Mono<OperationResult> publish(String streamId, long expectedVersion, T event);
 }

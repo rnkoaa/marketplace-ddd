@@ -29,7 +29,7 @@ public class TestMongoEvents {
         .id(testCreatedEvent.getId())
         .createdAt(testCreatedEvent.getCreatedAt())
         .events(List.of(testCreatedTypedEvent))
-        .version(0)
+        .version(0L)
         .streamName("ClassifiedAds:%s".formatted(testCreatedEvent.getAggregateId().toString()))
         .build();
 
@@ -44,7 +44,7 @@ public class TestMongoEvents {
         .id(testTextUpdatedEvent.getId())
         .createdAt(testTextUpdatedEvent.getCreatedAt())
         .events(List.of(testTextUpdatedTypedEvent))
-        .version(0)
+        .version(0L)
         .streamName("ClassifiedAds:%s".formatted(testCreatedEvent.getAggregateId().toString()))
         .build();
 
@@ -75,7 +75,7 @@ public class TestMongoEvents {
             .id(testTitleUpdatedEvent.getId())
             .createdAt(testTitleUpdatedEvent.getCreatedAt())
             .events(List.of(testTitleUpdatedTypedEvent))
-            .version(1)
+            .version(1L)
             .streamName(
                 "ClassifiedAds:%s".formatted(testTitleUpdatedEvent.getAggregateId().toString()))
             .build(),
@@ -84,7 +84,7 @@ public class TestMongoEvents {
             .id(testTextUpdatedEvent.getId())
             .createdAt(testTextUpdatedEvent.getCreatedAt())
             .events(List.of(testTextUpdatedTypedEvent))
-            .version(2)
+            .version(2L)
             .streamName("ClassifiedAds:%s".formatted(testCreatedEvent.getAggregateId().toString()))
             .build()
     );

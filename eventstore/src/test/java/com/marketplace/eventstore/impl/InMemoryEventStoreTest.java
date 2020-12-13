@@ -80,7 +80,7 @@ class InMemoryEventStoreTest {
         .verify();
 
     Mono<OperationResult> appendResult = eventStreamPublisher.flatMap(eventStream -> {
-      int expectedVersion = eventStream.getVersion() + 1;
+      long expectedVersion = eventStream.getVersion() + 1;
       return eventStore.append(streamId, expectedVersion, classifiedAdTextUpdated);
     });
 

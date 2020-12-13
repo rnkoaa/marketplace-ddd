@@ -207,7 +207,7 @@ class MongoEventStoreImplTest {
     @Test
     void malformedStreamIdWillResultInAnError() {
       String streamId = UUID.randomUUID().toString();
-      Mono<Integer> load = eventStore.getVersion(streamId);
+      Mono<Long> load = eventStore.getVersion(streamId);
       StepVerifier.create(load)
           .expectErrorMatches(throwable -> throwable instanceof IllegalArgumentException)
           .verify();
@@ -216,7 +216,7 @@ class MongoEventStoreImplTest {
     @Test
     void invalidStreamIdWithBadUUIDWillNotWork() {
       String streamId = "ClassifiedAd:hello-world";
-      Mono<Integer> load = eventStore.getVersion(streamId);
+      Mono<Long> load = eventStore.getVersion(streamId);
       StepVerifier.create(load)
           .expectErrorMatches(throwable -> throwable instanceof IllegalArgumentException)
           .verify();
@@ -225,9 +225,9 @@ class MongoEventStoreImplTest {
     @Test
     void canRetrieveStreamVersionBasedOnStreamId() {
       String validStreamId = "ClassifiedAd:%s".formatted(aggregateId);
-      Mockito.when(eventStoreRepository.getVersion(aggregateId)).thenReturn(Mono.just(10));
+      Mockito.when(eventStoreRepository.getVersion(aggregateId)).thenReturn(Mono.just(10L));
 
-      Mono<Integer> eventStreamMono = eventStore.getVersion(validStreamId);
+      Mono<Long> eventStreamMono = eventStore.getVersion(validStreamId);
       StepVerifier.create(eventStreamMono)
           .assertNext(version -> {
             assertThat(version).isEqualTo(10);
@@ -238,9 +238,9 @@ class MongoEventStoreImplTest {
     @Test
     void nonExistentStreamShouldStillReturnANumber() {
       String validStreamId = "ClassifiedAd:%s".formatted(aggregateId);
-      Mockito.when(eventStoreRepository.getVersion(aggregateId)).thenReturn(Mono.just(0));
+      Mockito.when(eventStoreRepository.getVersion(aggregateId)).thenReturn(Mono.just(0L));
 
-      Mono<Integer> eventStreamMono = eventStore.getVersion(validStreamId);
+      Mono<Long> eventStreamMono = eventStore.getVersion(validStreamId);
       StepVerifier.create(eventStreamMono)
           .assertNext(version -> {
             assertThat(version).isEqualTo(0L);

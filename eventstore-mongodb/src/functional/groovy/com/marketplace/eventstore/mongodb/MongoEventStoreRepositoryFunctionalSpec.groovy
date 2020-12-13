@@ -204,12 +204,12 @@ class MongoEventStoreRepositoryFunctionalSpec extends BaseMongoContainerSpec {
         UUID aggregateId = UUID.randomUUID()
 
         when:
-        Mono<Integer> versionPublisher = eventStoreRepository.getVersion(aggregateId)
+        Mono<Long> versionPublisher = eventStoreRepository.getVersion(aggregateId)
 
         then:
         StepVerifier.create(versionPublisher)
                 .assertNext {
-                    assert it == 0
+                    assert it == -1L
                 }
                 .expectComplete()
                 .verify()

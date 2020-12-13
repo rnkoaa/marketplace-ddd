@@ -17,9 +17,9 @@ public abstract class EventRecord {
 
   public abstract Event getEvent();
 
-  public abstract int getVersion();
+  public abstract long getVersion();
 
-  public static EventRecord fromEvent(String streamId, Event event, int version) {
+  public static EventRecord fromEvent(String streamId, Event event, long version) {
     return ImmutableEventRecord.builder()
         .id(streamId)
         .event(event)

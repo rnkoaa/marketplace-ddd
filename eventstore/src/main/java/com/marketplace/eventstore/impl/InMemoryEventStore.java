@@ -31,19 +31,19 @@ public class InMemoryEventStore implements EventStore<Event> {
     List<Event> events =
         eventStream.stream().map(EventRecord::getEvent).collect(Collectors.toList());
 
-    int version = eventStream.get(eventStream.size() - 1).getVersion();
+    long version = eventStream.get(eventStream.size() - 1).getVersion();
     return Mono.just(new EventStreamImpl(streamId, "", version, events));
   }
 
   @Override
-  public Mono<EventStream<Event>> load(String streamId, int fromVersion) {
+  public Mono<EventStream<Event>> load(String streamId, long fromVersion) {
     List<EventRecord> eventStream = entityStore.get(streamId);
     if (eventStream == null || eventStream.size() == 0) {
       return Mono.just(new EventStreamImpl(streamId, "", 0, List.of()));
     }
 
     eventStream.sort(Comparator.comparing(EventRecord::getVersion));
-    int version = eventStream.get(eventStream.size() - 1).getVersion();
+    long version = eventStream.get(eventStream.size() - 1).getVersion();
 
     List<Event> events =
         eventStream.stream()
@@ -55,10 +55,10 @@ public class InMemoryEventStore implements EventStore<Event> {
   }
 
   @Override
-  public Mono<OperationResult> append(String streamId, int expectedVersion, List<Event> events) {
+  public Mono<OperationResult> append(String streamId, long expectedVersion, List<Event> events) {
     return getVersion(streamId)
         .map(currentVersion -> {
-          int nextVersion = currentVersion + 1;
+          long nextVersion = currentVersion + 1;
 
           if ((expectedVersion == 0) || nextVersion == expectedVersion) {
             int numberOfEvents = events.size();
@@ -79,10 +79,10 @@ public class InMemoryEventStore implements EventStore<Event> {
   }
 
   @Override
-  public Mono<OperationResult> append(String streamId, int expectedVersion, Event event) {
+  public Mono<OperationResult> append(String streamId, long expectedVersion, Event event) {
     return getVersion(streamId)
         .map(currentVersion -> {
-          int nextVersion = currentVersion + 1;
+          long nextVersion = currentVersion + 1;
 
           // Concurrency check.
           if ((expectedVersion == 0) || nextVersion == expectedVersion) {
@@ -111,10 +111,10 @@ public class InMemoryEventStore implements EventStore<Event> {
   }
 
   @Override
-  public Mono<Integer> getVersion(String streamId) {
+  public Mono<Long> getVersion(String streamId) {
     List<EventRecord> eventStream = entityStore.get(streamId);
     if (eventStream == null || eventStream.isEmpty()) {
-      return Mono.just(0);
+      return Mono.just(-1L);
     }
 
     eventStream.sort(Comparator.comparing(EventRecord::getVersion));
@@ -122,7 +122,7 @@ public class InMemoryEventStore implements EventStore<Event> {
   }
 
   @Override
-  public Mono<Integer> nextVersion(String streamId) {
+  public Mono<Long> nextVersion(String streamId) {
     return getVersion(streamId).map(currentVersion -> ++currentVersion);
   }
 
@@ -138,7 +138,7 @@ public class InMemoryEventStore implements EventStore<Event> {
   }
 
   @Override
-  public Mono<OperationResult> publish(String streamId, int expectedVersion, List<Event> events) {
+  public Mono<OperationResult> publish(String streamId, long expectedVersion, List<Event> events) {
     var appendResult = append(streamId, expectedVersion, events);
     return appendResult.flatMap(result -> {
       if (Success.matches(result)) {
@@ -149,7 +149,7 @@ public class InMemoryEventStore implements EventStore<Event> {
   }
 
   @Override
-  public Mono<OperationResult> publish(String streamId, int expectedVersion, Event event) {
+  public Mono<OperationResult> publish(String streamId, long expectedVersion, Event event) {
     var appendResult = append(streamId, expectedVersion, event);
     return appendResult.flatMap(result -> {
       if (Success.matches(result)) {

@@ -49,7 +49,7 @@ public class MongoEventEntityCodec implements CollectibleCodec<ImmutableMongoEve
         .id(document.get(ID, UUID.class))
         .aggregateId(document.get(AGGREGATE_ID, UUID.class))
         .streamName((!Strings.isNullOrEmpty(streamName)) ? streamName : "")
-        .version(document.getInteger(VERSION, 0))
+        .version(document.getLong(VERSION))
         .events(typedEvents)
         .createdAt((createdAt != null) ? createdAt.toInstant() : Instant.now())
         .build();

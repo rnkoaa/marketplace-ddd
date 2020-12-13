@@ -19,7 +19,7 @@ public interface EventStream<T> {
   String getId();
 
   /** @return latest version of the stream */
-  int getVersion();
+  long getVersion();
 
   /** @return all events that make up the stream sorted in ascending order */
   List<T> getEvents();
@@ -30,7 +30,7 @@ public interface EventStream<T> {
    * @param entity event to be appended
    * @param expectedVersion the current version of the stream
    */
-  void append(T entity, int expectedVersion);
+  void append(T entity, long expectedVersion);
 
   /** @return the number of events in the current stream */
   int size();

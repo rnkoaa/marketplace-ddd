@@ -11,11 +11,11 @@ import com.marketplace.domain.userprofile.event.ProfilePhotoUploaded;
 import com.marketplace.domain.userprofile.event.UserDisplayNameUpdated;
 import com.marketplace.domain.userprofile.event.UserFullNameUpdated;
 import com.marketplace.domain.userprofile.event.UserRegistered;
-import com.marketplace.event.EventId;
 import com.marketplace.event.VersionedEvent;
 import com.marketplace.framework.AggregateRoot;
+import java.util.UUID;
 
-public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
+public class UserProfile extends AggregateRoot<VersionedEvent> {
 
   private static final IdGenerator idGenerator = new IdGeneratorImpl();
   private static final String AGGREGATE_NAME = UserProfile.class.getSimpleName();
@@ -108,6 +108,11 @@ public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
     } else if (event instanceof UserDisplayNameUpdated e) {
       this.displayName = new DisplayName(e.getDisplayName());
     }
+  }
+
+  @Override
+  public UUID getAggregateId() {
+    return id.value();
   }
 
 }

@@ -47,7 +47,7 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
   }
 
   @Override
-  public Mono<List<Event>> load(UUID aggregateId, int fromVersion) {
+  public Mono<List<Event>> load(UUID aggregateId, long fromVersion) {
     return find(Filters.and(
         eq(COL_AGGREGATE_ID, aggregateId),
         gte(COL_VERSION, fromVersion)
@@ -100,10 +100,10 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
   }
 
   @Override
-  public Mono<Optional<Boolean>> save(UUID aggregateId, List<Event> events, int expectedVersion) {
-    Mono<Integer> nextVersionPublisher = getVersion(aggregateId)
+  public Mono<Optional<Boolean>> save(UUID aggregateId, List<Event> events, long expectedVersion) {
+    Mono<Long> nextVersionPublisher = getVersion(aggregateId)
         .map(it -> it + 1);
-    Integer nextVersion = nextVersionPublisher.block();
+    Long nextVersion = nextVersionPublisher.block();
 
 //    // Concurrency check.
     if ((expectedVersion == 0) || (nextVersion != null && nextVersion == expectedVersion)) {
@@ -119,10 +119,10 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
   }
 
   @Override
-  public Mono<Optional<Boolean>> save(UUID aggregateId, Event event, int expectedVersion) {
+  public Mono<Optional<Boolean>> save(UUID aggregateId, Event event, long expectedVersion) {
     return getVersion(aggregateId)
         .flatMap(currentVersion -> {
-          int nextVersion = currentVersion + 1;
+          long nextVersion = currentVersion + 1;
           if (expectedVersion == 0 || nextVersion == expectedVersion) {
             Try<MongoEventEntity> mongoEventEntities = create(aggregateId, event, expectedVersion);
             MongoEventEntity mongoEventEntity = mongoEventEntities
@@ -138,14 +138,14 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
   }
 
   @Override
-  public Mono<Optional<Boolean>> save(Event event, int version) {
+  public Mono<Optional<Boolean>> save(Event event, long version) {
     if (event.getAggregateId() == null) {
       return Mono.just(Optional.of(false));
     }
     return save(event.getAggregateId(), event, version);
   }
 
-  private Try<MongoEventEntity> create(UUID aggregateId, Event event, int expectedVersion) {
+  private Try<MongoEventEntity> create(UUID aggregateId, Event event, long expectedVersion) {
     Try<TypedEvent> typedEvent = fromEvent(event);
     return typedEvent.map(e -> ImmutableMongoEventEntity.builder()
         .id(event.getId())
@@ -157,7 +157,7 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
         .build());
   }
 
-  private MongoEventEntity create(UUID aggregateId, List<Event> events, int expectedVersion) {
+  private MongoEventEntity create(UUID aggregateId, List<Event> events, long expectedVersion) {
     List<TypedEvent> typedEvents = events.stream().map(this::fromEvent)
         .filter(Try::isSuccess)
         .map(Try::get)
@@ -183,7 +183,7 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
   }
 
   @Override
-  public Mono<Integer> getVersion(UUID aggregateId) {
+  public Mono<Long> getVersion(UUID aggregateId) {
     Publisher<Document> aggregateResultPublisher = eventCollection.aggregate(
         List.of(
             match(Filters.eq(COL_AGGREGATE_ID, aggregateId)),
@@ -191,8 +191,8 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
         ),
         Document.class);
     return Mono.from(aggregateResultPublisher)
-        .map(it -> it.getInteger(COL_VERSION))
-        .switchIfEmpty(Mono.just(0));
+        .map(it -> it.getLong(COL_VERSION))
+        .switchIfEmpty(Mono.just(-1L));
   }
 
   @Override
