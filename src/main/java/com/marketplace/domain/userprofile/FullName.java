@@ -1,6 +1,6 @@
 package com.marketplace.domain.userprofile;
 
-import com.marketplace.framework.Strings;
+import com.marketplace.cqrs.framework.Strings;
 
 public record FullName(String firstName, String middleName, String lastName) {
     public FullName {

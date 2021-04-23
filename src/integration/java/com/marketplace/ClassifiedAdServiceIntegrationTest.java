@@ -2,7 +2,7 @@ package com.marketplace;
 
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
-import com.marketplace.domain.classifiedad.CommandHandlerResult;
+import com.marketplace.cqrs.command.CommandHandlerResult;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
@@ -10,7 +10,6 @@ import com.marketplace.domain.classifiedad.controller.AddPictureResponse;
 import com.marketplace.domain.classifiedad.controller.AddPictureToClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.controller.ImmutableAddPictureToClassifiedAd;
-import com.marketplace.domain.classifiedad.controller.ImmutableAddPicturesToClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.ImmutableResizeClassifiedAdPicture;
 import com.marketplace.domain.classifiedad.controller.ResizeClassifiedAdPicture;
 import com.marketplace.fixtures.LoadAddPicture;

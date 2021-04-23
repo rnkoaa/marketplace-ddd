@@ -5,9 +5,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.eventbus.EventBus;
+import com.marketplace.cqrs.event.Event;
 import com.marketplace.eventstore.framework.OperationResult;
 import com.marketplace.eventstore.framework.OperationResult.Success;
-import com.marketplace.eventstore.framework.event.Event;
 import com.marketplace.eventstore.framework.event.EventListener;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.eventstore.framework.event.EventStream;

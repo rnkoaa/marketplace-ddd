@@ -1,7 +1,7 @@
 package com.marketplace.eventstore.mongodb;
 
-import com.marketplace.eventstore.framework.event.ImmutableTypedEvent;
-import com.marketplace.eventstore.framework.event.TypedEvent;
+import com.marketplace.cqrs.event.ImmutableTypedEvent;
+import com.marketplace.cqrs.event.TypedEvent;
 import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;

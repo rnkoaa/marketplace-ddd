@@ -1,9 +1,10 @@
 package com.marketplace.eventstore.mongodb;
 
-import com.marketplace.eventstore.framework.event.Event;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.marketplace.cqrs.event.Event;
 import reactor.core.publisher.Mono;
 
 public interface EventStoreRepository<T, U> {

@@ -1,6 +1,6 @@
-package com.marketplace.framework;
+package com.marketplace.cqrs.framework;
 
-import com.marketplace.event.VersionedEvent;
+import com.marketplace.cqrs.event.VersionedEvent;
 
 @FunctionalInterface
 public interface EventApplier {

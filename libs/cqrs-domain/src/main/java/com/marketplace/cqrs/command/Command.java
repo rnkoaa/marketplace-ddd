@@ -1,4 +1,4 @@
-package com.marketplace.command;
+package com.marketplace.cqrs.command;
 
 import java.time.Instant;
 import org.immutables.value.Value;

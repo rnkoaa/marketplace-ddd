@@ -1,6 +1,6 @@
 package com.marketplace.eventstore.impl.fixtures.classifiedad;
 
-import com.marketplace.eventstore.framework.event.Event;
+import com.marketplace.cqrs.event.Event;
 
 import java.util.UUID;
 

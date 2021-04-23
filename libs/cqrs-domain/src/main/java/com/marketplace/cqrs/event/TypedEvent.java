@@ -1,4 +1,4 @@
-package com.marketplace.eventstore.framework.event;
+package com.marketplace.cqrs.event;
 
 import org.immutables.value.Value;
 

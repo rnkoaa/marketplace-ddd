@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation project(":libs:cqrs-domain")
     compileOnly("org.immutables:value:${immutablesVersion}")
     annotationProcessor("org.immutables:value:${immutablesVersion}")
 

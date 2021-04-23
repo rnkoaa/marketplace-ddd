@@ -2,7 +2,7 @@ package com.marketplace.domain.userprofile.event;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.marketplace.event.VersionedEvent;
+import com.marketplace.cqrs.event.VersionedEvent;
 import java.util.UUID;
 import org.immutables.value.Value.Immutable;
 

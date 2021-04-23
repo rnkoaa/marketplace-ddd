@@ -1,5 +1,6 @@
 package com.marketplace.eventstore.framework.event;
 
+import com.marketplace.cqrs.event.Event;
 import com.marketplace.eventstore.framework.OperationResult;
 
 import java.util.List;
@@ -79,7 +80,7 @@ public interface EventStore<T> {
    * @param streamId the id of the stream to append to then publish onto
    * @param event    event being processed
    */
-  Mono<OperationResult> publish(String streamId, Event event);
+  Mono<OperationResult> publish(String streamId, T event);
 
   /**
    * appends a list of events to the end of the event stream then publishes those events to any subscribers that may be listening for those

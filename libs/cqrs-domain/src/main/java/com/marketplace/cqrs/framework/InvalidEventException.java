@@ -1,4 +1,4 @@
-package com.marketplace.framework;
+package com.marketplace.cqrs.framework;
 
 public class InvalidEventException extends Throwable {
     public InvalidEventException(String message) {

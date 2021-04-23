@@ -49,12 +49,13 @@ idea {
 //        }
         testSourceDirs += file("src/functional/groovy")
         testResourceDirs += file("src/functional/resources")
-        scopes.TEST.plus += [ configurations.functionalImplementation ]
+        scopes.TEST.plus += [configurations.functionalImplementation]
     }
 }
 
 dependencies {
     implementation project(":libs:common")
+    implementation project(":libs:cqrs-domain")
     implementation project(":eventstore")
 
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
@@ -80,8 +81,11 @@ dependencies {
     annotationProcessor 'org.immutables:value:2.8.8'
 
     // Implementation dependencies are not leaked to consumers when building
-    testFixturesImplementation 'org.immutables:value:2.8.8'
-    testFixturesAnnotationProcessor('org.immutables:value:2.8.8')
+    testFixturesImplementation "org.immutables:value:${immutablesVersion}"
+    testFixturesAnnotationProcessor("org.immutables:value:${immutablesVersion}")
+    testFixturesImplementation project(":libs:common")
+    testFixturesImplementation project(":libs:cqrs-domain")
+
     testFixturesImplementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     testFixturesImplementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     testFixturesImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion")

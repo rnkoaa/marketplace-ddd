@@ -1,6 +1,6 @@
-package com.marketplace.framework;
+package com.marketplace.cqrs.framework;
 
-import com.marketplace.event.VersionedEvent;
+import com.marketplace.cqrs.event.VersionedEvent;
 
 public abstract class Entity<T, U extends VersionedEvent> implements InternalEventHandler<U> {
     private final EventApplier applier;

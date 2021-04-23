@@ -11,9 +11,9 @@ import com.marketplace.domain.userprofile.event.ProfilePhotoUploaded;
 import com.marketplace.domain.userprofile.event.UserDisplayNameUpdated;
 import com.marketplace.domain.userprofile.event.UserFullNameUpdated;
 import com.marketplace.domain.userprofile.event.UserRegistered;
-import com.marketplace.event.EventId;
-import com.marketplace.event.VersionedEvent;
-import com.marketplace.framework.AggregateRoot;
+import com.marketplace.cqrs.event.EventId;
+import com.marketplace.cqrs.event.VersionedEvent;
+import com.marketplace.cqrs.framework.AggregateRoot;
 
 public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
 

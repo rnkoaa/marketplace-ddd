@@ -6,18 +6,17 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gte;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.eventstore.framework.event.Event;
-import com.marketplace.eventstore.framework.event.ImmutableTypedEvent;
-import com.marketplace.eventstore.framework.event.TypedEvent;
+import com.marketplace.cqrs.event.Event;
+import com.marketplace.cqrs.event.ImmutableTypedEvent;
+import com.marketplace.cqrs.event.TypedEvent;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.FindPublisher;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.Success;
 import io.vavr.control.Try;
-import java.util.ArrayList;
+
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

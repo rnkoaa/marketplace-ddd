@@ -9,3 +9,5 @@ include 'eventstore'
 include 'eventstore-mongodb'
 include 'client'
 //
+include ':libs:cqrs-domain'
+

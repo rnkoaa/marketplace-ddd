@@ -1,7 +1,6 @@
 package com.marketplace.context.mongo.codec;
 
 import com.marketplace.domain.classifiedad.entity.ImmutablePictureEntity;
-import com.marketplace.eventstore.framework.event.ImmutableTypedEvent;
 import java.util.UUID;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;

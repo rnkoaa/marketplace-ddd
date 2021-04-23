@@ -64,6 +64,7 @@ configurations {
 dependencies {
     implementation project(":libs:config")
     implementation project(":libs:common")
+    implementation project(":libs:cqrs-domain")
     implementation project(":libs:mongo-config-commons")
     implementation project(":eventstore")
     implementation project(":eventstore-mongodb")

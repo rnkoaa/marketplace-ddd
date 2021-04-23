@@ -1,7 +1,7 @@
 package com.marketplace.context.mongo.codec;
 
 import com.marketplace.domain.userprofile.entity.ImmutableUserProfileEntity;
-import com.marketplace.framework.Strings;
+import com.marketplace.cqrs.framework.Strings;
 import java.util.UUID;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
