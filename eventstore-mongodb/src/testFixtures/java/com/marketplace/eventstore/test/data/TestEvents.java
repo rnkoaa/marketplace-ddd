@@ -1,7 +1,5 @@
 package com.marketplace.eventstore.test.data;
 
-import com.marketplace.eventstore.framework.event.Event;
-import com.marketplace.eventstore.framework.event.ImmutableTypedEvent;
 import com.marketplace.eventstore.test.events.ImmutableTestCreatedEvent;
 import com.marketplace.eventstore.test.events.ImmutableTestTextUpdatedEvent;
 import com.marketplace.eventstore.test.events.ImmutableTestTitleUpdatedEvent;

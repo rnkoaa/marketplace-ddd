@@ -19,24 +19,20 @@ import com.marketplace.eventstore.mongodb.application.event.TestEvent;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.model.Accumulators;
-import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.AggregatePublisher;
-import com.mongodb.reactivestreams.client.FindPublisher;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.MongoDatabase;
-import com.mongodb.reactivestreams.client.Success;
+
 import java.util.List;
 import java.util.UUID;
-import javax.print.Doc;
+
 import org.bson.Document;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.UuidCodecProvider;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 @SuppressWarnings("UnstableApiUsage")

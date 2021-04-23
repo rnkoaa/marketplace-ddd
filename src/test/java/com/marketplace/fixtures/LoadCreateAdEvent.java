@@ -7,7 +7,6 @@ import java.io.IOException;
 
 public class LoadCreateAdEvent {
 
-
     public static CreateClassifiedAd load() throws IOException {
         var resourceAsStream = LoadCreateAdEvent.class.getClassLoader().getResourceAsStream("fixtures/create_ad.json");
         return ObjectMapperModule.provideObjectMapper().readValue(resourceAsStream, CreateClassifiedAd.class);

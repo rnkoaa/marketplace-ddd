@@ -3,17 +3,6 @@ plugins {
     id 'idea'
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
-
-    // has issues with preview-features
-//    toolchain {
-//        languageVersion = JavaLanguageVersion.of(15)
-//    }
-}
-
-
 group 'com.richard.agyei'
 version '1.0.0-SNAPSHOT'
 
@@ -39,7 +28,7 @@ configurations {
         extendsFrom testImplementation
     }
     integrationRuntime {
-        extendsFrom testRuntime
+        extendsFrom testRuntimeOnly
     }
 }
 dependencies {

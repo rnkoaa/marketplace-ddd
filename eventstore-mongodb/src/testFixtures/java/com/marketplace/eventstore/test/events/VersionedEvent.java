@@ -1,6 +1,5 @@
 package com.marketplace.eventstore.test.events;
 
-import com.marketplace.eventstore.framework.event.Event;
 import java.time.Instant;
 import org.immutables.value.Value;
 

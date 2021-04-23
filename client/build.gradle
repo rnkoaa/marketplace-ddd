@@ -10,11 +10,11 @@ repositories {
 }
 
 dependencies {
-    compile project(":config")
-    compile project(":common")
+    implementation project(":libs:config")
+    implementation project(":libs:common")
 
-    compileOnly('org.projectlombok:lombok:1.18.16')
-    annotationProcessor('org.projectlombok:lombok:1.18.16')
+    compileOnly("org.projectlombok:lombok:${lombokVersion}")
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

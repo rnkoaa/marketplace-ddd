@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.immutables:value:2.8.2'
-    annotationProcessor 'org.immutables:value:2.8.2'
+    compileOnly("org.immutables:value:${immutablesVersion}")
+    annotationProcessor("org.immutables:value:${immutablesVersion}")
 
     implementation 'io.projectreactor:reactor-core:3.4.0'
     implementation("com.google.guava:guava:30.0-jre")
