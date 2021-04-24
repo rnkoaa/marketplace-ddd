@@ -17,6 +17,8 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders
 
 abstract class AbstractContainerInitializerSpec extends BaseFunctionalSpec {
 
+    private static final String MONGO_IMAGE_TAG = "4.4"
+    private static final String MONGO_IMAGE = String.format("mongo:%s", MONGO_IMAGE_TAG)
     private static final int MONGO_PORT = 27017
     @Shared
     MongoConfig mongoConfig;
@@ -24,7 +26,7 @@ abstract class AbstractContainerInitializerSpec extends BaseFunctionalSpec {
     MongoClient mongoClient;
 
     static final MongoDBContainer mongoDBContainer =
-            new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"))
+            new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
                     .withExposedPorts(MONGO_PORT);
 
     def setupSpec() {
