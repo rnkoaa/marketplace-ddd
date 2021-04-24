@@ -9,7 +9,6 @@ import org.bson.UuidRepresentation
 import org.bson.codecs.UuidCodecProvider
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.configuration.CodecRegistry
-import org.bson.codecs.pojo.PojoCodecProvider
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.utility.DockerImageName
 import spock.lang.Shared

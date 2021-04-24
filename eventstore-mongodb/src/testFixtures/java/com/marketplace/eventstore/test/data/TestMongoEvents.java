@@ -6,8 +6,8 @@ import static com.marketplace.eventstore.test.data.TestEvents.testTitleUpdatedEv
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.common.ObjectMapperBuilder;
-import com.marketplace.eventstore.framework.event.ImmutableTypedEvent;
-import com.marketplace.eventstore.framework.event.TypedEvent;
+import com.marketplace.cqrs.event.ImmutableTypedEvent;
+import com.marketplace.cqrs.event.TypedEvent;
 import com.marketplace.eventstore.mongodb.ImmutableMongoEventEntity;
 import com.marketplace.eventstore.mongodb.MongoEventEntity;
 import io.vavr.control.Try;

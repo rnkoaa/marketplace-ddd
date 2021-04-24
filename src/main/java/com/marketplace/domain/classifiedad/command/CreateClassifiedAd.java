@@ -3,7 +3,7 @@ package com.marketplace.domain.classifiedad.command;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.marketplace.command.Command;
+import com.marketplace.cqrs.command.Command;
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PriceDto;

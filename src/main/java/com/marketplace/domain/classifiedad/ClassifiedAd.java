@@ -22,14 +22,13 @@ import com.marketplace.domain.classifiedad.events.PictureAddedToAClassifiedAd;
 import com.marketplace.domain.shared.IdGenerator;
 import com.marketplace.domain.shared.IdGeneratorImpl;
 import com.marketplace.domain.shared.UserId;
-import com.marketplace.event.EventId;
-import com.marketplace.event.VersionedEvent;
-import com.marketplace.framework.AggregateRoot;
+import com.marketplace.cqrs.event.EventId;
+import com.marketplace.cqrs.event.VersionedEvent;
+import com.marketplace.cqrs.framework.AggregateRoot;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
 

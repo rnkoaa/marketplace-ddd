@@ -39,7 +39,7 @@ configurations {
         extendsFrom testImplementation
         canBeResolved true
     }
-    functionalRuntime.extendsFrom testRuntime
+    functionalRuntime.extendsFrom testRuntimeOnly
 }
 
 idea {
@@ -49,15 +49,16 @@ idea {
 //        }
         testSourceDirs += file("src/functional/groovy")
         testResourceDirs += file("src/functional/resources")
-        scopes.TEST.plus += [ configurations.functionalImplementation ]
+        scopes.TEST.plus += [configurations.functionalImplementation]
     }
 }
 
 dependencies {
-    compile project(":common")
-    compile project(":eventstore")
+    implementation project(":libs:common")
+    implementation project(":libs:cqrs-domain")
+    implementation project(":eventstore")
 
-    compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("org.slf4j:slf4j-log4j12:1.7.30")
@@ -80,8 +81,11 @@ dependencies {
     annotationProcessor 'org.immutables:value:2.8.8'
 
     // Implementation dependencies are not leaked to consumers when building
-    testFixturesImplementation 'org.immutables:value:2.8.8'
-    testFixturesAnnotationProcessor('org.immutables:value:2.8.8')
+    testFixturesImplementation "org.immutables:value:${immutablesVersion}"
+    testFixturesAnnotationProcessor("org.immutables:value:${immutablesVersion}")
+    testFixturesImplementation project(":libs:common")
+    testFixturesImplementation project(":libs:cqrs-domain")
+
     testFixturesImplementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     testFixturesImplementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     testFixturesImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion")
@@ -99,8 +103,8 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
     testImplementation('io.projectreactor:reactor-test:3.4.0')
 
-    testCompile project(":common-test")
-    testCompile project(":config")
+    testImplementation project(":libs:common-test")
+    testImplementation project(":libs:config")
     testImplementation("org.testcontainers:junit-jupiter:1.15.0")
     testImplementation("org.testcontainers:mongodb:1.15.0")
 

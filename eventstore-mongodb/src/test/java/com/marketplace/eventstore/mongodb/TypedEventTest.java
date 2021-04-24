@@ -3,8 +3,8 @@ package com.marketplace.eventstore.mongodb;
 import static com.marketplace.eventstore.test.data.TestMongoEvents.objectMapper;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-import com.marketplace.eventstore.framework.event.Event;
-import com.marketplace.eventstore.framework.event.TypedEvent;
+import com.marketplace.cqrs.event.Event;
+import com.marketplace.cqrs.event.TypedEvent;
 import com.marketplace.eventstore.test.data.TestMongoEvents;
 import com.marketplace.eventstore.test.events.ImmutableTestCreatedEvent;
 import com.marketplace.eventstore.test.events.ImmutableTestTextUpdatedEvent;

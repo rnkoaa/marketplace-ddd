@@ -1,31 +1,20 @@
 package com.marketplace.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
-import com.marketplace.domain.classifiedad.CommandHandlerResult;
-import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
-import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
-import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryController;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryEntity;
-import com.marketplace.framework.Strings;
-import spark.QueryParamsMap;
-import spark.Request;
+import com.marketplace.cqrs.framework.Strings;
 import spark.Route;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
-import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
 
 @Singleton
 @Named

@@ -2,7 +2,7 @@ package com.marketplace.domain.classifiedad.controller;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.marketplace.command.Command;
+import com.marketplace.cqrs.command.Command;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
 import java.util.List;
 import java.util.UUID;

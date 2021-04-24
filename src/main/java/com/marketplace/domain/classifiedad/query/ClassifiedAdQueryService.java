@@ -1,15 +1,13 @@
 package com.marketplace.domain.classifiedad.query;
 
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
-import com.marketplace.framework.Strings;
+import com.marketplace.cqrs.framework.Strings;
 import com.mongodb.client.model.Filters;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.processing.Filer;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;

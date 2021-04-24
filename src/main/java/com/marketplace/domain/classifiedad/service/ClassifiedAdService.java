@@ -1,5 +1,7 @@
 package com.marketplace.domain.classifiedad.service;
 
+import com.marketplace.cqrs.command.CommandHandlerResult;
+import com.marketplace.cqrs.command.ImmutableCommandHandlerResult;
 import com.marketplace.domain.PictureId;
 import com.marketplace.domain.PictureSize;
 import com.marketplace.domain.classifiedad.*;
@@ -8,7 +10,7 @@ import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto
 import com.marketplace.domain.classifiedad.controller.*;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.shared.UserId;
-import com.marketplace.framework.Strings;
+import com.marketplace.cqrs.framework.Strings;
 
 import java.util.List;
 import java.util.UUID;

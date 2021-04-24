@@ -1,7 +1,6 @@
 package com.marketplace.eventstore.mongodb
 
 
-import com.marketplace.eventstore.framework.event.TypedEvent
 import com.marketplace.eventstore.test.data.TestEvents
 import com.marketplace.eventstore.test.data.TestMongoEvents
 import com.mongodb.client.model.Accumulators

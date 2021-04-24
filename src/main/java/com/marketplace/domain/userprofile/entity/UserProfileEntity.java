@@ -5,7 +5,7 @@ import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.domain.userprofile.entity.ImmutableUserProfileEntity.Builder;
-import com.marketplace.framework.Strings;
+import com.marketplace.cqrs.framework.Strings;
 import com.marketplace.mongo.entity.MongoEntity;
 import java.util.Optional;
 import org.bson.codecs.pojo.annotations.BsonIgnore;

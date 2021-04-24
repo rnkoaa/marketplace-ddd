@@ -3,7 +3,7 @@ package com.marketplace.server;
 import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.domain.classifiedad.CommandHandlerResult;
+import com.marketplace.cqrs.command.CommandHandlerResult;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;

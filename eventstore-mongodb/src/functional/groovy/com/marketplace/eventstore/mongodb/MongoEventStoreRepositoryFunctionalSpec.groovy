@@ -1,6 +1,6 @@
 package com.marketplace.eventstore.mongodb
 
-import com.marketplace.eventstore.framework.event.Event
+
 import com.marketplace.eventstore.test.data.TestMongoEvents
 import com.mongodb.client.result.DeleteResult
 import com.mongodb.reactivestreams.client.Success

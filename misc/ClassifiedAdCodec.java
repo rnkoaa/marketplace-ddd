@@ -2,7 +2,7 @@ package com.marketplace.context.mongo.codec;
 
 import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.shared.UserId;
-import com.marketplace.framework.Strings;
+import com.marketplace.cqrs.framework.Strings;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.Document;

@@ -1,6 +1,5 @@
-package com.marketplace.command;
+package com.marketplace.cqrs.command;
 
-import com.marketplace.domain.classifiedad.CommandHandlerResult;
 
 public interface CommandHandler<T extends Command> {
 
