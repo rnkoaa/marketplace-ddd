@@ -15,8 +15,10 @@ import com.marketplace.domain.userprofile.controller.UpdateUserProfileCommand;
 import com.marketplace.domain.userprofile.repository.UserProfileRepository;
 import com.marketplace.fixtures.UserProfileFixture;
 import com.mongodb.client.MongoClient;
+import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -24,6 +26,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+@Disabled
 public class UserProfileRepositoryTest extends AbstractContainerInitializer {
 
   String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
@@ -53,6 +56,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
   }
 
   @Test
+  @Disabled
   void userProfileCanBeCreated() throws IOException {
     CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
     assertThat(command).isNotNull();
@@ -69,6 +73,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
   }
 
   @Test
+  @Disabled
   void userProfileCanBeCreatedAndLoaded() throws IOException {
     CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
     assertThat(command).isNotNull();
@@ -93,6 +98,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
   }
 
   @Test
+  @Disabled
   void userProfileCanBeUpdated() throws IOException {
     CreateUserProfileCommand createUserProfileCmd = UserProfileFixture.loadCreateUserProfileDto();
     UpdateUserProfileCommand updateUserProfileCommand =
@@ -127,6 +133,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
   }
 
   @Test
+  @Disabled
   void userProfileCanBeCreatedAndShownToExist() throws IOException {
     CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
     assertThat(command).isNotNull();

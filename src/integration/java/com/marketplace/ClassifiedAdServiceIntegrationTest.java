@@ -16,6 +16,7 @@ import com.marketplace.fixtures.LoadAddPicture;
 import com.marketplace.fixtures.LoadCreateAdEvent;
 import com.marketplace.fixtures.LoadResizePicture;
 import com.marketplace.fixtures.LoadUpdateAdEvent;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+@Disabled
 public class ClassifiedAdServiceIntegrationTest extends BaseMongoRepositoryTest {
 
   @Test

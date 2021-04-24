@@ -72,7 +72,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
-    implementation('org.mongodb:mongodb-driver-reactivestreams:1.13.1')
+    implementation('org.mongodb:mongodb-driver-reactivestreams:4.2.3')
+//    implementation('org.mongodb:mongodb-driver-reactivestreams:1.13.1')
 
 //    implementation("javax.inject:javax.inject:1")
     implementation("javax.persistence:javax.persistence-api:2.2")
@@ -94,7 +95,7 @@ dependencies {
     testFixturesImplementation('io.vavr:vavr:1.0.0-alpha-3')
 
     implementation 'io.projectreactor:reactor-core:3.4.0'
-    implementation("com.google.guava:guava:30.0-jre")
+    implementation("com.google.guava:guava:${guavaVersion}")
 
     testImplementation(platform("org.junit:junit-bom:${junitVersion}"))
     testImplementation('org.junit.jupiter:junit-jupiter')
@@ -105,11 +106,11 @@ dependencies {
 
     testImplementation project(":libs:common-test")
     testImplementation project(":libs:config")
-    testImplementation("org.testcontainers:junit-jupiter:1.15.0")
-    testImplementation("org.testcontainers:mongodb:1.15.0")
+    testImplementation("org.testcontainers:junit-jupiter:${testContainersVersion}")
+    testImplementation("org.testcontainers:mongodb:${testContainersVersion}")
 
-    testImplementation("org.codehaus.groovy:groovy-all:2.5.13")
-    testImplementation("org.spockframework:spock-core:1.2-groovy-2.5") {
+    testImplementation("org.codehaus.groovy:groovy-all:${groovyVersion}")
+    testImplementation("org.spockframework:spock-core:${spockVersion}") {
         exclude group: "org.codehaus.groovy", module: "groovy-all"
     }
 }
@@ -147,3 +148,6 @@ task functionalTest(type: Test) {
 
 check.dependsOn functionalTest
 
+processFunctionalResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
