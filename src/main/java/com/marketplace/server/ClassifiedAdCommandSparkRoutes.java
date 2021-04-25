@@ -48,7 +48,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
         response.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
         response.type(MEDIA_APPLICATION_JSON);
         response.status(201);
-        response.header("Location", String.format("/classified_ad/%s", createAdResponse.get().toString()));
+        response.header("Location", String.format("/classified_ad/%s", createAdResponse.get()));
         return NO_CONTENT;
       } else {
         Map<String, Object> resMessage = Map.of(

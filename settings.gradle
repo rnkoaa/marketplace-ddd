@@ -6,7 +6,7 @@ include 'libs:mongo-config-commons'
 include ':libs:config'
 include ':libs:common'
 include 'eventstore'
-include 'eventstore-mongodb'
+//include 'eventstore-mongodb'
 include 'client'
 //
 include ':libs:cqrs-domain'
