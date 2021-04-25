@@ -73,7 +73,6 @@ public class SparkServer {
     Spark.get(
         "/classified_ad/:classifiedAdId", classifiedAdQuerySparkRoutes.findClassifiedAdById());
 
-
     Spark.get("/classified_ad/myads", classifiedAdQuerySparkRoutes.findAll());
 
     System.out.println("Spark Server is running on port :" + Spark.port());

@@ -26,7 +26,6 @@ import com.marketplace.cqrs.event.EventId;
 import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.cqrs.framework.AggregateRoot;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -160,13 +159,13 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
     apply(ImmutablePictureAddedToAClassifiedAd.builder()
         .id(idGenerator.newUUID())
         .aggregateName(AGGREGATE_NAME)
-        .aggregateId(id.id())
+        .aggregateId(pictureId.id())
         .pictureId(pictureId.id())
         .url(uri)
         .height(size.height())
         .width(size.width())
         .order(newPictureOrder)
-        .classifiedAdId(id.id())
+        .classifiedAdId(pictureId.id())
         .build());
     return pictureId;
   }
@@ -216,10 +215,6 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
         .findFirst();
   }
 
-  private Optional<Picture> first() {
-    return this.pictures.stream().min(Comparator.comparingInt(Picture::getOrder));
-  }
-
   @Override
   public void when(VersionedEvent event) {
     if (event instanceof ClassifiedAdCreated e) {
@@ -232,7 +227,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
       this.price = new Price(new Money(e.getPrice(), e.getCurrency()));
     } else if (event instanceof ClassifiedAdTitleChanged e) {
       this.title = new ClassifiedAdTitle(e.getTitle());
-    } else if (event instanceof ClassifiedAdSentForReview e) {
+    } else if (event instanceof ClassifiedAdSentForReview) {
       this.state = ClassifiedAdState.PENDING_REVIEW;
     } else if (event instanceof ClassifiedApproved e) {
       this.state = ClassifiedAdState.APPROVED;
