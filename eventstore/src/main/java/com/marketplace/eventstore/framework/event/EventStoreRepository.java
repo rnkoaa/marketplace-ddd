@@ -1,4 +1,4 @@
-package com.marketplace.eventstore.mongodb;
+package com.marketplace.eventstore.framework.event;
 
 import java.util.List;
 import java.util.Optional;
