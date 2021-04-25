@@ -22,21 +22,19 @@ import com.marketplace.domain.classifiedad.events.PictureAddedToAClassifiedAd;
 import com.marketplace.domain.shared.IdGenerator;
 import com.marketplace.domain.shared.IdGeneratorImpl;
 import com.marketplace.domain.shared.UserId;
-import com.marketplace.event.VersionedEvent;
-import com.marketplace.eventstore.framework.event.Event;
-import com.marketplace.framework.AggregateRoot;
+import com.marketplace.cqrs.event.EventId;
+import com.marketplace.cqrs.event.VersionedEvent;
+import com.marketplace.cqrs.framework.AggregateRoot;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-public class ClassifiedAd extends AggregateRoot<VersionedEvent> {
+public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
 
   private final IdGenerator idGenerator = new IdGeneratorImpl();
   private static final String AGGREGATE_NAME = ClassifiedAd.class.getSimpleName();
   private ClassifiedAdId id;
-  private final List<Picture> pictures = new ArrayList<>();
+  private final List<Picture> pictures;
   private UserId ownerId;
   private ClassifiedAdTitle title;
   private ClassifiedAdText text;
@@ -48,42 +46,30 @@ public class ClassifiedAd extends AggregateRoot<VersionedEvent> {
    * this is for jackson deserialization
    */
   public ClassifiedAd() {
+    pictures = new ArrayList<>();
   }
 
   public ClassifiedAd(CreateClassifiedAd createClassifiedAd) {
+    this.pictures = new ArrayList<>();
     ClassifiedAdId classifiedAdId = createClassifiedAd.getClassifiedAdId()
         .map(ClassifiedAdId::from)
         .orElse(ClassifiedAdId.newClassifedAdId());
     apply(ImmutableClassifiedAdCreated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(classifiedAdId.value())
+        .aggregateId(classifiedAdId.id())
         .aggregateName(AGGREGATE_NAME)
         .ownerId(createClassifiedAd.getOwnerId())
         .build());
   }
 
   public ClassifiedAd(ClassifiedAdId id, UserId ownerId) {
+    this.pictures = new ArrayList<>();
     apply(ImmutableClassifiedAdCreated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.value())
+        .aggregateId(id.id())
         .aggregateName(AGGREGATE_NAME)
-        .ownerId(ownerId.value())
+        .ownerId(ownerId.id())
         .build());
-  }
-
-  public ClassifiedAd(List<Event> events) {
-    if (events == null || events.isEmpty()) {
-      throw new IllegalArgumentException("Cannot create classified ad with empty events");
-    }
-    events.stream().map(event -> (VersionedEvent) event)
-        .forEach(event -> {
-          when(event);
-          incrementVersion();
-        });
-  }
-
-  public static ClassifiedAd of(List<Event> events) {
-    return new ClassifiedAd(events);
   }
 
   public ClassifiedAdId getId() {
@@ -121,7 +107,7 @@ public class ClassifiedAd extends AggregateRoot<VersionedEvent> {
   public void updateTitle(ClassifiedAdTitle title) {
     apply(ImmutableClassifiedAdTitleChanged.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(this.id.value())
+        .aggregateId(this.id.id())
         .aggregateName(AGGREGATE_NAME)
         .title(title.toString())
         .build());
@@ -134,7 +120,7 @@ public class ClassifiedAd extends AggregateRoot<VersionedEvent> {
   public void updateText(ClassifiedAdText text) {
     apply(ImmutableClassifiedAdTextUpdated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.value())
+        .aggregateId(id.id())
         .aggregateName(AGGREGATE_NAME)
         .text(text.toString())
         .build());
@@ -144,15 +130,15 @@ public class ClassifiedAd extends AggregateRoot<VersionedEvent> {
     apply(ImmutableClassifiedApproved.builder()
         .id(idGenerator.newUUID())
         .aggregateName(AGGREGATE_NAME)
-        .aggregateId(id.value())
-        .userId(approvedBy.value())
+        .aggregateId(id.id())
+        .userId(approvedBy.id())
         .build());
   }
 
   public void updatePrice(Price price) {
     apply(ImmutableClassifiedAdPriceUpdated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.value())
+        .aggregateId(id.id())
         .aggregateName(AGGREGATE_NAME)
         .price(price.money().amount())
         .currency(price.money().currencyCode())
@@ -162,42 +148,41 @@ public class ClassifiedAd extends AggregateRoot<VersionedEvent> {
   public void requestToPublish() {
     apply(ImmutableClassifiedAdSentForReview.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.value())
+        .aggregateId(id.id())
         .aggregateName(AGGREGATE_NAME)
         .build());
   }
 
-  public PictureId addPicture(PictureId picId, String uri, PictureSize size, int order) {
-    int newPictureOrder = order > 0 ? order : pictures.size() <= 0 ? 0 : pictures.size() + 1;
-    var pictureId = (picId != null) ? picId : PictureId.newPictureId();
-
+  public PictureId addPicture(PictureId id, String uri, PictureSize size, int order) {
+    int newPictureOrder = (order > 0) ? order : ((pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1);
+    var pictureId = (id != null) ? id : PictureId.newPictureId();
     apply(ImmutablePictureAddedToAClassifiedAd.builder()
         .id(idGenerator.newUUID())
         .aggregateName(AGGREGATE_NAME)
-        .aggregateId(id.value())
-        .pictureId(pictureId.value())
+        .aggregateId(pictureId.id())
+        .pictureId(pictureId.id())
         .url(uri)
         .height(size.height())
         .width(size.width())
         .order(newPictureOrder)
-        .classifiedAdId(id.value())
+        .classifiedAdId(pictureId.id())
         .build());
     return pictureId;
   }
 
   public PictureId addPicture(String uri, PictureSize size, int order) {
-    int newPictureOrder = order > 0 ? order : pictures.size() <= 0 ? 0 : pictures.size() + 1;
+    int newPictureOrder = (order > 0) ? order : ((pictures == null || pictures.size() <= 0) ? 0 : pictures.size() + 1);
     var pictureId = idGenerator.newUUID();
     apply(ImmutablePictureAddedToAClassifiedAd.builder()
         .id(idGenerator.newUUID())
         .aggregateName(AGGREGATE_NAME)
-        .aggregateId(id.value())
+        .aggregateId(id.id())
         .pictureId(pictureId)
         .url(uri)
         .height(size.height())
         .width(size.width())
         .order(newPictureOrder)
-        .classifiedAdId(id.value())
+        .classifiedAdId(id.id())
         .build());
     return new PictureId(pictureId);
   }
@@ -230,10 +215,6 @@ public class ClassifiedAd extends AggregateRoot<VersionedEvent> {
         .findFirst();
   }
 
-  private Optional<Picture> first() {
-    return this.pictures.stream().min(Comparator.comparingInt(Picture::getOrder));
-  }
-
   @Override
   public void when(VersionedEvent event) {
     if (event instanceof ClassifiedAdCreated e) {
@@ -246,7 +227,7 @@ public class ClassifiedAd extends AggregateRoot<VersionedEvent> {
       this.price = new Price(new Money(e.getPrice(), e.getCurrency()));
     } else if (event instanceof ClassifiedAdTitleChanged e) {
       this.title = new ClassifiedAdTitle(e.getTitle());
-    } else if (event instanceof ClassifiedAdSentForReview e) {
+    } else if (event instanceof ClassifiedAdSentForReview) {
       this.state = ClassifiedAdState.PENDING_REVIEW;
     } else if (event instanceof ClassifiedApproved e) {
       this.state = ClassifiedAdState.APPROVED;
@@ -259,11 +240,6 @@ public class ClassifiedAd extends AggregateRoot<VersionedEvent> {
       var optionalPicture = findPicture(new PictureId(e.getPictureId()));
       optionalPicture.ifPresent(picture -> applyToEntity(picture, e));
     }
-  }
-
-  @Override
-  public UUID getAggregateId() {
-    return id.value();
   }
 
   @Override

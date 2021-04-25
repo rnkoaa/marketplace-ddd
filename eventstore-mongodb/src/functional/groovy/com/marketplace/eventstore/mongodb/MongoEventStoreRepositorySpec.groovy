@@ -1,12 +1,11 @@
 package com.marketplace.eventstore.mongodb
 
-
-import com.marketplace.eventstore.framework.event.TypedEvent
+import com.marketplace.cqrs.event.TypedEvent
 import com.marketplace.eventstore.test.data.TestEvents
 import com.marketplace.eventstore.test.data.TestMongoEvents
 import com.mongodb.client.model.Accumulators
 import com.mongodb.client.result.DeleteResult
-import com.mongodb.reactivestreams.client.Success
+import com.mongodb.client.result.InsertOneResult
 import org.bson.Document
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
@@ -37,11 +36,11 @@ class MongoEventStoreRepositorySpec extends BaseMongoContainerSpec {
     void "MongoEventEntity Can be saved  successfully"() {
 
         when:
-        Publisher<Success> publisher = eventCollection.insertOne(TestMongoEvents.testCreatedMongoEntity)
+        Publisher<InsertOneResult> publisher = eventCollection.insertOne(TestMongoEvents.testCreatedMongoEntity)
 
         then:
         StepVerifier.create(publisher)
-                .assertNext { it == Success.SUCCESS }
+                .assertNext { it.wasAcknowledged() }
                 .expectComplete()
                 .verify()
     }
@@ -51,7 +50,7 @@ class MongoEventStoreRepositorySpec extends BaseMongoContainerSpec {
         UUID testId = TestEvents.testCreatedEvent.id
 
         when:
-        Publisher<Success> publisher = eventCollection.insertOne(TestMongoEvents.testCreatedMongoEntity)
+        Publisher<InsertOneResult> publisher = eventCollection.insertOne(TestMongoEvents.testCreatedMongoEntity)
         Mono.from(publisher).block()
 
         Publisher<MongoEventEntity> foundEventEntity = eventCollection
@@ -73,11 +72,11 @@ class MongoEventStoreRepositorySpec extends BaseMongoContainerSpec {
         UUID testId = TestEvents.testCreatedEvent.aggregateId
 
         when:
-        Publisher<Success> publisher = eventCollection.insertMany(TestMongoEvents.versionedEntityEvents)
-        Success success = Mono.from(publisher).block()
+        Publisher<InsertOneResult> publisher = eventCollection.insertMany(TestMongoEvents.versionedEntityEvents)
+        InsertOneResult success = Mono.from(publisher).block()
 
         then:
-        success == Success.SUCCESS
+        success.wasAcknowledged()
 
         when:
         Publisher<Long> documentCount = eventCollection.countDocuments()
@@ -114,7 +113,7 @@ class MongoEventStoreRepositorySpec extends BaseMongoContainerSpec {
         UUID testId = TestEvents.testCreatedEvent.id
 
         when:
-        Publisher<Success> publisher = eventCollection.insertOne(TestMongoEvents.testCreatedMongoEntity)
+        Publisher<InsertOneResult> publisher = eventCollection.insertOne(TestMongoEvents.testCreatedMongoEntity)
         Mono.from(publisher).block()
 
         Publisher<MongoEventEntity> foundEventEntity = eventCollection
@@ -154,11 +153,11 @@ class MongoEventStoreRepositorySpec extends BaseMongoContainerSpec {
         ]
 
         when:
-        Publisher<Success> publisher = eventCollection.insertMany(entities)
-        Success success = Mono.from(publisher).block()
+        Publisher<InsertOneResult> publisher = eventCollection.insertMany(entities)
+        InsertOneResult success = Mono.from(publisher).block()
 
         then:
-        success == Success.SUCCESS
+        success.wasAcknowledged()
 
         when:
         Publisher<MongoEventEntity> foundEventEntity = eventCollection

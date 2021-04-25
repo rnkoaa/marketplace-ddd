@@ -8,8 +8,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.marketplace.cqrs.event.Event;
 import com.marketplace.eventstore.framework.OperationResult;
-import com.marketplace.eventstore.framework.event.Event;
 import com.marketplace.eventstore.framework.event.EventPublisher;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.eventstore.framework.event.EventStream;

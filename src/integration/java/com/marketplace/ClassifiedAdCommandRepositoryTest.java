@@ -5,6 +5,7 @@ import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.fixtures.LoadCreateAdEvent;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+@Disabled
 public class ClassifiedAdCommandRepositoryTest extends BaseMongoRepositoryTest {
     String insertId = "87a7fef0-1527-4a47-b196-504d9f9ce0fe";
 

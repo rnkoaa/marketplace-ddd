@@ -1,6 +1,6 @@
 package com.marketplace.domain.classifiedad.controller;
 
-import com.marketplace.domain.classifiedad.CommandHandlerResult;
+import com.marketplace.cqrs.command.CommandHandlerResult;
 import com.marketplace.domain.classifiedad.command.*;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryEntity;

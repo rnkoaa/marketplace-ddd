@@ -1,9 +1,10 @@
 package com.marketplace.eventstore.mongodb;
 
-import com.marketplace.eventstore.framework.event.TypedEvent;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
+import com.marketplace.cqrs.event.TypedEvent;
 import org.immutables.value.Value;
 
 @Value.Immutable

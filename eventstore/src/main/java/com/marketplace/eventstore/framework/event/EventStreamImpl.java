@@ -1,5 +1,7 @@
 package com.marketplace.eventstore.framework.event;
 
+import com.marketplace.cqrs.event.Event;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

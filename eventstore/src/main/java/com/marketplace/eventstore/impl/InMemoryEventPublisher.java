@@ -1,7 +1,7 @@
 package com.marketplace.eventstore.impl;
 
 import com.google.common.eventbus.EventBus;
-import com.marketplace.eventstore.framework.event.Event;
+import com.marketplace.cqrs.event.Event;
 import com.marketplace.eventstore.framework.event.EventListener;
 import com.marketplace.eventstore.framework.event.EventPublisher;
 

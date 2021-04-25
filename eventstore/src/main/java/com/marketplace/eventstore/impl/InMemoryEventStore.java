@@ -1,5 +1,6 @@
 package com.marketplace.eventstore.impl;
 
+import com.marketplace.cqrs.event.Event;
 import com.marketplace.eventstore.framework.OperationResult;
 import com.marketplace.eventstore.framework.OperationResult.Failure;
 import com.marketplace.eventstore.framework.OperationResult.Success;

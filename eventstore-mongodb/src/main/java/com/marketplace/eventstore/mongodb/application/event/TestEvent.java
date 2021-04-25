@@ -1,6 +1,6 @@
 package com.marketplace.eventstore.mongodb.application.event;
 
-import com.marketplace.eventstore.framework.event.Event;
+import com.marketplace.cqrs.event.Event;
 
 import java.util.UUID;
 

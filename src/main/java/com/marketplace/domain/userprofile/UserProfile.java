@@ -11,11 +11,11 @@ import com.marketplace.domain.userprofile.event.ProfilePhotoUploaded;
 import com.marketplace.domain.userprofile.event.UserDisplayNameUpdated;
 import com.marketplace.domain.userprofile.event.UserFullNameUpdated;
 import com.marketplace.domain.userprofile.event.UserRegistered;
-import com.marketplace.event.VersionedEvent;
-import com.marketplace.framework.AggregateRoot;
-import java.util.UUID;
+import com.marketplace.cqrs.event.EventId;
+import com.marketplace.cqrs.event.VersionedEvent;
+import com.marketplace.cqrs.framework.AggregateRoot;
 
-public class UserProfile extends AggregateRoot<VersionedEvent> {
+public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
 
   private static final IdGenerator idGenerator = new IdGeneratorImpl();
   private static final String AGGREGATE_NAME = UserProfile.class.getSimpleName();
@@ -43,8 +43,8 @@ public class UserProfile extends AggregateRoot<VersionedEvent> {
   public UserProfile(UserId id, FullName fullName, DisplayName displayName) {
     apply(ImmutableUserRegistered.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.value())
-        .userId(id.value())
+        .aggregateId(id.id())
+        .userId(id.id())
         .aggregateName(AGGREGATE_NAME)
         .firstName(fullName.firstName())
         .lastName(fullName.lastName())
@@ -57,9 +57,9 @@ public class UserProfile extends AggregateRoot<VersionedEvent> {
   public void updateUserFullName(FullName fullName) {
     apply(ImmutableUserFullNameUpdated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.value())
+        .aggregateId(id.id())
         .aggregateName(AGGREGATE_NAME)
-        .userId(id.value())
+        .userId(id.id())
         .firstName(fullName.firstName())
         .middleName(fullName.middleName())
         .lastName(fullName.lastName())
@@ -69,9 +69,9 @@ public class UserProfile extends AggregateRoot<VersionedEvent> {
   public void updateDisplayName(DisplayName displayName) {
     apply(ImmutableUserDisplayNameUpdated.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.value())
+        .aggregateId(id.id())
         .aggregateName(AGGREGATE_NAME)
-        .userId(id.value())
+        .userId(id.id())
         .displayName(displayName.value())
         .build());
   }
@@ -80,9 +80,9 @@ public class UserProfile extends AggregateRoot<VersionedEvent> {
   public void updatePhoto(String uri) {
     apply(ImmutableProfilePhotoUploaded.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(id.value())
+        .aggregateId(id.id())
         .aggregateName(AGGREGATE_NAME)
-        .userId(id.value())
+        .userId(id.id())
         .photoUrl(uri)
         .build());
   }
@@ -108,11 +108,6 @@ public class UserProfile extends AggregateRoot<VersionedEvent> {
     } else if (event instanceof UserDisplayNameUpdated e) {
       this.displayName = new DisplayName(e.getDisplayName());
     }
-  }
-
-  @Override
-  public UUID getAggregateId() {
-    return id.value();
   }
 
 }

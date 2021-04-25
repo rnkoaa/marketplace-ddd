@@ -1,9 +1,9 @@
 package com.marketplace.eventstore.mongodb
 
-import com.marketplace.eventstore.framework.event.Event
+import com.marketplace.cqrs.event.Event
 import com.marketplace.eventstore.test.data.TestMongoEvents
 import com.mongodb.client.result.DeleteResult
-import com.mongodb.reactivestreams.client.Success
+import com.mongodb.client.result.InsertOneResult
 import org.bson.Document
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
@@ -170,11 +170,11 @@ class MongoEventStoreRepositoryFunctionalSpec extends BaseMongoContainerSpec {
         UUID testAggregateId = testCreatedEvent.aggregateId
 
         when:
-        Publisher<Success> publisher = eventCollection.insertMany(TestMongoEvents.versionedEntityEvents)
-        Success success = Mono.from(publisher).block()
+        Publisher<InsertOneResult> publisher = eventCollection.insertMany(TestMongoEvents.versionedEntityEvents)
+        InsertOneResult success = Mono.from(publisher).block()
 
         then:
-        success == Success.SUCCESS
+        success.wasAcknowledged()
 
         when:
         Mono<Long> documentCount = eventStoreRepository.countEvents(testAggregateId)

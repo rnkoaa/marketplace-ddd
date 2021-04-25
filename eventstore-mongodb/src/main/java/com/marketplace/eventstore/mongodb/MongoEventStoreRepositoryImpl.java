@@ -6,18 +6,18 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gte;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.eventstore.framework.event.Event;
-import com.marketplace.eventstore.framework.event.ImmutableTypedEvent;
-import com.marketplace.eventstore.framework.event.TypedEvent;
+import com.marketplace.cqrs.event.Event;
+import com.marketplace.cqrs.event.ImmutableTypedEvent;
+import com.marketplace.cqrs.event.TypedEvent;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.reactivestreams.client.FindPublisher;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import com.mongodb.reactivestreams.client.Success;
+//import com.mongodb.reactivestreams.client.Success;
 import io.vavr.control.Try;
-import java.util.ArrayList;
+
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -108,9 +108,10 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
 //    // Concurrency check.
     if ((expectedVersion == 0) || (nextVersion != null && nextVersion == expectedVersion)) {
       MongoEventEntity mongoEventEntity = create(aggregateId, events, expectedVersion);
-      Publisher<Success> insertOne = eventCollection.insertOne(mongoEventEntity);
-      return Mono.from(insertOne)
-          .map(success -> Optional.of(success == Success.SUCCESS));
+      Publisher<InsertOneResult> insertOneResultPublisher = eventCollection.insertOne(mongoEventEntity);
+      return Mono.from(insertOneResultPublisher)
+              .map(result -> Optional.of(result.wasAcknowledged()));
+
     }
 
     LOGGER.info("expected version did not match current version: expected version: {}, current version: {}",
@@ -127,9 +128,9 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
             Try<MongoEventEntity> mongoEventEntities = create(aggregateId, event, expectedVersion);
             MongoEventEntity mongoEventEntity = mongoEventEntities
                 .getOrElseThrow(() -> new EventPersistenceException("failed to convert event to be persisted"));
-            Publisher<Success> insertOne = eventCollection.insertOne(mongoEventEntity);
+            Publisher<InsertOneResult> insertOne = eventCollection.insertOne(mongoEventEntity);
             return Mono.from(insertOne)
-                .map(success -> Optional.of(success == Success.SUCCESS));
+                .map(result -> Optional.of(result.wasAcknowledged()));
           }
           LOGGER.info("expected version did not match current version: expected version: {}, current version: {}",
               expectedVersion, nextVersion);
@@ -153,7 +154,7 @@ public class MongoEventStoreRepositoryImpl implements MongoEventStoreRepository 
         .version(expectedVersion)
         .createdAt(event.getCreatedAt())
         .addEvents(e)
-        .streamName("ClassifiedAd:" + aggregateId.toString())
+        .streamName("ClassifiedAd:" + aggregateId)
         .build());
   }
 

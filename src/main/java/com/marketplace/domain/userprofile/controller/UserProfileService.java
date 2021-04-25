@@ -1,7 +1,7 @@
 package com.marketplace.domain.userprofile.controller;
 
-import com.marketplace.domain.classifiedad.CommandHandlerResult;
-import com.marketplace.domain.classifiedad.ImmutableCommandHandlerResult;
+import com.marketplace.cqrs.command.CommandHandlerResult;
+import com.marketplace.cqrs.command.ImmutableCommandHandlerResult;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;

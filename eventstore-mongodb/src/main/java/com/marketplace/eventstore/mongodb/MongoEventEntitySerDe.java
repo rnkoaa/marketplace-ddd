@@ -1,13 +1,14 @@
 package com.marketplace.eventstore.mongodb;
 
 import com.google.common.base.Strings;
-import com.marketplace.eventstore.framework.event.ImmutableTypedEvent;
-import com.marketplace.eventstore.framework.event.TypedEvent;
-import java.time.Instant;
+
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import com.marketplace.cqrs.event.ImmutableTypedEvent;
+import com.marketplace.cqrs.event.TypedEvent;
 import org.bson.Document;
 
 public class MongoEventEntitySerDe {

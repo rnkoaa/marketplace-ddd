@@ -5,10 +5,8 @@ import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.domain.userprofile.entity.ImmutableUserProfileEntity.Builder;
-import com.marketplace.framework.Strings;
-import com.marketplace.mongo.entity.MongoEntity;
+import com.marketplace.cqrs.framework.Strings;
 import java.util.Optional;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,7 +15,7 @@ import org.immutables.value.Value.Immutable;
 
 @Entity
 @Immutable
-public abstract class UserProfileEntity implements MongoEntity {
+public abstract class UserProfileEntity  {
 
   @Id
   public abstract UUID getId();
@@ -47,12 +45,10 @@ public abstract class UserProfileEntity implements MongoEntity {
     return userProfileEntityBuilder.build();
   }
 
-  @BsonIgnore
   public FullName fullName() {
     return new FullName(getFirstName(), getMiddleName(), getLastName());
   }
 
-  @BsonIgnore
   public DisplayName displayName() {
     return new DisplayName(getDisplayName());
   }
@@ -78,10 +74,4 @@ public abstract class UserProfileEntity implements MongoEntity {
     return builder.build();
   }
 
-  // TODO use compile time error to validate that BsonIgnore is required here
-  @BsonIgnore
-  @Override
-  public String getCollection() {
-    return UserProfile.class.getSimpleName().toLowerCase();
-  }
 }

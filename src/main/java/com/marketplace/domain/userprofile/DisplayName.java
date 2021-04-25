@@ -1,6 +1,6 @@
 package com.marketplace.domain.userprofile;
 
-import com.marketplace.framework.Strings;
+import com.marketplace.cqrs.framework.Strings;
 
 public record DisplayName(String value) {
     public DisplayName {

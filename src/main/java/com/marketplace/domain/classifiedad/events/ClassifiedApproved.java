@@ -1,10 +1,9 @@
 package com.marketplace.domain.classifiedad.events;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.marketplace.event.VersionedEvent;
-import com.marketplace.eventstore.framework.event.Event;
+import com.marketplace.cqrs.event.VersionedEvent;
+
 import java.util.UUID;
 import org.immutables.value.Value.Immutable;
 

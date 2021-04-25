@@ -3,7 +3,7 @@ package com.marketplace.server;
 import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.domain.classifiedad.CommandHandlerResult;
+import com.marketplace.cqrs.command.CommandHandlerResult;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
@@ -49,7 +49,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
         response.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
         response.type(MEDIA_APPLICATION_JSON);
         response.status(201);
-        response.header("Location", String.format("/classified_ad/%s", createAdResponse.get().toString()));
+        response.header("Location", String.format("/classified_ad/%s", createAdResponse.get()));
         return NO_CONTENT;
       } else {
         Map<String, Object> resMessage = Map.of(

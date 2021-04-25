@@ -2,17 +2,6 @@ plugins {
     id 'java'
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
-
-    // has issues with preview-features
-//    toolchain {
-//        languageVersion = JavaLanguageVersion.of(15)
-//    }
-}
-
-
 group 'com.marketplace.common.mongo'
 version '1.0.0-SNAPSHOT'
 
@@ -21,7 +10,6 @@ repositories {
     mavenCentral()
 }
 
-
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -29,14 +17,14 @@ configurations {
 }
 
 dependencies {
-    compile project(":config")
-    compile project(":common")
+    implementation project(":libs:config")
+    implementation project(":libs:common")
 
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("org.slf4j:slf4j-log4j12:1.7.30")
 
-    compileOnly('org.projectlombok:lombok:1.18.16')
-    annotationProcessor('org.projectlombok:lombok:1.18.16')
+    compileOnly("org.projectlombok:lombok:${lombokVersion}")
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 
     // 2.11.3
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
@@ -60,7 +48,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
     testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
 
-    testCompile project(":common-test")
+    testImplementation project(":libs:common-test")
     testImplementation("org.testcontainers:junit-jupiter:1.15.0")
     testImplementation("org.testcontainers:mongodb:1.15.0")
 }
@@ -82,3 +70,6 @@ tasks.withType(JavaExec) {
     jvmArgs += "--enable-preview"
 }
 
+//processIntegrationResources {
+//    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+//}

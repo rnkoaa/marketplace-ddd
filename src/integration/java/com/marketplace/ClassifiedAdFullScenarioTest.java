@@ -21,6 +21,7 @@ import com.marketplace.domain.shared.UserId;
 import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -28,6 +29,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+@Disabled
 public class ClassifiedAdFullScenarioTest extends BaseMongoRepositoryTest {
 
   UUID classifiedAdIdUuid = UUID.fromString("d0b00201-a612-423d-969e-96f182468514");

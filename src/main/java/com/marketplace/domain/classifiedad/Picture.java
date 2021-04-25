@@ -8,10 +8,11 @@ import com.marketplace.domain.classifiedad.events.ImmutableClassifiedAdPictureRe
 import com.marketplace.domain.classifiedad.events.PictureAddedToAClassifiedAd;
 import com.marketplace.domain.shared.IdGenerator;
 import com.marketplace.domain.shared.IdGeneratorImpl;
-import com.marketplace.event.EventId;
-import com.marketplace.event.VersionedEvent;
-import com.marketplace.framework.Entity;
-import com.marketplace.framework.EventApplier;
+import com.marketplace.cqrs.event.Event;
+import com.marketplace.cqrs.event.EventId;
+import com.marketplace.cqrs.event.VersionedEvent;
+import com.marketplace.cqrs.framework.Entity;
+import com.marketplace.cqrs.framework.EventApplier;
 
 public class Picture extends Entity<EventId, VersionedEvent> {
 
@@ -62,9 +63,9 @@ public class Picture extends Entity<EventId, VersionedEvent> {
   public void resize(PictureSize newSize) {
     apply(ImmutableClassifiedAdPictureResized.builder()
         .id(idGenerator.newUUID())
-        .aggregateId(this.parentId.value())
-        .classifiedAdId(this.parentId.value())
-        .pictureId(this.id.value())
+        .aggregateId(this.parentId.id())
+        .classifiedAdId(this.parentId.id())
+        .pictureId(this.id.id())
         .height(newSize.height())
         .width(newSize.width())
         .build());

@@ -1,30 +1,29 @@
 package com.marketplace.domain.shared;
 
-
 import java.util.UUID;
 
-public record UserId(UUID value) {
+public record UserId(UUID id) {
 
-  public UserId {
-    if (value == null) {
-      throw new IllegalArgumentException("value cannot be null");
+    public UserId {
+        if (id == null) {
+            throw new IllegalArgumentException("id cannot be null");
+        }
     }
-  }
 
-  public static UserId newId() {
-    return new UserId(UUID.randomUUID());
-  }
+    public static UserId newId() {
+        return new UserId(UUID.randomUUID());
+    }
 
-  public static UserId from(UUID value) {
-    return new UserId(value);
-  }
+    public static UserId from(UUID id) {
+        return new UserId(id);
+    }
 
-  @Override
-  public String toString() {
-    return value.toString();
-  }
+    public static UserId from(String uuid) {
+        return new UserId(UUID.fromString(uuid));
+    }
 
-  public static UserId fromString(String value) {
-    return new UserId(UUID.fromString(value));
-  }
+    @Override
+    public String toString() {
+        return id.toString();
+    }
 }
