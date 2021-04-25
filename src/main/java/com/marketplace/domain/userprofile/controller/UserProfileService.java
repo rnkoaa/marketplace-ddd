@@ -26,7 +26,7 @@ public class UserProfileService {
     UserProfile saved = userProfileRepository.add(userProfile);
     if (saved != null) {
       return ImmutableCommandHandlerResult.<CreateUserProfileResult>builder()
-          .result(ImmutableCreateUserProfileResult.builder().id(userId.value()).build())
+          .result(ImmutableCreateUserProfileResult.builder().id(userId.id()).build())
           .isSuccessful(true)
           .build();
     }

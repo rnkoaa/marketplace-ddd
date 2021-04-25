@@ -1,17 +1,8 @@
 package com.marketplace.eventsourcing;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.event.VersionedEvent;
-import com.marketplace.eventstore.framework.event.EventStore;
-import com.marketplace.framework.AggregateRoot;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import javax.inject.Inject;
-import reactor.core.publisher.Mono;
+public class AggregateStoreImpl /*implements AggregateStore<AggregateRoot<VersionedEvent>, UUID>*/ {
 
-public class AggregateStoreImpl implements AggregateStore<AggregateRoot<VersionedEvent>, UUID> {
-
+    /*
   private final ObjectMapper objectMapper;
   private final EventStore<VersionedEvent> eventStore;
 
@@ -40,4 +31,6 @@ public class AggregateStoreImpl implements AggregateStore<AggregateRoot<Versione
   public Mono<Optional<AggregateRoot<VersionedEvent>>> load(UUID aggregateId) {
     return null;
   }
+
+     */
 }

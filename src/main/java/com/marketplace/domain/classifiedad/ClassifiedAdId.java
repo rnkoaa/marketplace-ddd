@@ -2,10 +2,10 @@ package com.marketplace.domain.classifiedad;
 
 import java.util.UUID;
 
-public record ClassifiedAdId(UUID value) {
+public record ClassifiedAdId(UUID id) {
 
   public ClassifiedAdId {
-    if (value == null) {
+    if (id == null) {
       throw new IllegalArgumentException("id cannot be null");
     }
   }
@@ -24,7 +24,7 @@ public record ClassifiedAdId(UUID value) {
 
   @Override
   public String toString() {
-    return value.toString();
+    return id.toString();
   }
 
   public static ClassifiedAdId fromString(String value) {

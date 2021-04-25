@@ -10,7 +10,6 @@ import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.controller.UpdateClassifiedAdResponse;
-import com.marketplace.eventstore.framework.event.Event;
 import io.vavr.control.Try;
 import java.util.List;
 import java.util.Map;

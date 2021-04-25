@@ -77,9 +77,9 @@ public class SparkServer {
     Spark.get(
         "/classified_ad/:classifiedAdId", classifiedAdQuerySparkRoutes.findClassifiedAdById());
 
-    Spark.get(
-        "/classified_ad/:classifiedAdId/events", classifiedAdQuerySparkRoutes.findClassifiedAdEventsById());
-
+//    Spark.get(
+//        "/classified_ad/:classifiedAdId/events", classifiedAdQuerySparkRoutes.findClassifiedAdEventsById());
+//
 
     Spark.get("/classified_ad/myads", classifiedAdQuerySparkRoutes.findAll());
 

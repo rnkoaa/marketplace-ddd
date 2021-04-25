@@ -2,10 +2,10 @@ package com.marketplace.domain;
 
 import java.util.UUID;
 
-public record PictureId(UUID value) {
+public record PictureId(UUID id) {
 
   public PictureId {
-    if (value == null) {
+    if (id == null) {
       throw new IllegalArgumentException("value cannot be null");
     }
   }
@@ -16,7 +16,7 @@ public record PictureId(UUID value) {
 
   @Override
   public String toString() {
-    return value.toString();
+    return id.toString();
   }
 
   public static PictureId fromString(String value) {

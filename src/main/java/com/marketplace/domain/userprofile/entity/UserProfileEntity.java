@@ -32,7 +32,7 @@ public abstract class UserProfileEntity  {
 
   public static UserProfileEntity create(UserProfile entity) {
     var userProfileEntityBuilder = ImmutableUserProfileEntity.builder()
-        .id(entity.getId().value())
+        .id(entity.getId().id())
         .firstName(entity.getFullName().firstName())
         .lastName(entity.getFullName().lastName())
         .middleName(entity.getFullName().middleName())
@@ -63,7 +63,7 @@ public abstract class UserProfileEntity  {
 
   public static UserProfileEntity from(UserProfile userProfile) {
     Builder builder = ImmutableUserProfileEntity.builder()
-        .id(userProfile.getId().value())
+        .id(userProfile.getId().id())
         .firstName(userProfile.getFullName().firstName())
         .middleName(userProfile.getFullName().middleName())
         .lastName(userProfile.getFullName().lastName())
