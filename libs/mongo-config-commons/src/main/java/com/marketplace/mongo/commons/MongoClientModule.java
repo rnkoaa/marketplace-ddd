@@ -1,6 +1,5 @@
 package com.marketplace.mongo.commons;
 
-import com.marketplace.common.config.MongoConfig;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;

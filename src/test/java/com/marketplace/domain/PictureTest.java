@@ -27,6 +27,5 @@ public class PictureTest {
         var classifiedAd = new ClassifiedAd(new ClassifiedAdId(UUID.randomUUID()), new UserId(UUID.randomUUID()));
         Picture picture = classifiedAd.createPicture(new PictureSize(800, 600), "", 0);
         assertThat(picture.hasCorrectSize()).isTrue();
-
     }
 }

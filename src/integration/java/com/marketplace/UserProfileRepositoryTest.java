@@ -1,12 +1,11 @@
 package com.marketplace;
 
-import com.marketplace.common.config.MongoConfig;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 import com.marketplace.config.ApplicationConfig;
 import com.marketplace.config.ConfigLoader;
-import com.marketplace.config.ImmutableApplicationConfig;
 import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
-import com.marketplace.context.mongo.MongoConfigModule;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.UserProfile;
@@ -14,24 +13,17 @@ import com.marketplace.domain.userprofile.controller.CreateUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.UpdateUserProfileCommand;
 import com.marketplace.domain.userprofile.repository.UserProfileRepository;
 import com.marketplace.fixtures.UserProfileFixture;
-import com.mongodb.client.MongoClient;
-import org.junit.Ignore;
+import java.io.IOException;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-
 @Disabled
 public class UserProfileRepositoryTest extends AbstractContainerInitializer {
 
   String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
-  MongoConfig mongoConfig;
-  MongoClient mongoClient;
   ApplicationContext context;
   UserProfileRepository userProfileRepository;
 
@@ -44,9 +36,9 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
 
     String hosts = mongoDBContainer.getHost();
     int port = mongoDBContainer.getMappedPort(27017);
-    mongoConfig = new MongoConfig(hosts, "test_db", port);
-    config = ImmutableApplicationConfig.copyOf(config).withMongo(mongoConfig);
-    mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
+//    mongoConfig = new MongoConfig(hosts, "test_db", port);
+//    config = ImmutableApplicationConfig.copyOf(config).withMongo(mongoConfig);
+//    mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
     userProfileRepository = context.getUserProfileRepository();
   }
 
@@ -65,7 +57,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
     assertThat(command.getLastName()).isNotBlank();
 
     UserProfile userProfile =
-        new UserProfile(UserId.fromString(insertId), command.fullName(), command.displayName());
+        new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
     UserProfile add = userProfileRepository.add(userProfile);
 
@@ -82,7 +74,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
     assertThat(command.getLastName()).isNotBlank();
 
     UserProfile userProfile =
-        new UserProfile(UserId.fromString(insertId), command.fullName(), command.displayName());
+        new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
     UserProfile add = userProfileRepository.add(userProfile);
 
@@ -110,7 +102,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
 
     UserProfile userProfile =
         new UserProfile(
-            UserId.fromString(insertId),
+            UserId.from(insertId),
             createUserProfileCmd.fullName(),
             new DisplayName(createUserProfileCmd.getDisplayName()));
 
@@ -142,7 +134,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
     assertThat(command.getLastName()).isNotBlank();
 
     UserProfile userProfile =
-        new UserProfile(UserId.fromString(insertId), command.fullName(), command.displayName());
+        new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
     UserProfile add = userProfileRepository.add(userProfile);
 

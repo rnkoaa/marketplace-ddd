@@ -6,7 +6,5 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class ApplicationConfig {
-  private MongoConfig mongo = new MongoConfig();
 }

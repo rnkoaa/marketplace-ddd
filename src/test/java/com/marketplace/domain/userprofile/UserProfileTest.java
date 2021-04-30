@@ -10,7 +10,7 @@ class UserProfileTest {
 
     @Test
     void createUserProfileResultsInOneEvent() {
-        var userProfile = new UserProfile(UserId.fromString(userIdStr),
+        var userProfile = new UserProfile(UserId.from(userIdStr),
                 new FullName("Hello", "A", "world"),
                 new DisplayName("user"));
 
@@ -19,7 +19,7 @@ class UserProfileTest {
 
     @Test
     void fullNameCanBeUpdated() {
-        var userProfile = new UserProfile(UserId.fromString(userIdStr),
+        var userProfile = new UserProfile(UserId.from(userIdStr),
                 new FullName("Hello", "A", "world"),
                 new DisplayName("user"));
 
@@ -31,7 +31,7 @@ class UserProfileTest {
 
     @Test
     void displayNameCanBeUpdated() {
-        var userProfile = new UserProfile(UserId.fromString(userIdStr),
+        var userProfile = new UserProfile(UserId.from(userIdStr),
                 new FullName("Hello", "A", "world"),
                 new DisplayName("user"));
 
@@ -42,7 +42,7 @@ class UserProfileTest {
     }
     @Test
     void photoUrlCanBeUpdated() {
-        var userProfile = new UserProfile(UserId.fromString(userIdStr),
+        var userProfile = new UserProfile(UserId.from(userIdStr),
                 new FullName("Hello", "A", "world"),
                 new DisplayName("user"));
 
@@ -54,7 +54,7 @@ class UserProfileTest {
 
     @Test
     void allEvents() {
-        var userProfile = new UserProfile(UserId.fromString(userIdStr),
+        var userProfile = new UserProfile(UserId.from(userIdStr),
                 new FullName("Hello", "A", "world"),
                 new DisplayName("user"));
 

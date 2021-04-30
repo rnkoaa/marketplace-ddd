@@ -1,7 +1,6 @@
 package com.marketplace.mongo.commons;
 
 import com.marketplace.common.config.ApplicationConfig;
-import com.marketplace.common.config.MongoConfig;
 import com.marketplace.config.ConfigLoader;
 import dagger.Module;
 import dagger.Provides;
