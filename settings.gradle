@@ -11,3 +11,5 @@ include ':libs:cqrs-domain'
 
 //include 'libs:mongo-config-commons'
 //include 'eventstore-mongodb'
+include 'eventstore-sqlite'
+
