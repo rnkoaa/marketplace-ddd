@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'nu.studer.jooq' version '5.2.1'
 }
 
 group 'com.marketplace'
@@ -16,6 +17,11 @@ dependencies {
     implementation project(":eventstore")
 
     implementation "io.projectreactor:reactor-core:${projectReactorVersion}"
+
+//    jooqRuntime "org.jooq:jooq-meta-extensions:$jooqVersion"
+    jooqGenerator "org.xerial:sqlite-jdbc:$sqliteVersion"
+    jooqGenerator "org.jooq:jooq-meta-extensions:$jooqVersion"
+
 
     // 2.11.3
     implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
@@ -35,4 +41,60 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+jooq {
+    version = '3.14.7'  // the default (can be omitted)
+    edition = nu.studer.gradle.jooq.JooqEdition.OSS  // the default (can be omitted)
+
+    configurations {
+        main {  // name of the jOOQ configuration
+            generateSchemaSourceOnCompilation = true  // default (can be omitted)
+
+            generationTool {
+                logging = org.jooq.meta.jaxb.Logging.WARN
+//                jdbc {
+//                    driver = 'org.sqlite.JDBC'
+//                    url = 'jdbc:sqlite:src/main/resources/db/eventstore.db'
+//                }
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = "org.jooq.meta.extensions.ddl.DDLDatabase"
+                        properties {
+                            property {
+                                key = "scripts"
+                                value = "src/main/resources/db/schema.sql"
+                            }
+                            property {
+                                key = "sort"
+                                value = "semantic"
+                            }
+                            property {
+                                key = "parseIgnoreCommentStart"
+                                value = "[jooq ignore start]"
+                            }
+                            property {
+                                key = "parseIgnoreCommentStop"
+                                value = "[jooq ignore stop]"
+                            }
+                        }
+                    }
+                    generate {
+                        relations = true
+                        deprecated = false
+                        records = true
+                        javaTimeTypes = true
+                        immutablePojos = true
+                        fluentSetters = true
+                    }
+                    target {
+                        packageName = 'com.marketplace.eventstore.jdbc'
+                        directory = 'src/main/jooq'  // default (can be omitted)
+                    }
+                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+                }
+            }
+        }
+    }
 }
