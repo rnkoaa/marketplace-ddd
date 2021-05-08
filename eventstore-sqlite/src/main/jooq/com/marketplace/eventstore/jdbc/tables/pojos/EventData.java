@@ -20,7 +20,7 @@ public class EventData implements Serializable {
     private final String  aggregateName;
     private final String  aggregateId;
     private final String  eventType;
-    private final Integer version;
+    private final Integer eventVersion;
     private final String  data;
     private final String  created;
 
@@ -30,7 +30,7 @@ public class EventData implements Serializable {
         this.aggregateName = value.aggregateName;
         this.aggregateId = value.aggregateId;
         this.eventType = value.eventType;
-        this.version = value.version;
+        this.eventVersion = value.eventVersion;
         this.data = value.data;
         this.created = value.created;
     }
@@ -41,7 +41,7 @@ public class EventData implements Serializable {
         String  aggregateName,
         String  aggregateId,
         String  eventType,
-        Integer version,
+        Integer eventVersion,
         String  data,
         String  created
     ) {
@@ -50,7 +50,7 @@ public class EventData implements Serializable {
         this.aggregateName = aggregateName;
         this.aggregateId = aggregateId;
         this.eventType = eventType;
-        this.version = version;
+        this.eventVersion = eventVersion;
         this.data = data;
         this.created = created;
     }
@@ -91,10 +91,10 @@ public class EventData implements Serializable {
     }
 
     /**
-     * Getter for <code>EVENT_DATA.VERSION</code>.
+     * Getter for <code>EVENT_DATA.EVENT_VERSION</code>.
      */
-    public Integer getVersion() {
-        return this.version;
+    public Integer getEventVersion() {
+        return this.eventVersion;
     }
 
     /**
@@ -120,7 +120,7 @@ public class EventData implements Serializable {
         sb.append(", ").append(aggregateName);
         sb.append(", ").append(aggregateId);
         sb.append(", ").append(eventType);
-        sb.append(", ").append(version);
+        sb.append(", ").append(eventVersion);
         sb.append(", ").append(data);
         sb.append(", ").append(created);
 

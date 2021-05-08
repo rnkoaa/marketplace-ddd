@@ -97,17 +97,17 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
     }
 
     /**
-     * Setter for <code>EVENT_DATA.VERSION</code>.
+     * Setter for <code>EVENT_DATA.EVENT_VERSION</code>.
      */
-    public EventDataRecord setVersion(Integer value) {
+    public EventDataRecord setEventVersion(Integer value) {
         set(5, value);
         return this;
     }
 
     /**
-     * Getter for <code>EVENT_DATA.VERSION</code>.
+     * Getter for <code>EVENT_DATA.EVENT_VERSION</code>.
      */
-    public Integer getVersion() {
+    public Integer getEventVersion() {
         return (Integer) get(5);
     }
 
@@ -191,7 +191,7 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
 
     @Override
     public Field<Integer> field6() {
-        return EventData.EVENT_DATA.VERSION;
+        return EventData.EVENT_DATA.EVENT_VERSION;
     }
 
     @Override
@@ -231,7 +231,7 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
 
     @Override
     public Integer component6() {
-        return getVersion();
+        return getEventVersion();
     }
 
     @Override
@@ -271,7 +271,7 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
 
     @Override
     public Integer value6() {
-        return getVersion();
+        return getEventVersion();
     }
 
     @Override
@@ -316,7 +316,7 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
 
     @Override
     public EventDataRecord value6(Integer value) {
-        setVersion(value);
+        setEventVersion(value);
         return this;
     }
 
@@ -359,7 +359,7 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
     /**
      * Create a detached, initialised EventDataRecord
      */
-    public EventDataRecord(Integer id, String eventId, String aggregateName, String aggregateId, String eventType, Integer version, String data, String created) {
+    public EventDataRecord(Integer id, String eventId, String aggregateName, String aggregateId, String eventType, Integer eventVersion, String data, String created) {
         super(EventData.EVENT_DATA);
 
         setId(id);
@@ -367,7 +367,7 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
         setAggregateName(aggregateName);
         setAggregateId(aggregateId);
         setEventType(eventType);
-        setVersion(version);
+        setEventVersion(eventVersion);
         setData(data);
         setCreated(created);
     }

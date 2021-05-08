@@ -129,7 +129,7 @@ jooq {
                             }
                             property {
                                 key = "parseIgnoreCommentStop"
-                                value = "[jooq ignore stop]"
+                                value = "[jooq ignore end]"
                             }
                         }
                     }

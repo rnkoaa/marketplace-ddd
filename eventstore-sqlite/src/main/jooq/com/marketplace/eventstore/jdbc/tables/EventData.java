@@ -73,9 +73,9 @@ public class EventData extends TableImpl<EventDataRecord> {
     public final TableField<EventDataRecord, String> EVENT_TYPE = createField(DSL.name("EVENT_TYPE"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
-     * The column <code>EVENT_DATA.VERSION</code>.
+     * The column <code>EVENT_DATA.EVENT_VERSION</code>.
      */
-    public final TableField<EventDataRecord, Integer> VERSION = createField(DSL.name("VERSION"), SQLDataType.INTEGER, this, "");
+    public final TableField<EventDataRecord, Integer> EVENT_VERSION = createField(DSL.name("EVENT_VERSION"), SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>EVENT_DATA.DATA</code>.

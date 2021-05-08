@@ -35,7 +35,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     public List<Event> load(UUID aggregateId, int fromVersion) {
         Result<EventDataRecord> fetch = dslContext.selectFrom(Tables.EVENT_DATA)
             .where(Tables.EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString())
-                .and(Tables.EVENT_DATA.VERSION.ge(fromVersion)))
+                .and(Tables.EVENT_DATA.EVENT_VERSION.ge(fromVersion)))
             .fetch();
         return fetch.stream()
             .map(eventRecordRecord -> {
@@ -92,7 +92,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         EventDataRecord eventRecordRecord = new EventDataRecord()
             .setEventId(event.getId().toString())
             .setAggregateId(event.getAggregateId().toString())
-            .setVersion((int) event.getVersion())
+            .setEventVersion((int) event.getVersion())
             .setData(eventData)
             .setCreated(event.getCreatedAt().toString());
 
@@ -135,7 +135,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         EventDataRecord eventRecordRecord = new EventDataRecord()
             .setEventId(event.getId().toString())
             .setAggregateId(event.getAggregateId().toString())
-            .setVersion(version)
+            .setEventVersion(version)
             .setData(eventData)
             .setCreated(event.getCreatedAt().toString());
 
@@ -157,13 +157,13 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
     @Override
     public Integer getVersion(UUID aggregateId) {
-        Record1<Integer> integerRecord = dslContext.select(DSL.max(Tables.EVENT_DATA.VERSION))
+        Record1<Integer> integerRecord = dslContext.select(DSL.max(Tables.EVENT_DATA.EVENT_VERSION))
             .where(Tables.EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString()))
             .fetchOne();
 
         if (integerRecord != null) {
 //            return Mono.just();
-            return integerRecord.get(Tables.EVENT_DATA.VERSION);
+            return integerRecord.get(Tables.EVENT_DATA.EVENT_VERSION);
         }
         return -1;
     }
@@ -171,9 +171,9 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     @Override
     public Long countEvents(UUID aggregateId) {
 //        return Mono.just(
-            return (long) dslContext.fetchCount(
-                dslContext.selectFrom(Tables.EVENT_DATA)
-                    .where(Tables.EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString())));
+        return (long) dslContext.fetchCount(
+            dslContext.selectFrom(Tables.EVENT_DATA)
+                .where(Tables.EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString())));
 //            )
 //        ).map(Long::valueOf);
     }
