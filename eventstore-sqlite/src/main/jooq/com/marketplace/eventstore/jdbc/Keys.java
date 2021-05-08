@@ -4,8 +4,8 @@
 package com.marketplace.eventstore.jdbc;
 
 
-import com.marketplace.eventstore.jdbc.tables.EventRecord;
-import com.marketplace.eventstore.jdbc.tables.records.EventRecordRecord;
+import com.marketplace.eventstore.jdbc.tables.EventData;
+import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
 
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -24,5 +24,5 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<EventRecordRecord> CONSTRAINT_6 = Internal.createUniqueKey(EventRecord.EVENT_RECORD, DSL.name("CONSTRAINT_6"), new TableField[] { EventRecord.EVENT_RECORD.ID }, true);
+    public static final UniqueKey<EventDataRecord> CONSTRAINT_5 = Internal.createUniqueKey(EventData.EVENT_DATA, DSL.name("CONSTRAINT_5"), new TableField[] { EventData.EVENT_DATA.ID }, true);
 }

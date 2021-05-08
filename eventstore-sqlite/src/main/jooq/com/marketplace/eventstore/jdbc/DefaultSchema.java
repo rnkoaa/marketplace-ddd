@@ -4,7 +4,7 @@
 package com.marketplace.eventstore.jdbc;
 
 
-import com.marketplace.eventstore.jdbc.tables.EventRecord;
+import com.marketplace.eventstore.jdbc.tables.EventData;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,9 +28,9 @@ public class DefaultSchema extends SchemaImpl {
     public static final DefaultSchema DEFAULT_SCHEMA = new DefaultSchema();
 
     /**
-     * The table <code>EVENT_RECORD</code>.
+     * The table <code>EVENT_DATA</code>.
      */
-    public final EventRecord EVENT_RECORD = EventRecord.EVENT_RECORD;
+    public final EventData EVENT_DATA = EventData.EVENT_DATA;
 
     /**
      * No further instances allowed
@@ -48,6 +48,6 @@ public class DefaultSchema extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.<Table<?>>asList(
-            EventRecord.EVENT_RECORD);
+            EventData.EVENT_DATA);
     }
 }

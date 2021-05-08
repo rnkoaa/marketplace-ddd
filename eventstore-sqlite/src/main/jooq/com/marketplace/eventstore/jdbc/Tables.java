@@ -4,7 +4,7 @@
 package com.marketplace.eventstore.jdbc;
 
 
-import com.marketplace.eventstore.jdbc.tables.EventRecord;
+import com.marketplace.eventstore.jdbc.tables.EventData;
 
 
 /**
@@ -14,7 +14,7 @@ import com.marketplace.eventstore.jdbc.tables.EventRecord;
 public class Tables {
 
     /**
-     * The table <code>EVENT_RECORD</code>.
+     * The table <code>EVENT_DATA</code>.
      */
-    public static final EventRecord EVENT_RECORD = EventRecord.EVENT_RECORD;
+    public static final EventData EVENT_DATA = EventData.EVENT_DATA;
 }

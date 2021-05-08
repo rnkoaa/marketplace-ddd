@@ -1,0 +1,206 @@
+package com.marketplace.eventstore.framework;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+public sealed abstract class Result<T> {
+
+    public abstract Result<T> filter(Predicate<T> p, String message);
+
+    public abstract <U> Result<U> map(Function<T, U> func);
+
+    public abstract <U> Result<U> flatmap(Function<T, Result<U>> func);
+
+    public abstract T orElse(T defaultValue);
+
+    public abstract T orElse(Supplier<T> defaultValue);
+
+    public abstract void then(Consumer<T> defaultValue);
+
+    public static <T> Result<T> of(final T value) {
+        return of(value, "null value");
+    }
+
+    public static <T> Result<T> of(final T value, final String message) {
+        return value != null ? success(value) : error(message);
+    }
+
+    public static <T> Result<T> ofNullable(final T value) {
+        return value != null ? success(value) : empty();
+    }
+
+    public static <T> Result<T> success(T value) {
+        return new Success<>(value);
+    }
+
+    public static <T> Result<T> error(Exception ex) {
+        return new Failure<>(ex);
+    }
+
+    public static <T> Result<T> error(String message) {
+        return new Failure<>(message);
+    }
+
+    public static <T> Result<T> error(String message, Exception ex) {
+        return new Failure<>(new Exception(message, ex));
+    }
+
+    public static <T> Result<T> failure(Failure<T> failure) {
+        return new Failure<>(failure.exception);
+    }
+
+    public static <T> Result<T> empty() {
+        return new Empty<>();
+    }
+
+    public final static class Success<T> extends Result<T> {
+
+        private final T value;
+
+        private Success(T value) {
+            this.value = value;
+        }
+
+        @Override
+        public Result<T> filter(Predicate<T> p, String message) {
+            try {
+                return p.test(this.value) ? success(this.value) : error(message);
+            } catch (Exception ex) {
+                return error(ex);
+            }
+        }
+
+        @Override
+        public <U> Result<U> map(Function<T, U> func) {
+            try {
+                return success(func.apply(this.value));
+            } catch (Exception ex) {
+                return error(ex);
+            }
+        }
+
+        @Override
+        public <U> Result<U> flatmap(Function<T, Result<U>> func) {
+            try {
+                return func.apply(this.value);
+            } catch (Exception ex) {
+                return error(ex);
+            }
+        }
+
+        @Override
+        public T orElse(T defaultValue) {
+            return this.value;
+        }
+
+        @Override
+        public T orElse(Supplier<T> defaultValue) {
+            return this.value;
+        }
+
+        @Override
+        public void then(Consumer<T> consumer) {
+            try {
+                consumer.accept(this.value);
+            } catch (Exception ex) {
+                // handle error consume
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "Success{" +
+                "value=" + value +
+                '}';
+        }
+    }
+
+    private final static class Failure<T> extends Result<T> {
+
+        private final Exception exception;
+
+        private Failure(Exception exception) {
+            this.exception = exception;
+        }
+
+        private Failure(String message) {
+            this.exception = new Exception(message);
+        }
+
+        @Override
+        public Result<T> filter(Predicate<T> p, String message) {
+            return error(this.exception);
+        }
+
+        @Override
+        public <U> Result<U> map(Function<T, U> func) {
+            return error(this.exception);
+        }
+
+        @Override
+        public <U> Result<U> flatmap(Function<T, Result<U>> func) {
+            return error(this.exception);
+        }
+
+        @Override
+        public T orElse(T defaultValue) {
+            return defaultValue;
+        }
+
+        @Override
+        public T orElse(Supplier<T> defaultValue) {
+            return defaultValue.get();
+        }
+
+        @Override
+        public void then(Consumer<T> consumer) {
+//           consumer.accept();
+        }
+
+        @Override
+        public String toString() {
+            return "Failure{" +
+                "exception=" + exception +
+                '}';
+        }
+    }
+
+    private final static class Empty<T> extends Result<T> {
+
+        private Empty() {
+
+        }
+
+        @Override
+        public Result<T> filter(Predicate<T> p, String message) {
+            return empty();
+        }
+
+        @Override
+        public <U> Result<U> map(Function<T, U> func) {
+            return empty();
+        }
+
+        @Override
+        public <U> Result<U> flatmap(Function<T, Result<U>> func) {
+            return empty();
+        }
+
+        @Override
+        public T orElse(T defaultValue) {
+            return defaultValue;
+        }
+
+        @Override
+        public T orElse(Supplier<T> defaultValue) {
+            return defaultValue.get();
+        }
+
+        @Override
+        public void then(Consumer<T> consumer) {
+
+        }
+    }
+}
