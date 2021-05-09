@@ -1,28 +1,29 @@
 package com.marketplace.eventstore.jdbc;
 
+import static com.marketplace.eventstore.jdbc.Tables.EVENT_DATA;
+import static org.jooq.impl.DSL.countDistinct;
+import static org.jooq.impl.DSL.max;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.common.ObjectMapperBuilder;
 import com.marketplace.cqrs.event.Event;
+import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jooq.DSLContext;
+import org.jooq.InsertResultStep;
 import org.jooq.Record1;
-import org.jooq.Result;
+//import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Mono;
 
 public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
-    Map<String, Class<Event>> eventClassCache = new HashMap<>();
+    EventClassCache eventClassCache = EventClassCache.getInstance();
     private final ObjectMapper objectMapper = new ObjectMapperBuilder().build();
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcEventStoreRepositoryImpl.class);
     private final DSLContext dslContext;
@@ -33,78 +34,123 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
     @Override
     public List<Event> load(UUID aggregateId, int fromVersion) {
-        Result<EventDataRecord> fetch = dslContext.selectFrom(Tables.EVENT_DATA)
-            .where(Tables.EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString())
-                .and(Tables.EVENT_DATA.EVENT_VERSION.ge(fromVersion)))
+        org.jooq.Result<EventDataRecord> fetch = dslContext.selectFrom(EVENT_DATA)
+            .where(EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString())
+                .and(EVENT_DATA.EVENT_VERSION.ge(fromVersion)))
             .fetch();
-        return fetch.stream()
-            .map(eventRecordRecord -> {
-                String data = eventRecordRecord.getData();
-                String eventType = eventRecordRecord.getEventType();
-                Class<Event> aClass = eventClassCache.get(eventType);
-                if (aClass == null) {
-                    return null;
-                }
-                try {
-                    return objectMapper.readValue(data, aClass);
-                } catch (JsonProcessingException e) {
-                    return null;
-                }
-            })
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+
+        return List.of();
+//        return fetch.stream()
+//            .map(eventRecordRecord -> {
+//                String data = eventRecordRecord.getData();
+//                String eventType = eventRecordRecord.getEventType();
+//                com.marketplace.eventstore.framework.Result<Class<?>> classResult = eventClassCache.get(eventType);
+////                Class<?> aClass = (Event)eventClassCache.get(eventType);
+//                if (aClass == null) {
+//                    return null;
+//                }
+//                try {
+//                    return objectMapper.readValue(data, aClass);
+//                } catch (JsonProcessingException e) {
+//                    return null;
+//                }
+//            })
+//            .filter(Objects::nonNull)
+//            .collect(Collectors.toList());
     }
 
     @Override
     public List<Event> load(UUID aggregateId) {
-        Result<EventDataRecord> fetch = dslContext.selectFrom(Tables.EVENT_DATA)
-            .where(Tables.EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString()))
+        org.jooq.Result<EventDataRecord> fetch = dslContext.selectFrom(EVENT_DATA)
+            .where(EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString()))
             .fetch();
-        return fetch.stream()
-            .map(eventRecordRecord -> {
-                String data = eventRecordRecord.getData();
-                String eventType = eventRecordRecord.getEventType();
-                Class<Event> aClass = eventClassCache.get(eventType);
-                if (aClass == null) {
-                    return null;
-                }
-                try {
-                    return objectMapper.readValue(data, aClass);
-                } catch (JsonProcessingException e) {
-                    return null;
-                }
-            })
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+
+        return List.of();
+//        return fetch.stream()
+//            .map(eventRecordRecord -> {
+//                String data = eventRecordRecord.getData();
+//                String eventType = eventRecordRecord.getEventType();
+//                Class<Event> aClass = eventClassCache.get(eventType);
+//                if (aClass == null) {
+//                    return null;
+//                }
+//                try {
+//                    return objectMapper.readValue(data, aClass);
+//                } catch (JsonProcessingException e) {
+//                    return null;
+//                }
+//            })
+//            .filter(Objects::nonNull)
+//            .collect(Collectors.toList());
     }
 
     @Override
     public Optional<Boolean> save(UUID aggregateId, Event event) {
-        String eventData;
-        try {
-            eventData = objectMapper.writeValueAsString(event);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-//            return Mono.error(e);
+        long expectedVersion = event.getVersion();
+        Integer latestVersion = getVersion(aggregateId);
+        if (expectedVersion != 0 && expectedVersion <= latestVersion) {
+            return Optional.empty();
+        }
+        eventClassCache.put(event.getClass());
+
+        Result<String> result = serializeJson(objectMapper, event);
+        Result<EventDataRecord> savedResult = result.map(eventData -> new EventDataRecord()
+            .setEventId(event.getId().toString())
+            .setAggregateId(event.getAggregateId().toString())
+            .setEventVersion((int) expectedVersion)
+            .setEventType(event.getClass().getSimpleName())
+            .setData(eventData)
+            .setCreated(event.getCreatedAt().toString())
+        ).map(eventDataRecord -> dslContext.insertInto(EVENT_DATA)
+            .set(eventDataRecord)
+            .returning()
+            .fetchOne()
+        );
+
+        if (!savedResult.isPresent()) {
+            return Optional.empty();
+        }
+        EventDataRecord eventDataRecord = savedResult.get();
+        Integer id = eventDataRecord.getId();
+        if (id == null) {
             return Optional.empty();
         }
 
-        EventDataRecord eventRecordRecord = new EventDataRecord()
-            .setEventId(event.getId().toString())
-            .setAggregateId(event.getAggregateId().toString())
-            .setEventVersion((int) event.getVersion())
-            .setData(eventData)
-            .setCreated(event.getCreatedAt().toString());
-
-        EventDataRecord saved = dslContext.insertInto(Tables.EVENT_DATA)
-            .set(eventRecordRecord)
-            .returning()
-            .fetchOne();
-        if (saved != null && saved.getId() > 0) {
-//            return Mono.just(Optional.of(true));
-            return Optional.of(true);
-        }
-        return Optional.empty();
+        return (id > 0) ? Optional.of(true) : Optional.empty();
+//        String eventData;
+//        try {
+//            eventData = objectMapper.writeValueAsString(event);
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//            return Optional.empty();
+//        }
+//
+//        eventClassCache.put(event.getClass());
+//
+//        EventDataRecord eventRecordRecord = new EventDataRecord()
+//            .setEventId(event.getId().toString())
+//            .setAggregateId(event.getAggregateId().toString())
+//            .setAggregateName(event.getAggregateName())
+//            .setEventVersion((int) event.getVersion())
+//            .setData(eventData)
+//            .setEventType(event.getClass().getSimpleName())
+//            .setCreated(event.getCreatedAt().toString());
+//
+//        EventDataRecord returnedEventDataRecord = dslContext.insertInto(EVENT_DATA)
+//            .set(eventRecordRecord)
+//            .returning(EVENT_DATA.ID)
+//            .fetchOne();
+//
+//        if (returnedEventDataRecord == null) {
+//            return Optional.empty();
+//        }
+//
+//        Integer id = returnedEventDataRecord.getId();
+//        if (id == null) {
+//            return Optional.empty();
+//        }
+//
+//        return (id > 0) ? Optional.of(true) : Optional.empty();
     }
 
     @Override
@@ -118,36 +164,34 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     }
 
     @Override
-    public Optional<Boolean> save(UUID aggregateId, Event event, int version) {
-////        Mono<Integer> versionMono = getVersion(aggregateId);
-////        Integer v = versionMono.block();
-//        if (v != null && v <= version) {
-//            return Optional.empty();
-//        }
-        String eventData;
-        try {
-            eventData = objectMapper.writeValueAsString(event);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+    public Optional<Boolean> save(UUID aggregateId, Event event, int expectedVersion) {
+        Integer latestVersion = getVersion(aggregateId);
+        if (expectedVersion != 0 && expectedVersion > latestVersion) {
+            return Optional.empty();
+        }
+        Result<String> result = serializeJson(objectMapper, event);
+        Result<EventDataRecord> savedResult = result.map(eventData -> new EventDataRecord()
+            .setEventId(event.getId().toString())
+            .setAggregateId(event.getAggregateId().toString())
+            .setEventVersion(expectedVersion)
+            .setData(eventData)
+            .setCreated(event.getCreatedAt().toString())
+        ).map(eventDataRecord -> dslContext.insertInto(EVENT_DATA)
+            .set(eventDataRecord)
+            .returning()
+            .fetchOne()
+        );
+
+        if (!savedResult.isPresent()) {
+            return Optional.empty();
+        }
+        EventDataRecord eventDataRecord = savedResult.get();
+        Integer id = eventDataRecord.getId();
+        if (id == null) {
             return Optional.empty();
         }
 
-        EventDataRecord eventRecordRecord = new EventDataRecord()
-            .setEventId(event.getId().toString())
-            .setAggregateId(event.getAggregateId().toString())
-            .setEventVersion(version)
-            .setData(eventData)
-            .setCreated(event.getCreatedAt().toString());
-
-        EventDataRecord saved = dslContext.insertInto(Tables.EVENT_DATA)
-            .set(eventRecordRecord)
-            .returning()
-            .fetchOne();
-        if (saved != null && saved.getId() > 0) {
-//            return Mono.just(Optional.of(true));
-            return Optional.of(true);
-        }
-        return Optional.empty();
+        return (id > 0) ? Optional.of(true) : Optional.empty();
     }
 
     @Override
@@ -157,25 +201,40 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
     @Override
     public Integer getVersion(UUID aggregateId) {
-        Record1<Integer> integerRecord = dslContext.select(DSL.max(Tables.EVENT_DATA.EVENT_VERSION))
-            .where(Tables.EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString()))
+        Record1<Integer> integerRecord1 = dslContext.select(
+            max(EVENT_DATA.EVENT_VERSION).as("event_version")
+        ).from(EVENT_DATA)
+            .where(EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString()))
             .fetchOne();
-
-        if (integerRecord != null) {
-//            return Mono.just();
-            return integerRecord.get(Tables.EVENT_DATA.EVENT_VERSION);
+        if (integerRecord1 == null) {
+            return -1;
         }
-        return -1;
+
+        Integer version = integerRecord1.get("event_version", Integer.class);
+        return (version != null) ? version : -1;
     }
 
     @Override
     public Long countEvents(UUID aggregateId) {
-//        return Mono.just(
-        return (long) dslContext.fetchCount(
-            dslContext.selectFrom(Tables.EVENT_DATA)
-                .where(Tables.EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString())));
-//            )
-//        ).map(Long::valueOf);
+        Record1<Integer> countRecord = dslContext.select(
+            countDistinct(EVENT_DATA.EVENT_ID).as("event_count")
+        ).from(EVENT_DATA)
+            .where(EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString()))
+            .fetchOne();
+
+        if (countRecord == null) {
+            return 0L;
+        }
+
+        return countRecord.get("event_count", Long.class);
+    }
+
+    private static Result<String> serializeJson(ObjectMapper objectMapper, Object object) {
+        try {
+            return Result.of(objectMapper.writeValueAsString(object));
+        } catch (JsonProcessingException e) {
+            return Result.error(e);
+        }
     }
 
     //    @Override

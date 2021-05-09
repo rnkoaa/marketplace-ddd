@@ -7,6 +7,11 @@ import java.util.function.Supplier;
 
 public sealed abstract class Result<T> {
 
+    // getError
+    // orElseThrow
+    // onSuccess
+    // onFailure
+
     public abstract Result<T> filter(Predicate<T> p, String message);
 
     public abstract <U> Result<U> map(Function<T, U> func);
@@ -18,6 +23,14 @@ public sealed abstract class Result<T> {
     public abstract T orElse(Supplier<T> defaultValue);
 
     public abstract void then(Consumer<T> defaultValue);
+
+    public static  <T> Result<T> tryOf(Supplier<T> supplier) {
+        try {
+            return Result.of(supplier.get());
+        } catch (Exception e) {
+            return Result.error(e);
+        }
+    }
 
     public static <T> Result<T> of(final T value) {
         return of(value, "null value");
@@ -54,6 +67,10 @@ public sealed abstract class Result<T> {
     public static <T> Result<T> empty() {
         return new Empty<>();
     }
+
+    public abstract boolean isPresent();
+
+    public abstract T get();
 
     public final static class Success<T> extends Result<T> {
 
@@ -109,6 +126,25 @@ public sealed abstract class Result<T> {
             }
         }
 
+//        @Override
+//        public <T> Result<T> tryOf(Supplier<T> supplier) {
+//            try {
+//                return Result.of(supplier.get());
+//            } catch (Exception e) {
+//                return Result.error(e);
+//            }
+//        }
+
+        @Override
+        public boolean isPresent() {
+            return this.value != null;
+        }
+
+        @Override
+        public T get() {
+            return this.value;
+        }
+
         @Override
         public String toString() {
             return "Success{" +
@@ -159,6 +195,21 @@ public sealed abstract class Result<T> {
 //           consumer.accept();
         }
 
+//        @Override
+//        public <T1> Result<T1> tryOf(Supplier<T1> supplier) {
+//            return null;
+//        }
+
+        @Override
+        public boolean isPresent() {
+            return false;
+        }
+
+        @Override
+        public T get() {
+           return null;
+        }
+
         @Override
         public String toString() {
             return "Failure{" +
@@ -201,6 +252,21 @@ public sealed abstract class Result<T> {
         @Override
         public void then(Consumer<T> consumer) {
 
+        }
+
+//        @Override
+//        public <T1> Result<T1> tryOf(Supplier<T1> supplier) {
+//            return null;
+//        }
+
+        @Override
+        public boolean isPresent() {
+            return false;
+        }
+
+        @Override
+        public T get() {
+            return null;
         }
     }
 }

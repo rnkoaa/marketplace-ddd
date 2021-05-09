@@ -90,6 +90,8 @@ dependencies {
     funcTestImplementation("org.assertj:assertj-core:${assertjVersion}")
     funcTestImplementation("org.mockito:mockito-core:${mockitoVersion}")
     funcTestImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
+
+    funcTestImplementation project(":eventstore-tests")
 }
 
 test {

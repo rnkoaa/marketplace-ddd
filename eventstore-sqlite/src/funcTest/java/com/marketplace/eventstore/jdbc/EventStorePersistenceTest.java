@@ -6,23 +6,14 @@ import static org.jooq.impl.DSL.countDistinct;
 import static org.jooq.impl.DSL.max;
 
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
-import org.jooq.DSLContext;
 import org.jooq.InsertResultStep;
 import org.jooq.Record1;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class EventStorePersistenceTest {
+public class EventStorePersistenceTest extends AbstractJdbcFuncTest {
 
     static String aggregateId = "f3864d92-9571-4212-8eb5-90b2f95c9739";
     static String aggregateType = "ClassifiedAd";
@@ -34,6 +25,10 @@ public class EventStorePersistenceTest {
         EventMetadata
             .of(aggregateType, "b975119e-e09e-42e7-9999-a443758f672e", aggregateId, "AddPictureToClassifiedAd", 2)
     );
+
+    public EventStorePersistenceTest() throws SQLException {
+        super();
+    }
 
     static record EventMetadata(String aggregateType,
                                 String eventId,
@@ -53,17 +48,6 @@ public class EventStorePersistenceTest {
             int version) {
             return new EventMetadata(aggregateType, eventId, aggregateId, eventType, version);
         }
-    }
-
-    private final static String CONNECTION_STRING = "jdbc:sqlite:src/funcTest/resources/db/eventstore.db";
-    private DSLContext dslContext;
-    private Connection connection;
-
-    @BeforeEach
-    void setup() throws SQLException {
-        connection = createConnection(CONNECTION_STRING);
-        dslContext = createDslContext(connection);
-        dslContext.delete(EVENT_DATA).execute();
     }
 
     @Test
@@ -186,34 +170,6 @@ public class EventStorePersistenceTest {
             .where(EVENT_DATA.AGGREGATE_ID.eq(aggregateId))
             .fetchInto(EventDataRecord.class);
         assertThat(eventDataRecords).isNotNull().hasSize(1);
-    }
-
-    @AfterEach
-    void cleanup() throws SQLException {
-        dslContext.delete(EVENT_DATA).execute();
-        closeConnection(connection);
-    }
-
-    @BeforeAll
-    static void setupAll() {
-// use flyway to seed data and create tables
-    }
-
-    @AfterAll
-    static void cleanupAll() {
-
-    }
-
-    private static Connection createConnection(final String connectionString) throws SQLException {
-        return DriverManager.getConnection(connectionString);
-    }
-
-    private static DSLContext createDslContext(Connection connection) throws SQLException {
-        return DSL.using(connection, SQLDialect.SQLITE);
-    }
-
-    private static void closeConnection(Connection connection) throws SQLException {
-        connection.close();
     }
 
     List<EventDataRecord> createMultipleEvents(List<EventMetadata> events, String aggregateId) {
