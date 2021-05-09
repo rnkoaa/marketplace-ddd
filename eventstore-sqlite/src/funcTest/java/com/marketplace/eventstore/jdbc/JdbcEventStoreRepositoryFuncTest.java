@@ -35,9 +35,9 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
     @Test
     void testSaveNewEvent() {
 
-        Optional<Boolean> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
+        Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
 
-        assertThat(save).isPresent();
+        assertThat(save.isPresent()).isTrue();
 
         List<EventDataRecord> eventDataRecords = dslContext
             .select().from(EVENT_DATA)
@@ -68,16 +68,16 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
     @Test
     void testCannotSaveTheSameEventTwice() {
 
-        Optional<Boolean> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
+        Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
 
-        assertThat(save).isPresent();
+        assertThat(save.isPresent()).isTrue();
 
         // Duplicate key since the event id is the same
 //        DataAccessException
 //        Assertions.assertThrows(DataAccessException.class, () -> {
-        Optional<Boolean> second = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
+        Result<Integer> second = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
 
-        assertThat(second).isNotPresent();
+        assertThat(second.isPresent()).isFalse();
 //        });
     }
 
@@ -88,14 +88,15 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
             .withId(UUID.fromString("c48e89e4-7219-44cf-9ae4-7df3d49fc9da"));
 
         assertThat(testCreatedEventCopy.getVersion()).isEqualByComparingTo(TestEvents.testCreatedEvent.getVersion());
-        Optional<Boolean> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
+        Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
 
-        assertThat(save).isPresent();
+        assertThat(save.isPresent()).isTrue();
+        assertThat(save.get()).isNotNull().isGreaterThan(0);
 
         // Duplicate key since the event id is the same
 //        DataAccessException
-        Optional<Boolean> save1 = jdbcEventStoreRepository.save(testCreatedEventCopy);
-        assertThat(save1).isNotPresent();
+        Result<Integer> save1 = jdbcEventStoreRepository.save(testCreatedEventCopy);
+        assertThat(save1.isPresent()).isFalse();
     }
 
     public static <T> Result<T> deserializeJSON(ObjectMapper objectMapper, String json, Class<T> clzz) {

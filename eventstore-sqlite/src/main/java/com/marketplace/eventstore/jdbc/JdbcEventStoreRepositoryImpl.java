@@ -9,15 +9,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.common.ObjectMapperBuilder;
 import com.marketplace.cqrs.event.Event;
 import com.marketplace.eventstore.framework.Result;
+import com.marketplace.eventstore.framework.event.InvalidVersionException;
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.jooq.DSLContext;
-import org.jooq.InsertResultStep;
 import org.jooq.Record1;
-//import org.jooq.Result;
-import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,11 +82,11 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     }
 
     @Override
-    public Optional<Boolean> save(UUID aggregateId, Event event) {
+    public Result<Integer> save(UUID aggregateId, Event event) {
         long expectedVersion = event.getVersion();
         Integer latestVersion = getVersion(aggregateId);
         if (expectedVersion != 0 && expectedVersion <= latestVersion) {
-            return Optional.empty();
+            return Result.error(new InvalidVersionException("invalid exception"));
         }
         eventClassCache.put(event.getClass());
 
@@ -108,67 +105,33 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         );
 
         if (!savedResult.isPresent()) {
-            return Optional.empty();
+            return Result.error("error while saving event");
         }
         EventDataRecord eventDataRecord = savedResult.get();
         Integer id = eventDataRecord.getId();
         if (id == null) {
-            return Optional.empty();
+            return Result.error("id for saved event not found");
         }
-
-        return (id > 0) ? Optional.of(true) : Optional.empty();
-//        String eventData;
-//        try {
-//            eventData = objectMapper.writeValueAsString(event);
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//            return Optional.empty();
-//        }
-//
-//        eventClassCache.put(event.getClass());
-//
-//        EventDataRecord eventRecordRecord = new EventDataRecord()
-//            .setEventId(event.getId().toString())
-//            .setAggregateId(event.getAggregateId().toString())
-//            .setAggregateName(event.getAggregateName())
-//            .setEventVersion((int) event.getVersion())
-//            .setData(eventData)
-//            .setEventType(event.getClass().getSimpleName())
-//            .setCreated(event.getCreatedAt().toString());
-//
-//        EventDataRecord returnedEventDataRecord = dslContext.insertInto(EVENT_DATA)
-//            .set(eventRecordRecord)
-//            .returning(EVENT_DATA.ID)
-//            .fetchOne();
-//
-//        if (returnedEventDataRecord == null) {
-//            return Optional.empty();
-//        }
-//
-//        Integer id = returnedEventDataRecord.getId();
-//        if (id == null) {
-//            return Optional.empty();
-//        }
-//
-//        return (id > 0) ? Optional.of(true) : Optional.empty();
+        return Result.of(id);
     }
 
     @Override
-    public Optional<Boolean> save(Event event) {
+    public Result<Integer> save(Event event) {
         return save(event.getAggregateId(), event);
     }
 
     @Override
-    public Optional<Boolean> save(UUID aggregateId, List<Event> events, int version) {
+    public Result<Integer> save(UUID aggregateId, List<Event> events, int version) {
         return null;
     }
 
     @Override
-    public Optional<Boolean> save(UUID aggregateId, Event event, int expectedVersion) {
+    public Result<Integer> save(UUID aggregateId, Event event, int expectedVersion) {
         Integer latestVersion = getVersion(aggregateId);
-        if (expectedVersion != 0 && expectedVersion > latestVersion) {
-            return Optional.empty();
+        if (expectedVersion != 0 && expectedVersion <= latestVersion) {
+            return Result.error(new InvalidVersionException("invalid exception"));
         }
+        eventClassCache.put(event.getClass());
         Result<String> result = serializeJson(objectMapper, event);
         Result<EventDataRecord> savedResult = result.map(eventData -> new EventDataRecord()
             .setEventId(event.getId().toString())
@@ -183,19 +146,19 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         );
 
         if (!savedResult.isPresent()) {
-            return Optional.empty();
+            return Result.error("error while saving event");
         }
         EventDataRecord eventDataRecord = savedResult.get();
         Integer id = eventDataRecord.getId();
         if (id == null) {
-            return Optional.empty();
+            return Result.error("id for saved event not found");
         }
 
-        return (id > 0) ? Optional.of(true) : Optional.empty();
+        return Result.of(id);
     }
 
     @Override
-    public Optional<Boolean> save(Event event, int version) {
+    public Result<Integer> save(Event event, int version) {
         return save(event.getAggregateId(), event, version);
     }
 

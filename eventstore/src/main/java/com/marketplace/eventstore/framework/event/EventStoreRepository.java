@@ -1,5 +1,6 @@
 package com.marketplace.eventstore.framework.event;
 
+import com.marketplace.eventstore.framework.Result;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,15 +14,15 @@ public interface EventStoreRepository<T, U> {
 
     List<Event> load(U aggregateId);
 
-    Optional<Boolean> save(U aggregateId, T event);
+    Result<Integer> save(U aggregateId, T event);
 
-    Optional<Boolean> save(T event);
+    Result<Integer> save(T event);
 
-    Optional<Boolean> save(U aggregateId, List<T> events, int version);
+    Result<Integer> save(U aggregateId, List<T> events, int version);
 
-    Optional<Boolean> save(U aggregateId, T event, int version);
+    Result<Integer> save(U aggregateId, T event, int version);
 
-    Optional<Boolean> save(T event, int version);
+    Result<Integer> save(T event, int version);
 
     Integer getVersion(U aggregateId);
 
