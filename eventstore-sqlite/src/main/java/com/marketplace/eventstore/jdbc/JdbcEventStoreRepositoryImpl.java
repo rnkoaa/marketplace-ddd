@@ -59,6 +59,35 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     }
 
     @Override
+    public List<Event> load(String aggregateName, int fromVersion) {
+        org.jooq.Result<EventDataRecord> fetch = dslContext.selectFrom(EVENT_DATA)
+            .where(EVENT_DATA.AGGREGATE_NAME.eq(aggregateName)
+                .and(EVENT_DATA.EVENT_VERSION.ge(fromVersion)))
+            .orderBy(EVENT_DATA.CREATED.asc())
+            .fetch();
+
+        return fetch.stream()
+            .map(eventDataRecord -> convertFromEventDataRecord(objectMapper, eventDataRecord))
+            .filter(Result::isPresent)
+            .map(Result::get)
+            .toList();
+    }
+
+    @Override
+    public List<Event> load(String aggregateName) {
+        org.jooq.Result<EventDataRecord> fetch = dslContext.selectFrom(EVENT_DATA)
+            .where(EVENT_DATA.AGGREGATE_NAME.eq(aggregateName))
+            .orderBy(EVENT_DATA.CREATED.asc())
+            .fetch();
+
+        return fetch.stream()
+            .map(eventDataRecord -> convertFromEventDataRecord(objectMapper, eventDataRecord))
+            .filter(Result::isPresent)
+            .map(Result::get)
+            .toList();
+    }
+
+    @Override
     public Result<Integer> save(UUID aggregateId, Event event) {
         long expectedVersion = event.getVersion();
         Integer latestVersion = getVersion(aggregateId);

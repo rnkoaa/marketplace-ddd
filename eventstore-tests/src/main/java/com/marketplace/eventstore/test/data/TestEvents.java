@@ -14,6 +14,7 @@ import com.marketplace.eventstore.test.events.TestCreatedEvent;
 public class TestEvents {
 
     public static final UUID aggregateId = UUID.fromString("0a4a2dfc-eb10-45ec-9f8c-4d05e9dab6fe");
+    public static String aggregateName = "ClassifiedAd:0a4a2dfc-eb10-45ec-9f8c-4d05e9dab6fe";
     public static final UUID createdEventId = UUID
         .fromString("a7c92883-5406-4ea5-a1c4-8d9d6b7ee9bc");
     public static final UUID titleUpdatedEventId = UUID
@@ -29,7 +30,7 @@ public class TestEvents {
     public static TestCreatedEvent testCreatedEvent = ImmutableTestCreatedEvent.builder()
         .aggregateId(aggregateId)
         .id(createdEventId)
-        .aggregateName("ClassifiedAd:"+aggregateId)
+        .aggregateName(aggregateName)
         .createdAt(Instant.now())
         .version(1L)
         .build();
@@ -38,7 +39,7 @@ public class TestEvents {
         .builder()
         .aggregateId(aggregateId)
         .id(titleUpdatedEventId)
-        .aggregateName("ClassifiedAd:"+aggregateId)
+        .aggregateName(aggregateName)
         .version(2)
         .title("first title")
         .build();
@@ -48,7 +49,7 @@ public class TestEvents {
         .aggregateId(aggregateId)
         .id(titleUpdatedEventId2)
         .version(4)
-        .aggregateName("ClassifiedAd:"+aggregateId)
+        .aggregateName(aggregateName)
         .title("second title")
         .build();
 
@@ -57,7 +58,7 @@ public class TestEvents {
         .aggregateId(aggregateId)
         .id(textUpdatedEventId)
         .version(3)
-        .aggregateName("ClassifiedAd:"+aggregateId)
+        .aggregateName(aggregateName)
         .text("item is being sold as is")
         .build();
 
@@ -65,6 +66,7 @@ public class TestEvents {
         .builder()
         .aggregateId(aggregateId)
         .id(textUpdatedEventId2)
+        .aggregateName(aggregateName)
         .version(3)
         .text("item is being sold as is; seller has good deal")
         .build();

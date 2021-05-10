@@ -144,6 +144,53 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         // then
         assertThat(events).isNotNull().hasSize(3);
     }
+    @Test
+    void testLoadEventsUsingAggregateName() {
+        List<Event> aggregateEvents = TestEvents.aggregateEvents;
+
+        // when
+        jdbcEventStoreRepository.save(TestEvents.aggregateId, aggregateEvents, 1);
+
+        List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateName);
+
+        // then
+        assertThat(events).isNotNull().hasSize(3);
+    }
+
+    @Test
+    void testLoadMissingAggregates() {
+        List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateId);
+
+        // then
+        assertThat(events).isNotNull().hasSize(0);
+
+    }
+
+    @Test
+    void testLoadEventsFromVersion() {
+        List<Event> aggregateEvents = TestEvents.aggregateEvents;
+
+        // when
+        jdbcEventStoreRepository.save(TestEvents.aggregateId, aggregateEvents, 1);
+
+        List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateId, 2);
+
+        // then
+        assertThat(events).isNotNull().hasSize(2);
+    }
+
+    @Test
+    void testLoadEventsUsingAggregateNameFromVersion() {
+        List<Event> aggregateEvents = TestEvents.aggregateEvents;
+
+        // when
+        jdbcEventStoreRepository.save(TestEvents.aggregateId, aggregateEvents, 1);
+
+        List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateName, 2);
+
+        // then
+        assertThat(events).isNotNull().hasSize(2);
+    }
 
     public static <T> Result<T> deserializeJSON(ObjectMapper objectMapper, String json, Class<T> clzz) {
         try {

@@ -10,9 +10,13 @@ import reactor.core.publisher.Mono;
 
 public interface EventStoreRepository<T, U> {
 
+    List<Event> load(String aggregateName, int fromVersion);
+
     List<Event> load(U aggregateId, int fromVersion);
 
     List<Event> load(U aggregateId);
+
+    List<Event> load(String aggregateName);
 
     Result<Integer> save(U aggregateId, T event);
 
