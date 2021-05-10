@@ -24,6 +24,8 @@ public sealed abstract class Result<T> {
 
     public abstract void then(Consumer<T> defaultValue);
 
+    public abstract Exception getError();
+
     public static  <T> Result<T> tryOf(Supplier<T> supplier) {
         try {
             return Result.of(supplier.get());
@@ -71,6 +73,8 @@ public sealed abstract class Result<T> {
     public abstract boolean isPresent();
 
     public abstract T get();
+
+    public abstract boolean isError();
 
     public final static class Success<T> extends Result<T> {
 
@@ -126,6 +130,11 @@ public sealed abstract class Result<T> {
             }
         }
 
+        @Override
+        public Exception getError() {
+            return null;
+        }
+
 //        @Override
 //        public <T> Result<T> tryOf(Supplier<T> supplier) {
 //            try {
@@ -143,6 +152,11 @@ public sealed abstract class Result<T> {
         @Override
         public T get() {
             return this.value;
+        }
+
+        @Override
+        public boolean isError() {
+            return false;
         }
 
         @Override
@@ -195,6 +209,11 @@ public sealed abstract class Result<T> {
 //           consumer.accept();
         }
 
+        @Override
+        public Exception getError() {
+            return this.exception;
+        }
+
 //        @Override
 //        public <T1> Result<T1> tryOf(Supplier<T1> supplier) {
 //            return null;
@@ -208,6 +227,11 @@ public sealed abstract class Result<T> {
         @Override
         public T get() {
            return null;
+        }
+
+        @Override
+        public boolean isError() {
+            return true;
         }
 
         @Override
@@ -254,6 +278,11 @@ public sealed abstract class Result<T> {
 
         }
 
+        @Override
+        public Exception getError() {
+            return null;
+        }
+
 //        @Override
 //        public <T1> Result<T1> tryOf(Supplier<T1> supplier) {
 //            return null;
@@ -267,6 +296,11 @@ public sealed abstract class Result<T> {
         @Override
         public T get() {
             return null;
+        }
+
+        @Override
+        public boolean isError() {
+            return false;
         }
     }
 }

@@ -39,7 +39,7 @@ public class TestEvents {
         .aggregateId(aggregateId)
         .id(titleUpdatedEventId)
         .aggregateName("ClassifiedAd:"+aggregateId)
-        .version(1)
+        .version(2)
         .title("first title")
         .build();
 
@@ -47,6 +47,7 @@ public class TestEvents {
         .builder()
         .aggregateId(aggregateId)
         .id(titleUpdatedEventId2)
+        .version(4)
         .aggregateName("ClassifiedAd:"+aggregateId)
         .title("second title")
         .build();
@@ -55,7 +56,8 @@ public class TestEvents {
         .builder()
         .aggregateId(aggregateId)
         .id(textUpdatedEventId)
-        .version(2)
+        .version(3)
+        .aggregateName("ClassifiedAd:"+aggregateId)
         .text("item is being sold as is")
         .build();
 
@@ -63,6 +65,7 @@ public class TestEvents {
         .builder()
         .aggregateId(aggregateId)
         .id(textUpdatedEventId2)
+        .version(3)
         .text("item is being sold as is; seller has good deal")
         .build();
 
