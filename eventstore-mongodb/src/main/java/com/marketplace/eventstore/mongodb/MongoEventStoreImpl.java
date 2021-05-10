@@ -27,9 +27,9 @@ public class MongoEventStoreImpl implements EventStore<Event> {
   }
 
   @Override
-  public Mono<EventStream<Event>> load(String streamId) {
+  public Mono<EventStream> load(String streamId) {
     var tryAggregateInfo = Try.of(() -> getAggregateInfo(streamId));
-    Try<Mono<EventStream<Event>>> tryResult = tryAggregateInfo
+    Try<Mono<EventStream>> tryResult = tryAggregateInfo
         .map(aggregateInfo -> {
           if (aggregateInfo == null) {
             return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));
@@ -53,9 +53,9 @@ public class MongoEventStoreImpl implements EventStore<Event> {
   }
 
   @Override
-  public Mono<EventStream<Event>> load(String streamId, long fromVersion) {
+  public Mono<EventStream> load(String streamId, long fromVersion) {
     var tryAggregateInfo = Try.of(() -> getAggregateInfo(streamId));
-    Try<Mono<EventStream<Event>>> tryResult = tryAggregateInfo
+    Try<Mono<EventStream>> tryResult = tryAggregateInfo
         .map(aggregateInfo -> {
           if (aggregateInfo == null) {
             return Mono.error(new IllegalArgumentException("unable to process streamId into its parts"));

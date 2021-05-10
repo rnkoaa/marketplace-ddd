@@ -16,7 +16,7 @@ public interface EventStore<T> {
    * @param streamId id of the stream to load
    * @return an {@link EventStream} of events. If there are no events, the stream will be empty
    */
-  Mono<EventStream<T>> load(String streamId);
+  Mono<EventStream> load(String streamId);
 
   /**
    * Load all events of the stream ignoring all events prior to {@param fromVersion}
@@ -25,7 +25,7 @@ public interface EventStore<T> {
    * @param fromVersion load events from the eventstore excluding all events prior to this version
    * @return an {@link EventStream} of events. If there are no events, the stream will be empty
    */
-  Mono<EventStream<T>> load(String streamId, long fromVersion);
+  Mono<EventStream> load(String streamId, long fromVersion);
 
   /**
    * Adds a list of events to the end of the event stream

@@ -3,7 +3,7 @@ package com.marketplace.eventstore.framework.event;
 import java.time.Instant;
 import java.util.List;
 
-public interface EventStream<T> {
+public interface EventStream {
   /**
    * The Name of the stream This is an optional field
    *
@@ -22,15 +22,15 @@ public interface EventStream<T> {
   long getVersion();
 
   /** @return all events that make up the stream sorted in ascending order */
-  List<T> getEvents();
+  List<Event> getEvents();
 
   /**
    * Append an event to the stream with the expectedVersion of the current stream
    *
-   * @param entity event to be appended
+   * @param event event to be appended
    * @param expectedVersion the current version of the stream
    */
-  void append(T entity, long expectedVersion);
+  void append(Event event, long expectedVersion);
 
   /** @return the number of events in the current stream */
   int size();

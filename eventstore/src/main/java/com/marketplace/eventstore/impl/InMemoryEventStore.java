@@ -21,7 +21,7 @@ public class InMemoryEventStore implements EventStore<Event> {
   }
 
   @Override
-  public Mono<EventStream<Event>> load(String streamId) {
+  public Mono<EventStream> load(String streamId) {
     List<EventRecord> eventStream = entityStore.get(streamId);
     if (eventStream == null || eventStream.size() == 0) {
       return Mono.just(new EventStreamImpl(streamId, "", 0, List.of()));
@@ -37,7 +37,7 @@ public class InMemoryEventStore implements EventStore<Event> {
   }
 
   @Override
-  public Mono<EventStream<Event>> load(String streamId, long fromVersion) {
+  public Mono<EventStream> load(String streamId, long fromVersion) {
     List<EventRecord> eventStream = entityStore.get(streamId);
     if (eventStream == null || eventStream.size() == 0) {
       return Mono.just(new EventStreamImpl(streamId, "", 0, List.of()));

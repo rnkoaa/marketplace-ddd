@@ -14,7 +14,6 @@ java {
 //    }
 }
 
-
 group 'com.marketplace'
 version '1.0.0-SNAPSHOT'
 

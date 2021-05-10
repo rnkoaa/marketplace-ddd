@@ -71,7 +71,7 @@ class InMemoryEventStoreTest {
 
     var classifiedAdTextUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
 //
-    Mono<EventStream<Event>> eventStreamPublisher = eventStore.load(streamId);
+    Mono<EventStream> eventStreamPublisher = eventStore.load(streamId);
     StepVerifier.create(eventStreamPublisher)
         .assertNext(eventStream -> {
           assertThat(eventStream.getVersion()).isEqualTo(0);

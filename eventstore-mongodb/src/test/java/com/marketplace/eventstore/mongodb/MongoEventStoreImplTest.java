@@ -37,7 +37,7 @@ class MongoEventStoreImplTest {
     @Test
     void malformedStreamIdWillResultInAnError() {
       String streamId = UUID.randomUUID().toString();
-      Mono<EventStream<Event>> load = eventStore.load(streamId);
+      Mono<EventStream> load = eventStore.load(streamId);
       StepVerifier.create(load)
           .expectErrorMatches(throwable -> throwable instanceof IllegalArgumentException)
           .verify();
@@ -46,7 +46,7 @@ class MongoEventStoreImplTest {
     @Test
     void invalidStreamIdWithBadUUIDWillNotWork() {
       String streamId = "ClassifiedAd:hello-world";
-      Mono<EventStream<Event>> load = eventStore.load(streamId);
+      Mono<EventStream> load = eventStore.load(streamId);
       StepVerifier.create(load)
           .expectErrorMatches(throwable -> throwable instanceof IllegalArgumentException)
           .verify();
@@ -62,7 +62,7 @@ class MongoEventStoreImplTest {
 
       Mockito.when(eventStoreRepository.load(aggregateId, fromVersion)).thenReturn(Mono.just(testEvents));
 
-      Mono<EventStream<Event>> eventStreamMono = eventStore.load(validStreamId, fromVersion);
+      Mono<EventStream> eventStreamMono = eventStore.load(validStreamId, fromVersion);
       StepVerifier.create(eventStreamMono)
           .assertNext(eventStream -> {
             assertThat(eventStream).isNotNull();
@@ -79,7 +79,7 @@ class MongoEventStoreImplTest {
       String validStreamId = "ClassifiedAd:%s".formatted(aggregateId);
       Mockito.when(eventStoreRepository.load(aggregateId)).thenReturn(Mono.just(TestEvents.aggregateEvents));
 
-      Mono<EventStream<Event>> eventStreamMono = eventStore.load(validStreamId);
+      Mono<EventStream> eventStreamMono = eventStore.load(validStreamId);
       StepVerifier.create(eventStreamMono)
           .assertNext(eventStream -> {
             assertThat(eventStream).isNotNull();
@@ -96,7 +96,7 @@ class MongoEventStoreImplTest {
       String validStreamId = "ClassifiedAd:%s".formatted(aggregateId);
       Mockito.when(eventStoreRepository.load(aggregateId)).thenReturn(Mono.just(List.of()));
 
-      Mono<EventStream<Event>> eventStreamMono = eventStore.load(validStreamId);
+      Mono<EventStream> eventStreamMono = eventStore.load(validStreamId);
       StepVerifier.create(eventStreamMono)
           .assertNext(eventStream -> {
             assertThat(eventStream.size()).isEqualTo(0);

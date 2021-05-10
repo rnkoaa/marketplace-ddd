@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventStreamImpl implements EventStream<Event> {
+public class EventStreamImpl implements EventStream {
 
   private List<Event> events;
   private final String id;
