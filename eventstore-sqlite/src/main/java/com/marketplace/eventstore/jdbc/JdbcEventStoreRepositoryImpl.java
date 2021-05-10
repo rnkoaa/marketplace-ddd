@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
-    EventClassCache eventClassCache = EventClassCache.getInstance();
+    private static final EventClassCache eventClassCache = EventClassCache.getInstance();
     private final ObjectMapper objectMapper = new ObjectMapperBuilder().build();
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcEventStoreRepositoryImpl.class);
     private final DSLContext dslContext;
@@ -34,55 +34,29 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         org.jooq.Result<EventDataRecord> fetch = dslContext.selectFrom(EVENT_DATA)
             .where(EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString())
                 .and(EVENT_DATA.EVENT_VERSION.ge(fromVersion)))
+            .orderBy(EVENT_DATA.CREATED.asc())
             .fetch();
 
-        return List.of();
-//        return fetch.stream()
-//            .map(eventRecordRecord -> {
-//                String data = eventRecordRecord.getData();
-//                String eventType = eventRecordRecord.getEventType();
-//                com.marketplace.eventstore.framework.Result<Class<?>> classResult = eventClassCache.get(eventType);
-////                Class<?> aClass = (Event)eventClassCache.get(eventType);
-//                if (aClass == null) {
-//                    return null;
-//                }
-//                try {
-//                    return objectMapper.readValue(data, aClass);
-//                } catch (JsonProcessingException e) {
-//                    return null;
-//                }
-//            })
-//            .filter(Objects::nonNull)
-//            .collect(Collectors.toList());
+        return fetch.stream()
+            .map(eventDataRecord -> convertFromEventDataRecord(objectMapper, eventDataRecord))
+            .filter(Result::isPresent)
+            .map(Result::get)
+            .toList();
     }
 
     @Override
     public List<Event> load(UUID aggregateId) {
         org.jooq.Result<EventDataRecord> fetch = dslContext.selectFrom(EVENT_DATA)
             .where(EVENT_DATA.AGGREGATE_ID.eq(aggregateId.toString()))
+            .orderBy(EVENT_DATA.CREATED.asc())
             .fetch();
 
-        return List.of();
-//        return fetch.stream()
-//            .map(eventRecordRecord -> {
-//                String data = eventRecordRecord.getData();
-//                String eventType = eventRecordRecord.getEventType();
-//                Class<Event> aClass = eventClassCache.get(eventType);
-//                if (aClass == null) {
-//                    return null;
-//                }
-//                try {
-//                    return objectMapper.readValue(data, aClass);
-//                } catch (JsonProcessingException e) {
-//                    return null;
-//                }
-//            })
-//            .filter(Objects::nonNull)
-//            .collect(Collectors.toList());
+        return fetch.stream()
+            .map(eventDataRecord -> convertFromEventDataRecord(objectMapper, eventDataRecord))
+            .filter(Result::isPresent)
+            .map(Result::get)
+            .toList();
     }
-
-    // latestVersion == 0 && expectedVersion == 1 -- valid
-    // latestVersion == 0 && expectedVersion == 1 -- valid
 
     @Override
     public Result<Integer> save(UUID aggregateId, Event event) {
@@ -209,9 +183,31 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         return countRecord.get("event_count", Long.class);
     }
 
+    private static Result<Event> convertFromEventDataRecord(ObjectMapper objectMapper,
+        EventDataRecord eventDataRecord) {
+        String data = eventDataRecord.getData();
+        String eventType = eventDataRecord.getEventType();
+
+        if (eventType == null || eventType.isEmpty()) {
+            return Result.error("unable to determine event type");
+        }
+
+        Result<Class<?>> classResult = eventClassCache.get(eventType);
+        return classResult.flatmap(clzz -> deserializeJSON(objectMapper, data, clzz))
+            .map(e -> (Event) e);
+    }
+
     private static Result<String> serializeJson(ObjectMapper objectMapper, Object object) {
         try {
             return Result.of(objectMapper.writeValueAsString(object));
+        } catch (JsonProcessingException e) {
+            return Result.error(e);
+        }
+    }
+
+    public static <T> Result<T> deserializeJSON(ObjectMapper objectMapper, String json, Class<T> clzz) {
+        try {
+            return Result.of(objectMapper.readValue(json, clzz));
         } catch (JsonProcessingException e) {
             return Result.error(e);
         }

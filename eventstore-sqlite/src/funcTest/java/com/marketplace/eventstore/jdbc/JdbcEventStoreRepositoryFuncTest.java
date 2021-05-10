@@ -132,6 +132,19 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         assertThat(save1.isPresent()).isFalse();
     }
 
+    @Test
+    void testAllEventsForAggregateCanBeLoaded() {
+        List<Event> aggregateEvents = TestEvents.aggregateEvents;
+
+        // when
+        jdbcEventStoreRepository.save(TestEvents.aggregateId, aggregateEvents, 1);
+
+        List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateId);
+
+        // then
+        assertThat(events).isNotNull().hasSize(3);
+    }
+
     public static <T> Result<T> deserializeJSON(ObjectMapper objectMapper, String json, Class<T> clzz) {
         try {
             return Result.of(objectMapper.readValue(json, clzz));
