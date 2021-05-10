@@ -1,9 +1,19 @@
-package com.marketplace.eventsourcing;
+package com.marketplace.framework.eventsourcing;
 
-public interface AggregateStore/*<T extends AggregateRoot<VersionedEvent>, U>*/ {
+import com.marketplace.event.VersionedEvent;
+import com.marketplace.eventstore.framework.OperationResult;
+import com.marketplace.framework.AggregateRoot;
+import java.util.UUID;
+import reactor.core.publisher.Mono;
 
-//  Mono<T> save(T aggregate);
-//
-//  Mono<Optional<T>> load(U aggregateId);
+public interface AggregateStore {
+
+  Mono<OperationResult> save(AggregateRoot<VersionedEvent> aggregate);
+
+  Mono<AggregateRoot<VersionedEvent>> load(UUID aggregateId);
+
+  Mono<Long> size();
+
+  Mono<Long> countEvents(UUID aggregateId);
 
 }
