@@ -9,12 +9,6 @@ sourceSets {
         java.srcDirs += "$buildDir/generated/sources/annotationProcessor/java"
     }
 
-//    functionalTest {
-//        java.srcDir "$projectDir/src/functionalTest/groovy"
-//        resources.srcDir "$projectDir/src/functionalTest/resources"
-//        compileClasspath += main.output + test.output
-//        runtimeClasspath += main.output + test.output
-//    }
     funcTest {
         compileClasspath += main.output + test.output
         runtimeClasspath += main.output + test.output
@@ -34,7 +28,6 @@ version '1.0.0-SNAPSHOT'
 repositories {
     mavenCentral()
 }
-
 
 configurations {
     compileOnly {
@@ -59,12 +52,8 @@ dependencies {
     implementation project(":libs:cqrs-domain")
     implementation project(":eventstore")
 
-//    implementation "io.projectreactor:reactor-core:${projectReactorVersion}"
-
-//    jooqRuntime "org.jooq:jooq-meta-extensions:$jooqVersion"
     jooqGenerator "org.xerial:sqlite-jdbc:$sqliteVersion"
     jooqGenerator "org.jooq:jooq-meta-extensions:$jooqVersion"
-
 
     // 2.11.3
     implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"

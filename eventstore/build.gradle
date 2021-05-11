@@ -23,7 +23,6 @@ dependencies {
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
     testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
     testImplementation('io.projectreactor:reactor-test:3.4.0')
-
 }
 
 test {

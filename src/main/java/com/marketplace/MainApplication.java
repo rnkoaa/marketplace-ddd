@@ -23,8 +23,8 @@ public class MainApplication {
                 builder()
                 .config(config)
                 .build();
-        SparkServer server = context.getServer();
-        server.run();
+//        SparkServer server = context.getServer();
+//        server.run();
     }
 
     public void run() throws InterruptedException {
