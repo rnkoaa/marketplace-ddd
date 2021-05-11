@@ -11,9 +11,10 @@ import dagger.Component;
 import javax.inject.Singleton;
 
 @Component(modules = {
-        SparkServerModule.class,
-        ApplicationModule.class,
-        ObjectMapperModule.class
+    SparkServerModule.class,
+    ApplicationModule.class,
+    JooqModule.class,
+    ObjectMapperModule.class,
 })
 @Singleton
 public interface ApplicationContext {
@@ -28,6 +29,7 @@ public interface ApplicationContext {
 
     @Component.Builder
     interface Builder {
+
         ApplicationContext build();
 
         @BindsInstance

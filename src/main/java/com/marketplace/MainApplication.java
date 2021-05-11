@@ -4,6 +4,7 @@ import com.marketplace.config.ApplicationConfig;
 import com.marketplace.config.ConfigLoader;
 import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
+import com.marketplace.eventstore.jdbc.flyway.FlywayMigration;
 import com.marketplace.server.SparkServer;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -20,11 +21,15 @@ public class MainApplication {
     public void start() throws IOException {
         ApplicationConfig config = ConfigLoader.loadClasspathResource("application.yml", ApplicationConfig.class);
         ApplicationContext context = DaggerApplicationContext.
-                builder()
-                .config(config)
-                .build();
-//        SparkServer server = context.getServer();
-//        server.run();
+            builder()
+            .config(config)
+            .build();
+
+        String dbConnectionUrl = config.getDb().getUrl();
+
+        FlywayMigration.migrate(dbConnectionUrl);
+        SparkServer server = context.getServer();
+        server.run();
     }
 
     public void run() throws InterruptedException {

@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'idea'
-    id 'nu.studer.jooq' version '5.2.1'
+    id 'nu.studer.jooq'
 }
 
 sourceSets {
@@ -51,6 +51,8 @@ dependencies {
     implementation project(":libs:common")
     implementation project(":libs:cqrs-domain")
     implementation project(":eventstore")
+
+    implementation "org.jooq:jooq:$jooqVersion"
 
     jooqGenerator "org.xerial:sqlite-jdbc:$sqliteVersion"
     jooqGenerator "org.jooq:jooq-meta-extensions:$jooqVersion"

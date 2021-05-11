@@ -12,24 +12,24 @@ import javax.inject.Singleton;
 @Singleton
 public class ClassifiedAdQueryService {
 
-  private final ClassifiedAdMongoQueryRepository classifiedAdMongoQueryRepository;
+  private final ClassifiedAdQueryRepository classifiedAdQueryRepository;
 
   @Inject
   public ClassifiedAdQueryService(
-      ClassifiedAdMongoQueryRepository classifiedAdMongoQueryRepository) {
-    this.classifiedAdMongoQueryRepository = classifiedAdMongoQueryRepository;
+      ClassifiedAdQueryRepository classifiedAdQueryRepository) {
+    this.classifiedAdQueryRepository = classifiedAdQueryRepository;
   }
 
   public Optional<ClassifiedAdQueryEntity> findById(UUID id) {
-    return classifiedAdMongoQueryRepository.findById(id);
+    return classifiedAdQueryRepository.findById(id);
   }
 
   public List<ClassifiedAdQueryEntity> findAll() {
-    return classifiedAdMongoQueryRepository.findAll();
+    return classifiedAdQueryRepository.findAll();
   }
 
   public List<ClassifiedAdQueryEntity> findByOwner(UUID ownerId) {
-    return classifiedAdMongoQueryRepository.findByOwner(ownerId);
+    return classifiedAdQueryRepository.findByOwner(ownerId);
   }
 
   public List<ClassifiedAdQueryEntity> find(UUID owner, ClassifiedAdState status) {
