@@ -1,0 +1,171 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'nu.studer.jooq' version '5.2.1'
+}
+
+sourceSets {
+    main {
+        java.srcDirs += "$buildDir/generated/sources/annotationProcessor/java"
+    }
+
+//    functionalTest {
+//        java.srcDir "$projectDir/src/functionalTest/groovy"
+//        resources.srcDir "$projectDir/src/functionalTest/resources"
+//        compileClasspath += main.output + test.output
+//        runtimeClasspath += main.output + test.output
+//    }
+    funcTest {
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.funcTest.java.srcDirs
+        testResourceDirs += sourceSets.funcTest.resources.srcDirs
+    }
+}
+
+group 'com.marketplace'
+version '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+
+    funcTestImplementation {
+        extendsFrom testImplementation
+    }
+    funcTestRuntime {
+        extendsFrom testRuntimeClasspath
+    }
+
+    funcTestRuntimeOnly {
+        extendsFrom testRuntimeOnly
+    }
+}
+
+dependencies {
+    implementation project(":libs:config")
+    implementation project(":libs:common")
+    implementation project(":libs:cqrs-domain")
+    implementation project(":eventstore")
+
+//    implementation "io.projectreactor:reactor-core:${projectReactorVersion}"
+
+//    jooqRuntime "org.jooq:jooq-meta-extensions:$jooqVersion"
+    jooqGenerator "org.xerial:sqlite-jdbc:$sqliteVersion"
+    jooqGenerator "org.jooq:jooq-meta-extensions:$jooqVersion"
+
+
+    // 2.11.3
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
+
+    implementation "org.flywaydb:flyway-core:$flywayVersion"
+
+    implementation("org.slf4j:slf4j-api:1.7.30")
+    implementation("org.slf4j:slf4j-log4j12:1.7.30")
+
+    implementation "org.xerial:sqlite-jdbc:$sqliteVersion"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    testImplementation("org.assertj:assertj-core:${assertjVersion}")
+    testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+    testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
+
+    funcTestImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    funcTestRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    funcTestImplementation("org.assertj:assertj-core:${assertjVersion}")
+    funcTestImplementation("org.mockito:mockito-core:${mockitoVersion}")
+    funcTestImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
+
+    funcTestImplementation project(":eventstore-tests")
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jooq {
+    version = '3.14.7'  // the default (can be omitted)
+    edition = nu.studer.gradle.jooq.JooqEdition.OSS  // the default (can be omitted)
+
+    configurations {
+        main {  // name of the jOOQ configuration
+            generateSchemaSourceOnCompilation = true  // default (can be omitted)
+
+            generationTool {
+                logging = org.jooq.meta.jaxb.Logging.WARN
+//                jdbc {
+//                    driver = 'org.sqlite.JDBC'
+//                    url = 'jdbc:sqlite:src/main/resources/db/eventstore.db'
+//                }
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = "org.jooq.meta.extensions.ddl.DDLDatabase"
+                        properties {
+                            property {
+                                key = "scripts"
+                                value = "src/main/resources/db/schema.sql"
+                            }
+                            property {
+                                key = "sort"
+                                value = "semantic"
+                            }
+                            property {
+                                key = "parseIgnoreCommentStart"
+                                value = "[jooq ignore start]"
+                            }
+                            property {
+                                key = "parseIgnoreCommentStop"
+                                value = "[jooq ignore end]"
+                            }
+                        }
+                    }
+                    generate {
+                        relations = true
+                        deprecated = false
+                        records = true
+                        javaTimeTypes = true
+                        immutablePojos = true
+                        fluentSetters = true
+                    }
+                    target {
+                        packageName = 'com.marketplace.eventstore.jdbc'
+                        directory = 'src/main/jooq'  // default (can be omitted)
+                    }
+                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+                }
+            }
+        }
+    }
+}
+
+task funcTest(type: Test) {
+    description = 'Runs the functional tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.funcTest.output.classesDirs
+    classpath = sourceSets.funcTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+    mustRunAfter test
+}
+
+funcTest {
+    useJUnitPlatform()
+}
+
+check.dependsOn funcTest

@@ -1,13 +1,13 @@
 rootProject.name = 'marketplace'
 //include 'annotations'
 //include 'annotations-compiler'
-include ':libs:common-test'
-include 'libs:mongo-config-commons'
 include ':libs:config'
 include ':libs:common'
 include 'eventstore'
-//include 'eventstore-mongodb'
 include 'client'
 //
 include ':libs:cqrs-domain'
+
+include 'eventstore-sqlite'
+include 'eventstore-tests'
 

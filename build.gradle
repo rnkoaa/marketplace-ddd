@@ -91,7 +91,6 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
 
-//    implementation("io.lettuce:lettuce-core:6.0.1.RELEASE")
     implementation("javax.inject:javax.inject:1")
     implementation("javax.persistence:javax.persistence-api:2.2")
 
@@ -104,7 +103,6 @@ dependencies {
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
     testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
 
-    testImplementation project(":libs:common-test")
     testImplementation("org.testcontainers:junit-jupiter:1.15.3")
     testImplementation("org.testcontainers:mongodb:1.15.3")
 

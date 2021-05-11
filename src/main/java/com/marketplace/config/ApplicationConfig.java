@@ -1,6 +1,5 @@
 package com.marketplace.config;
 
-import com.marketplace.common.config.MongoConfig;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -11,9 +10,9 @@ public abstract class ApplicationConfig {
     return ImmutableServerConfig.builder().build();
   }
 
-  @Value.Default
-  public MongoConfig getMongo() {
-    return new MongoConfig();
-  }
+//  @Value.Default
+//  public MongoConfig getMongo() {
+//    return new MongoConfig();
+//  }
 }
 
