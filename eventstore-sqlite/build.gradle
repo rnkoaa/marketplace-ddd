@@ -59,7 +59,7 @@ dependencies {
     implementation project(":libs:cqrs-domain")
     implementation project(":eventstore")
 
-    implementation "io.projectreactor:reactor-core:${projectReactorVersion}"
+//    implementation "io.projectreactor:reactor-core:${projectReactorVersion}"
 
 //    jooqRuntime "org.jooq:jooq-meta-extensions:$jooqVersion"
     jooqGenerator "org.xerial:sqlite-jdbc:$sqliteVersion"
@@ -73,6 +73,7 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
 
+    implementation "org.flywaydb:flyway-core:$flywayVersion"
 
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("org.slf4j:slf4j-log4j12:1.7.30")

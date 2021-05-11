@@ -2,6 +2,8 @@ package com.marketplace.eventstore.jdbc;
 
 import static com.marketplace.eventstore.jdbc.Tables.EVENT_DATA;
 
+import com.marketplace.eventstore.jdbc.flyway.FlywayMigration;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,8 +14,11 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractJdbcFuncTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractJdbcFuncTest.class);
 
     private final static String CONNECTION_STRING = "jdbc:sqlite:src/funcTest/resources/db/eventstore.db";
     protected DSLContext dslContext;
@@ -37,49 +42,16 @@ public abstract class AbstractJdbcFuncTest {
 
     @BeforeAll
     static void setupAll() {
-        //  testCompile group: 'org.flywaydb', name:'flyway-core', version : '3.2.1'
-        // resources/db/migration/V1__Initial_Setup.sql
-//        create table event_data (
-//            id INTEGER PRIMARY KEY,
-//            event_id TEXT NOT NULL,
-//            aggregate_name TEXT NULL,
-//            aggregate_id TEXT NOT NULL,
-//            event_type TEXT NOT NULL,
-//            event_version integer,
-//            data TEXT NOT NULL,
-//            created TEXt NOT NULL
-//        );
-
-        // public static final String JDBC_URL = "jdbc:h2:mem:test_mem;MODE=PostgreSQL;DB_CLOSE_DELAY=-1";
-        //
-        //    private static Server server;
-        //    protected static DBI jdbi;
-        //
-        //    @BeforeClass
-        //    public static void initDB() throws Exception {
-        //        server = Server.createTcpServer();
-        //
-        //        initSchema();
-        //        DataSource dataSource = JdbcConnectionPool.create(JDBC_URL, "sa", "");
-        //        jdbi = new DBI(dataSource);
-        //    }
-        //
-        //    private static void initSchema() {
-        //        Flyway flyway = new Flyway();
-        //        flyway.setDataSource(JDBC_URL, "sa", "");
-        //        flyway.migrate();
-        //    }
-        //
-        //    @AfterClass
-        //    public static void closeDB() throws Exception {
-        //        server.shutdown();
-        //    }
-// use flyway to seed data and create tables
+        FlywayMigration.migrate(CONNECTION_STRING);
     }
 
     @AfterAll
     static void cleanupAll() {
-
+// delete db file
+        File dbFile = new File("src/funcTest/resources/db/eventstore.db");
+        if (!dbFile.delete()) {
+           LOGGER.info("unable to delete db file");
+        }
     }
 
     private static Connection createConnection(final String connectionString) throws SQLException {
