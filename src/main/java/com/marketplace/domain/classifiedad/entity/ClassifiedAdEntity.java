@@ -34,7 +34,6 @@ public class ClassifiedAdEntity {
     private Price price;
     private ClassifiedAdState state;
 
-    // for mongo entity
     public ClassifiedAdEntity() {
     }
 
