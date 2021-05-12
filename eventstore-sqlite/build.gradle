@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'idea'
-    id 'nu.studer.jooq' version '5.2.1'
+    id 'nu.studer.jooq'
 }
 
 sourceSets {
@@ -9,12 +9,6 @@ sourceSets {
         java.srcDirs += "$buildDir/generated/sources/annotationProcessor/java"
     }
 
-//    functionalTest {
-//        java.srcDir "$projectDir/src/functionalTest/groovy"
-//        resources.srcDir "$projectDir/src/functionalTest/resources"
-//        compileClasspath += main.output + test.output
-//        runtimeClasspath += main.output + test.output
-//    }
     funcTest {
         compileClasspath += main.output + test.output
         runtimeClasspath += main.output + test.output
