@@ -34,8 +34,8 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
 
     context = DaggerApplicationContext.builder().config(config).build();
 
-    String hosts = mongoDBContainer.getHost();
-    int port = mongoDBContainer.getMappedPort(27017);
+//    String hosts = mongoDBContainer.getHost();
+//    int port = mongoDBContainer.getMappedPort(27017);
 //    mongoConfig = new MongoConfig(hosts, "test_db", port);
 //    config = ImmutableApplicationConfig.copyOf(config).withMongo(mongoConfig);
 //    mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);

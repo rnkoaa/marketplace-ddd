@@ -9,11 +9,13 @@ import com.marketplace.server.SparkServer;
 import dagger.BindsInstance;
 import dagger.Component;
 import javax.inject.Singleton;
+import org.jooq.DSLContext;
 
 @Component(modules = {
-        SparkServerModule.class,
-        ApplicationModule.class,
-        ObjectMapperModule.class
+    SparkServerModule.class,
+    ApplicationModule.class,
+    JooqModule.class,
+    ObjectMapperModule.class
 })
 @Singleton
 public interface ApplicationContext {
@@ -26,8 +28,11 @@ public interface ApplicationContext {
 
     ClassifiedAdService getClassifiedAdService();
 
+    DSLContext getDSLContext();
+
     @Component.Builder
     interface Builder {
+
         ApplicationContext build();
 
         @BindsInstance

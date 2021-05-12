@@ -3,19 +3,12 @@ package com.marketplace;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
-import com.marketplace.domain.classifiedad.Currency;
-import com.marketplace.domain.classifiedad.command.ApproveClassifiedAd;
-import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.ImmutableApproveClassifiedAd;
 import com.marketplace.domain.classifiedad.command.ImmutableCreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.ImmutablePublishClassifiedAd;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAdPrice;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAdText;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAdTitle;
-import com.marketplace.domain.classifiedad.command.PublishClassifiedAd;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdPrice;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdText;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdTitle;
 import com.marketplace.domain.shared.UserId;
 
 import java.math.BigDecimal;
@@ -30,7 +23,7 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @Disabled
-public class ClassifiedAdFullScenarioTest extends BaseMongoRepositoryTest {
+public class ClassifiedAdFullScenarioTest extends BaseRepositoryTest {
 
   UUID classifiedAdIdUuid = UUID.fromString("d0b00201-a612-423d-969e-96f182468514");
   UUID ownerIdUuid = UUID.fromString("c205ac9d-d480-4c67-8714-cbbaaf2ae0c4");

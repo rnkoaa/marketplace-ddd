@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'nu.studer.jooq' version '5.2.1'
+    id "org.flywaydb.flyway" version "7.8.2"
 //    id 'jacoco' // HERE!
 }
 
@@ -58,6 +60,7 @@ configurations {
     functionalRuntime {
         extendsFrom testRuntimeClasspath
     }
+    flywayMigration
 }
 
 
@@ -66,6 +69,15 @@ dependencies {
     implementation project(":libs:common")
     implementation project(":libs:cqrs-domain")
     implementation project(":eventstore")
+
+    implementation "org.flywaydb:flyway-core:$flywayVersion"
+    flywayMigration "org.xerial:sqlite-jdbc:$sqliteVersion"
+
+    implementation "org.xerial:sqlite-jdbc:$sqliteVersion"
+
+
+    jooqGenerator "org.xerial:sqlite-jdbc:$sqliteVersion"
+    jooqGenerator "org.jooq:jooq-meta-extensions:$jooqVersion"
 
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("org.slf4j:slf4j-log4j12:1.7.30")
@@ -183,3 +195,77 @@ processIntegrationResources {
 processFunctionalResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
+
+flyway {
+    driver = 'org.sqlite.JDBC'
+    url = "jdbc:sqlite:${projectDir}/src/main/resources/db/marketplace.db"
+//    locations = "${projectDir}/src/main/resources/migration"
+//    locations = ["classpath:db/migration"]
+    locations = ["filesystem:${projectDir}/src/main/resources/db/migration"]
+//    user = 'myUsr'
+//    password = 'mySecretPwd'
+//    schemas = ['schema1', 'schema2', 'schema3']
+//    placeholders = [
+//            'keyABC': 'valueXYZ',
+//            'otherplaceholder': 'value123'
+//    ]
+}
+
+jooq {
+    version = '3.14.7'  // the default (can be omitted)
+    edition = nu.studer.gradle.jooq.JooqEdition.OSS  // the default (can be omitted)
+
+    configurations {
+        main {  // name of the jOOQ configuration
+            generateSchemaSourceOnCompilation = true  // default (can be omitted)
+
+            generationTool {
+                logging = org.jooq.meta.jaxb.Logging.WARN
+                jdbc {
+                    driver = 'org.sqlite.JDBC'
+                    url = 'jdbc:sqlite:src/main/resources/db/marketplace.db'
+                }
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.sqlite.SQLiteDatabase'
+//                        name = "org.jooq.meta.extensions.ddl.DDLDatabase"
+//                        properties {
+//                            property {
+//                                key = "scripts"
+//                                value = "src/main/resources/db/schema.sql"
+//                            }
+//                            property {
+//                                key = "sort"
+//                                value = "semantic"
+//                            }
+//                            property {
+//                                key = "parseIgnoreCommentStart"
+//                                value = "[jooq ignore start]"
+//                            }
+//                            property {
+//                                key = "parseIgnoreCommentStop"
+//                                value = "[jooq ignore end]"
+//                            }
+//                        }
+                    }
+                    generate {
+                        relations = true
+                        deprecated = false
+                        records = true
+                        javaTimeTypes = true
+                        immutablePojos = true
+                        fluentSetters = true
+                    }
+                    target {
+                        packageName = 'com.marketplace.eventstore.jdbc'
+                        directory = 'src/main/jooq'  // default (can be omitted)
+                    }
+                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+                }
+            }
+        }
+    }
+}
+
+generateJooq.dependsOn(flywayMigrate)

@@ -15,7 +15,7 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @Disabled
-public class ClassifiedAdCommandRepositoryTest extends BaseMongoRepositoryTest {
+public class ClassifiedAdCommandRepositoryTest extends BaseRepositoryTest {
     String insertId = "87a7fef0-1527-4a47-b196-504d9f9ce0fe";
 
     @Test
