@@ -25,7 +25,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @Disabled
-public class ClassifiedAdServiceIntegrationTest extends BaseMongoRepositoryTest {
+public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
 
   @Test
   void classifiedAdCanBeCreatedAndAPictureCanBeAdded() throws IOException {

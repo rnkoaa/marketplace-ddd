@@ -10,9 +10,9 @@ public abstract class ApplicationConfig {
     return ImmutableServerConfig.builder().build();
   }
 
-//  @Value.Default
-//  public MongoConfig getMongo() {
-//    return new MongoConfig();
-//  }
+  @Value.Default
+  public DbConfig getDb() {
+    return ImmutableDbConfig.builder().build();
+  }
 }
 
