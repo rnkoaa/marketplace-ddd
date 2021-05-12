@@ -17,7 +17,6 @@ public class UserProfileEntityRepositoryTest extends BaseRepositoryTest {
         userProfileRecord.setFirstname("hello")
             .setId("hello-id")
             .setLastname("world")
-            .setUserProfileId("uuid")
             .setDisplayname("helloworld")
             .setCreated(Instant.now().toString())
             .setUpdated(Instant.now().toString())
@@ -33,6 +32,33 @@ public class UserProfileEntityRepositoryTest extends BaseRepositoryTest {
 
         assertThat(savedUserProfileRecord.getId()).isNotNull()
         .isEqualTo("hello-id");
+    }
 
+    @Test
+    void testFindSaveUserProfileEntityRecord() {
+        UserProfileRecord userProfileRecord = getUserProfileRecord();
+
+        UserProfileRecord savedUserProfileRecord = dslContext.insertInto(Tables.USER_PROFILE)
+            .set(userProfileRecord)
+            .returning(Tables.USER_PROFILE.ID)
+            .fetchOne();
+
+        assertThat(savedUserProfileRecord).isNotNull();
+
+
+        assertThat(savedUserProfileRecord.getId()).isNotNull()
+            .isEqualTo("hello-id");
+    }
+
+    private UserProfileRecord generateUserProfile() {
+        UserProfileRecord userProfileRecord = new UserProfileRecord();
+        userProfileRecord.setFirstname("hello")
+            .setId("hello-id")
+            .setLastname("world")
+            .setDisplayname("helloworld")
+            .setCreated(Instant.now().toString())
+            .setUpdated(Instant.now().toString())
+            .setMiddlename("h.");
+        return userProfileRecord;
     }
 }

@@ -16,7 +16,6 @@ public class UserProfile implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String id;
-    private final String userProfileId;
     private final String firstname;
     private final String lastname;
     private final String middlename;
@@ -27,7 +26,6 @@ public class UserProfile implements Serializable {
 
     public UserProfile(UserProfile value) {
         this.id = value.id;
-        this.userProfileId = value.userProfileId;
         this.firstname = value.firstname;
         this.lastname = value.lastname;
         this.middlename = value.middlename;
@@ -39,7 +37,6 @@ public class UserProfile implements Serializable {
 
     public UserProfile(
         String id,
-        String userProfileId,
         String firstname,
         String lastname,
         String middlename,
@@ -49,7 +46,6 @@ public class UserProfile implements Serializable {
         String updated
     ) {
         this.id = id;
-        this.userProfileId = userProfileId;
         this.firstname = firstname;
         this.lastname = lastname;
         this.middlename = middlename;
@@ -64,13 +60,6 @@ public class UserProfile implements Serializable {
      */
     public String getId() {
         return this.id;
-    }
-
-    /**
-     * Getter for <code>user_profile.user_profile_id</code>.
-     */
-    public String getUserProfileId() {
-        return this.userProfileId;
     }
 
     /**
@@ -127,7 +116,6 @@ public class UserProfile implements Serializable {
         StringBuilder sb = new StringBuilder("UserProfile (");
 
         sb.append(id);
-        sb.append(", ").append(userProfileId);
         sb.append(", ").append(firstname);
         sb.append(", ").append(lastname);
         sb.append(", ").append(middlename);

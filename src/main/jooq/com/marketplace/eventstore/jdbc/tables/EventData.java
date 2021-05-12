@@ -17,7 +17,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row8;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -53,11 +53,6 @@ public class EventData extends TableImpl<EventDataRecord> {
      * The column <code>event_data.id</code>.
      */
     public final TableField<EventDataRecord, String> ID = createField(DSL.name("id"), SQLDataType.CLOB, this, "");
-
-    /**
-     * The column <code>event_data.event_id</code>.
-     */
-    public final TableField<EventDataRecord, String> EVENT_ID = createField(DSL.name("event_id"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>event_data.aggregate_name</code>.
@@ -129,7 +124,7 @@ public class EventData extends TableImpl<EventDataRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.IDX_EVENT_DATA_AGGREGATE_ID, Indexes.IDX_EVENT_DATA_AGGREGATE_NAME, Indexes.IDX_EVENT_DATA_EVENT_ID);
+        return Arrays.<Index>asList(Indexes.IDX_EVENT_DATA_AGGREGATE_ID, Indexes.IDX_EVENT_DATA_AGGREGATE_NAME);
     }
 
     @Override
@@ -169,11 +164,11 @@ public class EventData extends TableImpl<EventDataRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row8 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row8<String, String, String, String, String, Integer, String, String> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public Row7<String, String, String, String, Integer, String, String> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }
