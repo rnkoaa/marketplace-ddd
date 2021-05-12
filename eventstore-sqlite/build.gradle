@@ -102,13 +102,14 @@ jooq {
                 logging = org.jooq.meta.jaxb.Logging.WARN
 //                jdbc {
 //                    driver = 'org.sqlite.JDBC'
-//                    url = 'jdbc:sqlite:src/main/resources/db/eventstore.db'
+//                    url = 'jdbc:sqlite:src/main/resources/db/marketplace.db'
 //                }
                 generator {
                     name = 'org.jooq.codegen.DefaultGenerator'
                     database {
                         name = "org.jooq.meta.extensions.ddl.DDLDatabase"
-                        properties {
+//                        name = "org.jooq.meta.sqlite.SQLiteDatabase"
+                       properties {
                             property {
                                 key = "scripts"
                                 value = "src/main/resources/db/schema.sql"

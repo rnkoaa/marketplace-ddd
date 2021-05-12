@@ -83,7 +83,10 @@ create table classified_ad
     created          TEXT NOT NULL,
     updated          TEXT NOT NULL, -- timestamp,
 
+
+-- [jooq ignore start]
     FOREIGN KEY (owner) REFERENCES user_profile (user_profile_id)
+-- [jooq ignore end]
 );
 
 -- [jooq ignore start]

@@ -1,34 +1,42 @@
 package com.marketplace.domain.userprofile.query;
 
-public class UserProfileQueryRepositoryImpl implements UserProfileQueryRepository{
-/*
-private final DSLContext dslContext;
+import com.marketplace.domain.userprofile.entity.UserProfileEntity;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-    @Inject
-    public UserProfileRepositoryImpl(DSLContext dslContext) {
-        this.dslContext = dslContext;
-    }
+//@Named
+//@Singleton
+public class UserProfileQueryRepositoryImpl implements UserProfileQueryRepository {
+
+//    private final DSLContext dslContext;
+//
+//    public UserProfileQueryRepositoryImpl(DSLContext dslContext) {
+//        this.dslContext = dslContext;
+//    }
 
     @Override
-    public boolean exists(UserId id) {
-        return load(id).isPresent();
-    }
-
-    @Override
-    public Optional<UserProfile> load(UserId id) {
-        UserProfileRecord userProfileRecord = dslContext.select().from(Tables.USER_PROFILE)
-            .where(Tables.USER_PROFILE.USER_PROFILE_ID.eq(id.toString()))
-            .fetchOneInto(UserProfileRecord.class);
+    public Optional<UserProfileEntity> findById(UUID id) {
+//        UserProfileRecord userProfileRecord = dslContext.selectOne()
+//            .from(Tables.USER_PROFILE)
+//            .where(Tables.USER_PROFILE.USER_PROFILE_ID.eq(id.toString()))
+//            .fetchOneInto(UserProfileRecord.class);
+//
+//        return UserProfileMapper.convert(userProfileRecord);
         return Optional.empty();
     }
 
     @Override
-    public UserProfile add(UserProfile entity) {
-        return null;
+    public List<UserProfileEntity> findAll() {
+//        List<UserProfileRecord> userProfileRecords = dslContext.selectOne()
+//            .from(Tables.USER_PROFILE)
+//            .fetchInto(UserProfileRecord.class);
+//
+//        return userProfileRecords.stream()
+//            .map(UserProfileMapper::convert)
+//            .filter(Optional::isPresent)
+//            .map(Optional::get)
+//            .toList();
+        return List.of();
     }
-
-    @Override
-    public void deleteAll() {
-    }
- */
 }

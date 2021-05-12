@@ -70,6 +70,7 @@ dependencies {
     implementation project(":eventstore-sqlite")
 
     implementation "org.jooq:jooq:$jooqVersion"
+    jooqGenerator "org.xerial:sqlite-jdbc:$sqliteVersion"
     jooqGenerator "org.jooq:jooq-meta-extensions:$jooqVersion"
 
     implementation("org.slf4j:slf4j-api:1.7.30")
@@ -122,8 +123,9 @@ test {
     }
 }
 
+
 jooq {
-    version = '3.14.7'  // the default (can be omitted)
+//    version = '3.14.9'  // the default (can be omitted)
     edition = nu.studer.gradle.jooq.JooqEdition.OSS  // the default (can be omitted)
 
     configurations {
@@ -132,22 +134,19 @@ jooq {
 
             generationTool {
                 logging = org.jooq.meta.jaxb.Logging.WARN
-//                jdbc {
-//                    driver = 'org.sqlite.JDBC'
-//                    url = 'jdbc:sqlite:src/main/resources/db/eventstore.db'
-//                }
+                jdbc {
+                    driver = 'org.sqlite.JDBC'
+                    url = 'jdbc:sqlite:src/main/resources/db/marketplace.db'
+                }
                 generator {
                     name = 'org.jooq.codegen.DefaultGenerator'
                     database {
-                        name = "org.jooq.meta.extensions.ddl.DDLDatabase"
+                        name = "org.jooq.meta.sqlite.SQLiteDatabase"
+//                        name = "org.jooq.meta.extensions.ddl.DDLDatabase"
                         properties {
-                            property {
-                                key = "scripts"
-                                value = "src/main/resources/db/migration/*.sql"
-                            }
 //                            property {
 //                                key = "scripts"
-//                                value = "src/main/resources/db/schema.sql"
+//                                value = "src/main/resources/db/migration/*.sql"
 //                            }
                             property {
                                 key = "sort"

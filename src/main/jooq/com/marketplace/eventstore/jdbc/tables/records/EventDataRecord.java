@@ -22,7 +22,7 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>EVENT_DATA.ID</code>.
+     * Setter for <code>event_data.id</code>.
      */
     public EventDataRecord setId(Integer value) {
         set(0, value);
@@ -30,14 +30,14 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
     }
 
     /**
-     * Getter for <code>EVENT_DATA.ID</code>.
+     * Getter for <code>event_data.id</code>.
      */
     public Integer getId() {
         return (Integer) get(0);
     }
 
     /**
-     * Setter for <code>EVENT_DATA.EVENT_ID</code>.
+     * Setter for <code>event_data.event_id</code>.
      */
     public EventDataRecord setEventId(String value) {
         set(1, value);
@@ -45,14 +45,14 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
     }
 
     /**
-     * Getter for <code>EVENT_DATA.EVENT_ID</code>.
+     * Getter for <code>event_data.event_id</code>.
      */
     public String getEventId() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>EVENT_DATA.AGGREGATE_NAME</code>.
+     * Setter for <code>event_data.aggregate_name</code>.
      */
     public EventDataRecord setAggregateName(String value) {
         set(2, value);
@@ -60,14 +60,14 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
     }
 
     /**
-     * Getter for <code>EVENT_DATA.AGGREGATE_NAME</code>.
+     * Getter for <code>event_data.aggregate_name</code>.
      */
     public String getAggregateName() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>EVENT_DATA.AGGREGATE_ID</code>.
+     * Setter for <code>event_data.aggregate_id</code>.
      */
     public EventDataRecord setAggregateId(String value) {
         set(3, value);
@@ -75,14 +75,14 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
     }
 
     /**
-     * Getter for <code>EVENT_DATA.AGGREGATE_ID</code>.
+     * Getter for <code>event_data.aggregate_id</code>.
      */
     public String getAggregateId() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>EVENT_DATA.EVENT_TYPE</code>.
+     * Setter for <code>event_data.event_type</code>.
      */
     public EventDataRecord setEventType(String value) {
         set(4, value);
@@ -90,14 +90,14 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
     }
 
     /**
-     * Getter for <code>EVENT_DATA.EVENT_TYPE</code>.
+     * Getter for <code>event_data.event_type</code>.
      */
     public String getEventType() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>EVENT_DATA.EVENT_VERSION</code>.
+     * Setter for <code>event_data.event_version</code>.
      */
     public EventDataRecord setEventVersion(Integer value) {
         set(5, value);
@@ -105,14 +105,14 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
     }
 
     /**
-     * Getter for <code>EVENT_DATA.EVENT_VERSION</code>.
+     * Getter for <code>event_data.event_version</code>.
      */
     public Integer getEventVersion() {
         return (Integer) get(5);
     }
 
     /**
-     * Setter for <code>EVENT_DATA.DATA</code>.
+     * Setter for <code>event_data.data</code>.
      */
     public EventDataRecord setData(String value) {
         set(6, value);
@@ -120,14 +120,14 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
     }
 
     /**
-     * Getter for <code>EVENT_DATA.DATA</code>.
+     * Getter for <code>event_data.data</code>.
      */
     public String getData() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>EVENT_DATA.CREATED</code>.
+     * Setter for <code>event_data.created</code>.
      */
     public EventDataRecord setCreated(String value) {
         set(7, value);
@@ -135,7 +135,7 @@ public class EventDataRecord extends UpdatableRecordImpl<EventDataRecord> implem
     }
 
     /**
-     * Getter for <code>EVENT_DATA.CREATED</code>.
+     * Getter for <code>event_data.created</code>.
      */
     public String getCreated() {
         return (String) get(7);

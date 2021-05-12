@@ -9,6 +9,7 @@ import com.marketplace.server.SparkServer;
 import dagger.BindsInstance;
 import dagger.Component;
 import javax.inject.Singleton;
+import org.jooq.DSLContext;
 
 @Component(modules = {
     SparkServerModule.class,
@@ -26,6 +27,8 @@ public interface ApplicationContext {
     UserProfileRepository getUserProfileRepository();
 
     ClassifiedAdService getClassifiedAdService();
+
+//    DSLContext getDSLContext();
 
     @Component.Builder
     interface Builder {

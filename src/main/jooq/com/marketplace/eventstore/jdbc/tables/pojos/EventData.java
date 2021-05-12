@@ -56,56 +56,56 @@ public class EventData implements Serializable {
     }
 
     /**
-     * Getter for <code>EVENT_DATA.ID</code>.
+     * Getter for <code>event_data.id</code>.
      */
     public Integer getId() {
         return this.id;
     }
 
     /**
-     * Getter for <code>EVENT_DATA.EVENT_ID</code>.
+     * Getter for <code>event_data.event_id</code>.
      */
     public String getEventId() {
         return this.eventId;
     }
 
     /**
-     * Getter for <code>EVENT_DATA.AGGREGATE_NAME</code>.
+     * Getter for <code>event_data.aggregate_name</code>.
      */
     public String getAggregateName() {
         return this.aggregateName;
     }
 
     /**
-     * Getter for <code>EVENT_DATA.AGGREGATE_ID</code>.
+     * Getter for <code>event_data.aggregate_id</code>.
      */
     public String getAggregateId() {
         return this.aggregateId;
     }
 
     /**
-     * Getter for <code>EVENT_DATA.EVENT_TYPE</code>.
+     * Getter for <code>event_data.event_type</code>.
      */
     public String getEventType() {
         return this.eventType;
     }
 
     /**
-     * Getter for <code>EVENT_DATA.EVENT_VERSION</code>.
+     * Getter for <code>event_data.event_version</code>.
      */
     public Integer getEventVersion() {
         return this.eventVersion;
     }
 
     /**
-     * Getter for <code>EVENT_DATA.DATA</code>.
+     * Getter for <code>event_data.data</code>.
      */
     public String getData() {
         return this.data;
     }
 
     /**
-     * Getter for <code>EVENT_DATA.CREATED</code>.
+     * Getter for <code>event_data.created</code>.
      */
     public String getCreated() {
         return this.created;

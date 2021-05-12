@@ -15,63 +15,65 @@ import org.immutables.value.Value.Immutable;
 
 @Entity
 @Immutable
-public abstract class UserProfileEntity  {
+public abstract class UserProfileEntity {
 
-  @Id
-  public abstract UUID getId();
+    @Id
+    public abstract int getInternalId();
 
-  public abstract String getFirstName();
+    public abstract UUID getId();
 
-  public abstract String getMiddleName();
+    public abstract String getFirstName();
 
-  public abstract String getLastName();
+    public abstract String getMiddleName();
 
-  public abstract String getDisplayName();
+    public abstract String getLastName();
 
-  public abstract Optional<String> getPhotoUrl();
+    public abstract String getDisplayName();
 
-  public static UserProfileEntity create(UserProfile entity) {
-    var userProfileEntityBuilder = ImmutableUserProfileEntity.builder()
-        .id(entity.getId().id())
-        .firstName(entity.getFullName().firstName())
-        .lastName(entity.getFullName().lastName())
-        .middleName(entity.getFullName().middleName())
-        .displayName(entity.getDisplayName().value());
+    public abstract Optional<String> getPhotoUrl();
 
-    if (!Strings.isNullOrEmpty(entity.getPhotoUrl())) {
-      userProfileEntityBuilder.photoUrl(entity.getPhotoUrl());
+    public static UserProfileEntity create(UserProfile entity) {
+        var userProfileEntityBuilder = ImmutableUserProfileEntity.builder()
+            .id(entity.getId().id())
+            .firstName(entity.getFullName().firstName())
+            .lastName(entity.getFullName().lastName())
+            .middleName(entity.getFullName().middleName())
+            .displayName(entity.getDisplayName().value());
+
+        if (!Strings.isNullOrEmpty(entity.getPhotoUrl())) {
+            userProfileEntityBuilder.photoUrl(entity.getPhotoUrl());
+        }
+
+        return userProfileEntityBuilder.build();
     }
 
-    return userProfileEntityBuilder.build();
-  }
-
-  public FullName fullName() {
-    return new FullName(getFirstName(), getMiddleName(), getLastName());
-  }
-
-  public DisplayName displayName() {
-    return new DisplayName(getDisplayName());
-  }
-
-  public static UserProfile toUserProfile(UserProfileEntity userProfileEntity) {
-    UserProfile userProfile = new UserProfile(UserId.from(userProfileEntity.getId()),
-        userProfileEntity.fullName(),
-        userProfileEntity.displayName());
-    userProfileEntity.getPhotoUrl().ifPresent(userProfile::updatePhoto);
-    return userProfile;
-  }
-
-  public static UserProfileEntity from(UserProfile userProfile) {
-    Builder builder = ImmutableUserProfileEntity.builder()
-        .id(userProfile.getId().id())
-        .firstName(userProfile.getFullName().firstName())
-        .middleName(userProfile.getFullName().middleName())
-        .lastName(userProfile.getFullName().lastName())
-        .displayName(userProfile.getDisplayName().value());
-    if (!Strings.isNullOrEmpty(userProfile.getPhotoUrl())) {
-      builder.photoUrl(userProfile.getPhotoUrl());
+    public FullName fullName() {
+        return new FullName(getFirstName(), getMiddleName(), getLastName());
     }
-    return builder.build();
-  }
+
+    public DisplayName displayName() {
+        return new DisplayName(getDisplayName());
+    }
+
+    public static UserProfile toUserProfile(UserProfileEntity userProfileEntity) {
+        UserProfile userProfile = new UserProfile(UserId.from(userProfileEntity.getId()),
+            userProfileEntity.fullName(),
+            userProfileEntity.displayName());
+        userProfileEntity.getPhotoUrl().ifPresent(userProfile::updatePhoto);
+        return userProfile;
+    }
+
+    public static UserProfileEntity from(UserProfile userProfile) {
+        Builder builder = ImmutableUserProfileEntity.builder()
+            .id(userProfile.getId().id())
+            .firstName(userProfile.getFullName().firstName())
+            .middleName(userProfile.getFullName().middleName())
+            .lastName(userProfile.getFullName().lastName())
+            .displayName(userProfile.getDisplayName().value());
+        if (!Strings.isNullOrEmpty(userProfile.getPhotoUrl())) {
+            builder.photoUrl(userProfile.getPhotoUrl());
+        }
+        return builder.build();
+    }
 
 }
