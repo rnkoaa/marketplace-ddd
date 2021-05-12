@@ -6,6 +6,7 @@ import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
+import com.marketplace.eventstore.jdbc.Tables;
 import java.io.IOException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,15 +27,15 @@ public abstract class BaseRepositoryTest extends AbstractContainerInitializer {
             .build();
         classifiedAdCommandRepository = context.getClassifiedAdRepository();
         classifiedAdService = context.getClassifiedAdService();
+
+        dslContext.delete(Tables.USER_PROFILE)
+            .execute();
     }
 
     @AfterEach
     public void cleanup() {
-//    DeleteResult deleteResult = classifiedAdCollection.deleteMany(new Document());
-//    if (deleteResult.wasAcknowledged()) {
-//      System.out.println("delete was acknowledged.");
-//    }
-//    System.out.println("Number of records deleted: " + deleteResult.getDeletedCount());
+        dslContext.delete(Tables.USER_PROFILE)
+            .execute();
     }
 
 }
