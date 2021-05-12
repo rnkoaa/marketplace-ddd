@@ -6,6 +6,7 @@ import com.marketplace.BaseRepositoryTest;
 import com.marketplace.eventstore.jdbc.Tables;
 import com.marketplace.eventstore.jdbc.tables.records.UserProfileRecord;
 import java.time.Instant;
+import java.util.List;
 import org.jooq.User;
 import org.junit.jupiter.api.Test;
 
@@ -13,14 +14,7 @@ public class UserProfileEntityRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void testSaveUserProfileEntityRecord() {
-        UserProfileRecord userProfileRecord = new UserProfileRecord();
-        userProfileRecord.setFirstname("hello")
-            .setId("hello-id")
-            .setLastname("world")
-            .setDisplayname("helloworld")
-            .setCreated(Instant.now().toString())
-            .setUpdated(Instant.now().toString())
-            .setMiddlename("h.");
+        UserProfileRecord userProfileRecord = generateUserProfile();
 
         UserProfileRecord savedUserProfileRecord = dslContext.insertInto(Tables.USER_PROFILE)
             .set(userProfileRecord)
@@ -29,14 +23,32 @@ public class UserProfileEntityRepositoryTest extends BaseRepositoryTest {
 
         assertThat(savedUserProfileRecord).isNotNull();
 
-
         assertThat(savedUserProfileRecord.getId()).isNotNull()
-        .isEqualTo("hello-id");
+            .isEqualTo("hello-id");
+    }
+
+    @Test
+    void testFindAllSaveUserProfileEntityRecord() {
+        UserProfileRecord userProfileRecord = generateUserProfile();
+
+        UserProfileRecord savedUserProfileRecord = dslContext.insertInto(Tables.USER_PROFILE)
+            .set(userProfileRecord)
+            .returning(Tables.USER_PROFILE.ID)
+            .fetchOne();
+
+        assertThat(savedUserProfileRecord).isNotNull();
+
+        List<UserProfileRecord> savedProfileRecord = dslContext.select()
+            .from(Tables.USER_PROFILE)
+            .where(Tables.USER_PROFILE.ID.eq("hello-id"))
+            .fetchInto(UserProfileRecord.class);
+
+        assertThat(savedProfileRecord).isNotNull().hasSize(0);
     }
 
     @Test
     void testFindSaveUserProfileEntityRecord() {
-        UserProfileRecord userProfileRecord = getUserProfileRecord();
+        UserProfileRecord userProfileRecord = generateUserProfile();
 
         UserProfileRecord savedUserProfileRecord = dslContext.insertInto(Tables.USER_PROFILE)
             .set(userProfileRecord)
@@ -45,9 +57,12 @@ public class UserProfileEntityRepositoryTest extends BaseRepositoryTest {
 
         assertThat(savedUserProfileRecord).isNotNull();
 
+        UserProfileRecord savedProfileRecord = dslContext.select()
+            .from(Tables.USER_PROFILE)
+            .where(Tables.USER_PROFILE.ID.eq("hello-id"))
+            .fetchOneInto(UserProfileRecord.class);
 
-        assertThat(savedUserProfileRecord.getId()).isNotNull()
-            .isEqualTo("hello-id");
+        assertThat(savedProfileRecord).isNotNull().isEqualTo(userProfileRecord);
     }
 
     private UserProfileRecord generateUserProfile() {
