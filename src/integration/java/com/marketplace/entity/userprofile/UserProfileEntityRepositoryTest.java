@@ -66,14 +66,13 @@ public class UserProfileEntityRepositoryTest extends BaseRepositoryTest {
     }
 
     private UserProfileRecord generateUserProfile() {
-        UserProfileRecord userProfileRecord = new UserProfileRecord();
-        userProfileRecord.setFirstname("hello")
+        return new UserProfileRecord()
+            .setFirstname("hello")
             .setId("hello-id")
             .setLastname("world")
             .setDisplayname("helloworld")
             .setCreated(Instant.now().toString())
             .setUpdated(Instant.now().toString())
             .setMiddlename("h.");
-        return userProfileRecord;
     }
 }
