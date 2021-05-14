@@ -42,7 +42,7 @@ public class UserProfileEntityRepositoryTest extends BaseRepositoryTest {
             .where(Tables.USER_PROFILE.ID.eq("hello-id"))
             .fetchInto(UserProfileRecord.class);
 
-        assertThat(savedProfileRecord).isNotNull().hasSize(0);
+        assertThat(savedProfileRecord).isNotNull().hasSize(1);
     }
 
     @Test
