@@ -16,7 +16,6 @@ public class ClassifiedAd implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String id;
-    private final String classifiedAdId;
     private final String approver;
     private final String owner;
     private final String title;
@@ -28,7 +27,6 @@ public class ClassifiedAd implements Serializable {
 
     public ClassifiedAd(ClassifiedAd value) {
         this.id = value.id;
-        this.classifiedAdId = value.classifiedAdId;
         this.approver = value.approver;
         this.owner = value.owner;
         this.title = value.title;
@@ -41,7 +39,6 @@ public class ClassifiedAd implements Serializable {
 
     public ClassifiedAd(
         String id,
-        String classifiedAdId,
         String approver,
         String owner,
         String title,
@@ -52,7 +49,6 @@ public class ClassifiedAd implements Serializable {
         String updated
     ) {
         this.id = id;
-        this.classifiedAdId = classifiedAdId;
         this.approver = approver;
         this.owner = owner;
         this.title = title;
@@ -68,13 +64,6 @@ public class ClassifiedAd implements Serializable {
      */
     public String getId() {
         return this.id;
-    }
-
-    /**
-     * Getter for <code>classified_ad.classified_ad_id</code>.
-     */
-    public String getClassifiedAdId() {
-        return this.classifiedAdId;
     }
 
     /**
@@ -138,7 +127,6 @@ public class ClassifiedAd implements Serializable {
         StringBuilder sb = new StringBuilder("ClassifiedAd (");
 
         sb.append(id);
-        sb.append(", ").append(classifiedAdId);
         sb.append(", ").append(approver);
         sb.append(", ").append(owner);
         sb.append(", ").append(title);

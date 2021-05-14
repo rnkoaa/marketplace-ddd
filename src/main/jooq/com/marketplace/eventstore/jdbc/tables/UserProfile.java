@@ -5,7 +5,6 @@ package com.marketplace.eventstore.jdbc.tables;
 
 
 import com.marketplace.eventstore.jdbc.DefaultSchema;
-import com.marketplace.eventstore.jdbc.Indexes;
 import com.marketplace.eventstore.jdbc.Keys;
 import com.marketplace.eventstore.jdbc.tables.records.UserProfileRecord;
 
@@ -14,10 +13,9 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row9;
+import org.jooq.Row8;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -53,11 +51,6 @@ public class UserProfile extends TableImpl<UserProfileRecord> {
      * The column <code>user_profile.id</code>.
      */
     public final TableField<UserProfileRecord, String> ID = createField(DSL.name("id"), SQLDataType.CLOB, this, "");
-
-    /**
-     * The column <code>user_profile.user_profile_id</code>.
-     */
-    public final TableField<UserProfileRecord, String> USER_PROFILE_ID = createField(DSL.name("user_profile_id"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>user_profile.firstName</code>.
@@ -133,11 +126,6 @@ public class UserProfile extends TableImpl<UserProfileRecord> {
     }
 
     @Override
-    public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.IDX_USER_PROFILE_ID);
-    }
-
-    @Override
     public UniqueKey<UserProfileRecord> getPrimaryKey() {
         return Keys.PK_USER_PROFILE;
     }
@@ -174,11 +162,11 @@ public class UserProfile extends TableImpl<UserProfileRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row9 type methods
+    // Row8 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<String, String, String, String, String, String, String, String, String> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Row8<String, String, String, String, String, String, String, String> fieldsRow() {
+        return (Row8) super.fieldsRow();
     }
 }

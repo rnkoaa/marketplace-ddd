@@ -1,7 +1,6 @@
 create table event_data
 (
     id             TEXT PRIMARY KEY,
-    event_id       TEXT NOT NULL,
     aggregate_name TEXT NULL,
     aggregate_id   TEXT NOT NULL,
     event_type     TEXT NOT NULL,
@@ -11,9 +10,6 @@ create table event_data
 );
 
 -- [jooq ignore start]
-CREATE
-    UNIQUE INDEX idx_event_data_event_id
-    ON event_data (event_id);
 
 CREATE
     INDEX idx_event_data_aggregate_id
@@ -27,11 +23,6 @@ CREATE
 create table user_profile
 (
     id              TEXT PRIMARY KEY,
-
-    -- [jooq ignore start]
-    -- uuid
-    -- [jooq ignore end]
-    user_profile_id TEXT NOT NULL,
     firstName       TEXT,                 -- uuid
     lastName        TEXT,                 -- string
     middleName      TEXT,                 -- string
@@ -41,22 +32,9 @@ create table user_profile
     updated         TEXT        NOT NULL  -- timestamp
 );
 
--- [jooq ignore start]
-CREATE
-    INDEX idx_user_profile_id
-    ON user_profile (user_profile_id);
-
--- [jooq ignore end]
-
-
 create table classified_ad
 (
     id               TEXT PRIMARY KEY,
-
-    -- [jooq ignore start]
-    -- uuid
-    -- [jooq ignore end]
-    classified_ad_id TEXT NOT NULL,
 
     -- [jooq ignore start]
     -- uuid
@@ -83,13 +61,10 @@ create table classified_ad
     created          TEXT NOT NULL,
     updated          TEXT NOT NULL, -- timestamp,
 
-    FOREIGN KEY (owner) REFERENCES user_profile (user_profile_id)
+    FOREIGN KEY (owner) REFERENCES user_profile (id)
 );
 
 -- [jooq ignore start]
-CREATE
-    INDEX idx_classified_ad_id
-    ON classified_ad (classified_ad_id);
 
 CREATE
     INDEX idx_classified_ad_owner_id

@@ -17,7 +17,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row10;
+import org.jooq.Row9;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -53,11 +53,6 @@ public class ClassifiedAd extends TableImpl<ClassifiedAdRecord> {
      * The column <code>classified_ad.id</code>.
      */
     public final TableField<ClassifiedAdRecord, String> ID = createField(DSL.name("id"), SQLDataType.CLOB, this, "");
-
-    /**
-     * The column <code>classified_ad.classified_ad_id</code>.
-     */
-    public final TableField<ClassifiedAdRecord, String> CLASSIFIED_AD_ID = createField(DSL.name("classified_ad_id"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>classified_ad.approver</code>.
@@ -139,7 +134,7 @@ public class ClassifiedAd extends TableImpl<ClassifiedAdRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.IDX_CLASSIFIED_AD_APPROVER_ID, Indexes.IDX_CLASSIFIED_AD_ID, Indexes.IDX_CLASSIFIED_AD_OWNER_ID);
+        return Arrays.<Index>asList(Indexes.IDX_CLASSIFIED_AD_APPROVER_ID, Indexes.IDX_CLASSIFIED_AD_OWNER_ID);
     }
 
     @Override
@@ -193,11 +188,11 @@ public class ClassifiedAd extends TableImpl<ClassifiedAdRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row10 type methods
+    // Row9 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row10<String, String, String, String, String, String, String, String, String, String> fieldsRow() {
-        return (Row10) super.fieldsRow();
+    public Row9<String, String, String, String, String, String, String, String, String> fieldsRow() {
+        return (Row9) super.fieldsRow();
     }
 }

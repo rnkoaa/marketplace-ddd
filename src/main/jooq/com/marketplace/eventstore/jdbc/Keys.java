@@ -40,5 +40,5 @@ public class Keys {
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final ForeignKey<ClassifiedAdRecord, UserProfileRecord> FK_CLASSIFIED_AD_USER_PROFILE_1 = Internal.createForeignKey(ClassifiedAd.CLASSIFIED_AD, DSL.name("fk_classified_ad_user_profile_1"), new TableField[] { ClassifiedAd.CLASSIFIED_AD.OWNER }, Keys.PK_USER_PROFILE, new TableField[] { UserProfile.USER_PROFILE.USER_PROFILE_ID }, true);
+    public static final ForeignKey<ClassifiedAdRecord, UserProfileRecord> FK_CLASSIFIED_AD_USER_PROFILE_1 = Internal.createForeignKey(ClassifiedAd.CLASSIFIED_AD, DSL.name("fk_classified_ad_user_profile_1"), new TableField[] { ClassifiedAd.CLASSIFIED_AD.OWNER }, Keys.PK_USER_PROFILE, new TableField[] { UserProfile.USER_PROFILE.ID }, true);
 }
