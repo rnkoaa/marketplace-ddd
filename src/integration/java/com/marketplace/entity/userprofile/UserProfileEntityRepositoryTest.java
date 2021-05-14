@@ -6,7 +6,6 @@ import com.marketplace.BaseRepositoryTest;
 import com.marketplace.eventstore.jdbc.Tables;
 import com.marketplace.eventstore.jdbc.tables.records.UserProfileRecord;
 import java.time.Instant;
-import org.jooq.User;
 import org.junit.jupiter.api.Test;
 
 public class UserProfileEntityRepositoryTest extends BaseRepositoryTest {
