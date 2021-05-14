@@ -75,7 +75,6 @@ dependencies {
 
     implementation "org.xerial:sqlite-jdbc:$sqliteVersion"
 
-
     jooqGenerator "org.xerial:sqlite-jdbc:$sqliteVersion"
     jooqGenerator "org.jooq:jooq-meta-extensions:$jooqVersion"
 
@@ -196,19 +195,11 @@ processFunctionalResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
+// https://flywaydb.org/documentation/usage/gradle/migrate
 flyway {
     driver = 'org.sqlite.JDBC'
     url = "jdbc:sqlite:${projectDir}/src/main/resources/db/marketplace.db"
-//    locations = "${projectDir}/src/main/resources/migration"
-//    locations = ["classpath:db/migration"]
     locations = ["filesystem:${projectDir}/src/main/resources/db/migration"]
-//    user = 'myUsr'
-//    password = 'mySecretPwd'
-//    schemas = ['schema1', 'schema2', 'schema3']
-//    placeholders = [
-//            'keyABC': 'valueXYZ',
-//            'otherplaceholder': 'value123'
-//    ]
 }
 
 jooq {
@@ -229,25 +220,6 @@ jooq {
                     name = 'org.jooq.codegen.DefaultGenerator'
                     database {
                         name = 'org.jooq.meta.sqlite.SQLiteDatabase'
-//                        name = "org.jooq.meta.extensions.ddl.DDLDatabase"
-//                        properties {
-//                            property {
-//                                key = "scripts"
-//                                value = "src/main/resources/db/schema.sql"
-//                            }
-//                            property {
-//                                key = "sort"
-//                                value = "semantic"
-//                            }
-//                            property {
-//                                key = "parseIgnoreCommentStart"
-//                                value = "[jooq ignore start]"
-//                            }
-//                            property {
-//                                key = "parseIgnoreCommentStop"
-//                                value = "[jooq ignore end]"
-//                            }
-//                        }
                     }
                     generate {
                         relations = true
