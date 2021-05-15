@@ -47,27 +47,20 @@ public class UserProfileRepositoryImpl implements UserProfileRepository {
         UserProfileRecord userProfileRecord = UserProfileMapper.convert(userProfileEntity);
 
         userProfileRecord.setUpdated(Instant.now().toString());
-
-        UserProfileRecord savedUserProfileRecord;
-        if (userExists.isPresent()) {
-            UserProfileRecord existingUserProfile = userExists.get();
-            userProfileRecord.setCreated(existingUserProfile.getCreated());
-            savedUserProfileRecord = dslContext.update(Tables.USER_PROFILE)
+        Optional<UserProfileRecord> optionalUser = userExists.map(existingUser -> {
+            userProfileRecord.setCreated(existingUser.getCreated());
+            return dslContext.update(Tables.USER_PROFILE)
                 .set(userProfileRecord)
                 .returning(Tables.USER_PROFILE.ID)
                 .fetchOne();
-        } else {
+        }).or(() -> {
             userProfileRecord.setCreated(Instant.now().toString());
-            savedUserProfileRecord = dslContext.insertInto(Tables.USER_PROFILE)
+            return dslContext.insertInto(Tables.USER_PROFILE)
                 .set(userProfileRecord)
                 .returning(Tables.USER_PROFILE.ID)
-                .fetchOne();
-        }
-
-        if (savedUserProfileRecord == null || savedUserProfileRecord.getId() == null) {
-            return null;
-        }
-        return entity;
+                .fetchOptional();
+        }).filter(it -> it.getId() != null);
+        return optionalUser.isPresent() ? entity : null;
     }
 
     private Optional<UserProfileRecord> fetchRecord(String id) {
