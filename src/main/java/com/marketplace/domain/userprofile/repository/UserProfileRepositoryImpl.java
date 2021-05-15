@@ -6,7 +6,6 @@ import com.marketplace.domain.userprofile.entity.UserProfileEntity;
 import com.marketplace.eventstore.jdbc.Tables;
 import com.marketplace.eventstore.jdbc.tables.records.UserProfileRecord;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;

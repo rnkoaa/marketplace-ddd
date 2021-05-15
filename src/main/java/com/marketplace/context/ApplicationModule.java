@@ -1,7 +1,7 @@
 package com.marketplace.context;
 
-import com.marketplace.domain.classifiedad.query.ClassifiedAdMongoQueryRepository;
-import com.marketplace.domain.classifiedad.query.ClassifiedAdMongoQueryRepositoryImpl;
+import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepository;
+import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepositoryImpl;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdMongoCommandRepositoryImpl;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.userprofile.repository.UserProfileRepository;
@@ -21,8 +21,8 @@ public abstract class ApplicationModule {
 
   @Binds
   @Singleton
-  abstract ClassifiedAdMongoQueryRepository bindClassifiedAdQueryRepository(
-      ClassifiedAdMongoQueryRepositoryImpl impl);
+  abstract ClassifiedAdQueryRepository bindClassifiedAdQueryRepository(
+      ClassifiedAdQueryRepositoryImpl impl);
 
   @Binds
   @Singleton

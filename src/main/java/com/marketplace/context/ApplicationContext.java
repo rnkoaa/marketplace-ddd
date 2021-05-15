@@ -2,6 +2,7 @@ package com.marketplace.context;
 
 import com.marketplace.config.ApplicationConfig;
 import com.marketplace.context.server.SparkServerModule;
+import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepository;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
 import com.marketplace.domain.userprofile.repository.UserProfileRepository;
@@ -29,6 +30,8 @@ public interface ApplicationContext {
     ClassifiedAdService getClassifiedAdService();
 
     DSLContext getDSLContext();
+
+    ClassifiedAdQueryRepository getClassifiedAdQueryRepository();
 
     @Component.Builder
     interface Builder {
