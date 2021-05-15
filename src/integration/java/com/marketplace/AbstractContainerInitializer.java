@@ -20,8 +20,9 @@ public class AbstractContainerInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractContainerInitializer.class);
     protected ApplicationContext context;
     protected DSLContext dslContext;
+
     @BeforeAll
-     void setupAll() throws IOException {
+    void setupAll() throws IOException {
         ApplicationConfig config = ConfigLoader.loadClasspathResource("application.yml", ApplicationConfig.class);
         context = DaggerApplicationContext.
             builder()
@@ -33,5 +34,8 @@ public class AbstractContainerInitializer {
         String dbConnectionUrl = config.getDb().getUrl();
     }
 
+    public ApplicationContext getApplicationContext() {
+        return context;
+    }
 
 }

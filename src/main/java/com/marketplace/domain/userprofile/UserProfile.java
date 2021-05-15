@@ -14,6 +14,7 @@ import com.marketplace.domain.userprofile.event.UserRegistered;
 import com.marketplace.cqrs.event.EventId;
 import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.cqrs.framework.AggregateRoot;
+import java.util.Objects;
 
 public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
 
@@ -110,4 +111,21 @@ public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
     }
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    UserProfile that = (UserProfile) o;
+    return Objects.equals(id, that.id) && Objects.equals(fullName, that.fullName)
+        && Objects.equals(displayName, that.displayName) && Objects.equals(photoUrl, that.photoUrl);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, fullName, displayName, photoUrl);
+  }
 }

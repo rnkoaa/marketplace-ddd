@@ -64,7 +64,7 @@ public class UserProfileEntityRepositoryTest extends BaseRepositoryTest {
         assertThat(savedProfileRecord).isNotNull().isEqualTo(userProfileRecord);
     }
 
-    private UserProfileRecord generateUserProfile() {
+    protected static UserProfileRecord generateUserProfile() {
         return new UserProfileRecord()
             .setFirstname("hello")
             .setId("hello-id")
