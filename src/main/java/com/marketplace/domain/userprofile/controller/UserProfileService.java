@@ -7,111 +7,94 @@ import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.domain.userprofile.repository.UserProfileRepository;
-
 import java.util.Optional;
+import java.util.UUID;
 
 public class UserProfileService {
 
-  private final UserProfileRepository userProfileRepository;
+    private final UserProfileRepository userProfileRepository;
 
-  public UserProfileService(UserProfileRepository userProfileRepository) {
-    this.userProfileRepository = userProfileRepository;
-  }
-
-  public CommandHandlerResult<CreateUserProfileResult> handle(CreateUserProfileCommand command) {
-    var userId = UserId.newId();
-    var fullName = new FullName(command.getFirstName(), command.getMiddleName(), command.getLastName());
-    var displayName = new DisplayName(command.getDisplayName());
-    UserProfile userProfile = new UserProfile(userId, fullName, displayName);
-    UserProfile saved = userProfileRepository.add(userProfile);
-    if (saved != null) {
-      return ImmutableCommandHandlerResult.<CreateUserProfileResult>builder()
-          .result(ImmutableCreateUserProfileResult.builder().id(userId.id()).build())
-          .isSuccessful(true)
-          .build();
+    public UserProfileService(UserProfileRepository userProfileRepository) {
+        this.userProfileRepository = userProfileRepository;
     }
-    return ImmutableCommandHandlerResult.<CreateUserProfileResult>builder()
-        .isSuccessful(false)
-        .message("failed to create user, please try again")
-        .build();
-  }
 
-  public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserProfileCommand command) {
-    Optional<UserProfile> load = userProfileRepository.load(UserId.from(command.getUserId()));
-    return load
-        .map(userProfile -> {
-          userProfile.updatePhoto(command.getPhotoUrl());
-          UserProfile saved = userProfileRepository.add(userProfile);
-          if (saved != null) {
-            return ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
-                .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
-                .isSuccessful(true)
-                .build();
-          }
-          return ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
-              .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
-              .isSuccessful(false)
-              .message("failed to update user, please try again")
-              .build();
-        })
-        .orElse(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
-            .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
-            .isSuccessful(false)
-            .message("user with id " + command.getUserId().toString() + " was not found to be updated.")
-            .build());
-  }
+    public CommandHandlerResult<CreateUserProfileResult> handle(CreateUserProfileCommand command) {
+        var userId = UserId.newId();
+        var fullName = new FullName(command.getFirstName(), command.getMiddleName(), command.getLastName());
+        var displayName = new DisplayName(command.getDisplayName());
+        UserProfile userProfile = new UserProfile(userId, fullName, displayName);
+        Optional<UserProfile> saved = userProfileRepository.add(userProfile);
+        return saved.map(user -> ImmutableCommandHandlerResult.<CreateUserProfileResult>builder()
+            .result(ImmutableCreateUserProfileResult.builder().id(user.getId().id()).build())
+            .isSuccessful(true)
+            .build())
+            .orElseGet(() -> ImmutableCommandHandlerResult.<CreateUserProfileResult>builder()
+                .isSuccessful(false)
+                .message("failed to create user, please try again")
+                .build());
+    }
 
-  public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserFullNameCommand command) {
-    Optional<UserProfile> load = userProfileRepository.load(UserId.from(command.getUserId()));
-    return load
-        .map(userProfile -> {
-          var fullName = new FullName(command.getFirstName(), command.getMiddleName(), command.getLastName());
-          userProfile.updateUserFullName(fullName);
-          UserProfile saved = userProfileRepository.add(userProfile);
-          if (saved != null) {
-            return ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
+    public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserProfileCommand command) {
+        return userProfileRepository.load(UserId.from(command.getUserId()))
+            .flatMap(userProfile -> {
+                userProfile.updatePhoto(command.getPhotoUrl());
+                return doUserProfileUpdate(command.getUserId(), userProfile);
+            })
+            .orElse(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
                 .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
-                .isSuccessful(true)
-                .build();
-          }
-          return ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
-              .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
-              .isSuccessful(false)
-              .message("failed to update user, please try again")
-              .build();
-        })
-        .orElse(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
-            .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
-            .isSuccessful(false)
-            .message("user with id " + command.getUserId().toString() + " was not found to be updated.")
-            .build());
-  }
+                .isSuccessful(false)
+                .message("user with id " + command.getUserId().toString() + " was not found to be updated.")
+                .build());
+    }
 
-  public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserDisplayNameCommand command) {
-    Optional<UserProfile> load = userProfileRepository.load(UserId.from(command.getUserId()));
-    return load
-        .map(userProfile -> {
-          var displayName = new DisplayName(command.getDisplayName());
-          userProfile.updateDisplayName(displayName);
-          UserProfile saved = userProfileRepository.add(userProfile);
-          if (saved != null) {
-            return ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
+    public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserFullNameCommand command) {
+        return userProfileRepository.load(UserId.from(command.getUserId()))
+            .flatMap(userProfile -> updateUserFullName(command, userProfile))
+            .orElse(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
                 .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
+                .isSuccessful(false)
+                .message("user with id " + command.getUserId().toString() + " was not found to be updated.")
+                .build());
+    }
+
+    public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserDisplayNameCommand command) {
+        return userProfileRepository
+            .load(UserId.from(command.getUserId()))
+            .flatMap(userProfile -> updateUserDisplayName(command, userProfile))
+            .orElse(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
+                .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
+                .isSuccessful(false)
+                .message("user with id " + command.getUserId().toString() + " was not found to be updated.")
+                .build());
+    }
+
+    private Optional<ImmutableCommandHandlerResult<UpdateUserProfileResult>> updateUserFullName(
+        UpdateUserFullNameCommand command, UserProfile userProfile) {
+        var fullName = new FullName(command.getFirstName(), command.getMiddleName(), command.getLastName());
+        userProfile.updateUserFullName(fullName);
+        return doUserProfileUpdate(command.getUserId(), userProfile);
+    }
+
+    private Optional<ImmutableCommandHandlerResult<UpdateUserProfileResult>> updateUserDisplayName(
+        UpdateUserDisplayNameCommand command, UserProfile userProfile) {
+        var displayName = new DisplayName(command.getDisplayName());
+        userProfile.updateDisplayName(displayName);
+        return doUserProfileUpdate(command.getUserId(), userProfile);
+    }
+
+    private Optional<ImmutableCommandHandlerResult<UpdateUserProfileResult>> doUserProfileUpdate(
+        UUID userId, UserProfile userProfile) {
+        return userProfileRepository.add(userProfile)
+            .map(user -> ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
+                .result(ImmutableUpdateUserProfileResult.builder().id(userId).build())
                 .isSuccessful(true)
-                .build();
-          }
-          return ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
-              .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
-              .isSuccessful(false)
-              .message("failed to update user, please try again")
-              .build();
-        })
-        .orElse(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
-            .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
-            .isSuccessful(false)
-            .message("user with id " + command.getUserId().toString() + " was not found to be updated.")
-            .build());
-  }
+                .build())
+            .or(() -> Optional.of(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
+                .result(ImmutableUpdateUserProfileResult.builder().id(userId).build())
+                .isSuccessful(false)
+                .message("failed to update user, please try again")
+                .build()));
+    }
 
 
 }

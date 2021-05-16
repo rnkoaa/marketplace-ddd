@@ -16,6 +16,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @Disabled
 public class ClassifiedAdCommandRepositoryTest extends BaseRepositoryTest {
+
     String insertId = "87a7fef0-1527-4a47-b196-504d9f9ce0fe";
 
     @Test
@@ -31,11 +32,14 @@ public class ClassifiedAdCommandRepositoryTest extends BaseRepositoryTest {
         classifiedAd.addPicture("uri", new PictureSize(800, 600), 0);
         classifiedAd.setState(ClassifiedAdState.ACTIVE);
 
-        ClassifiedAd savedClassifiedAd = classifiedAdCommandRepository.add(classifiedAd);
+        Optional<ClassifiedAd> savedClassifiedAd = classifiedAdCommandRepository.add(classifiedAd);
+        assertThat(savedClassifiedAd).isPresent();
 
-        assertThat(savedClassifiedAd.getId()).isNotNull();
-        assertThat(savedClassifiedAd.getId().id()).isNotNull()
-                .isEqualByComparingTo(UUID.fromString(insertId));
+        var actual = savedClassifiedAd.get();
+
+        assertThat(actual.getId()).isNotNull();
+        assertThat(actual.getId().id()).isNotNull()
+            .isEqualByComparingTo(UUID.fromString(insertId));
 
         Optional<ClassifiedAd> load = classifiedAdCommandRepository.load(ClassifiedAdId.fromString(insertId));
 

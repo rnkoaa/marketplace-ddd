@@ -29,8 +29,8 @@ public class UserProfileRepositoryTest extends BaseRepositoryTest {
             new DisplayName("helloworld")
         );
 
-        UserProfile add = userProfileRepository.add(userProfile);
-        assertThat(add).isNotNull();
+        var addedUserProfile = userProfileRepository.add(userProfile);
+        assertThat(addedUserProfile).isPresent();
     }
 
     @Test
@@ -41,8 +41,8 @@ public class UserProfileRepositoryTest extends BaseRepositoryTest {
             new DisplayName("helloworld")
         );
 
-        UserProfile add = userProfileRepository.add(userProfile);
-        assertThat(add).isNotNull();
+        var addedUserProfile = userProfileRepository.add(userProfile);
+        assertThat(addedUserProfile).isPresent();
 
         var maybeUser = userProfileRepository.load(userProfile.getId());
         assertThat(maybeUser).isPresent();
@@ -61,8 +61,8 @@ public class UserProfileRepositoryTest extends BaseRepositoryTest {
             new DisplayName("helloworld")
         );
 
-        UserProfile add = userProfileRepository.add(userProfile);
-        assertThat(add).isNotNull();
+        var addedUserProfile = userProfileRepository.add(userProfile);
+        assertThat(addedUserProfile).isPresent();
 
         var secondUserProfile = new UserProfile(userProfile.getId(),
             userProfile.getFullName(), new DisplayName("helloworld2"));
@@ -85,8 +85,8 @@ public class UserProfileRepositoryTest extends BaseRepositoryTest {
             new DisplayName("helloworld")
         );
 
-        UserProfile add = userProfileRepository.add(userProfile);
-        assertThat(add).isNotNull();
+        var addedUserProfile = userProfileRepository.add(userProfile);
+        assertThat(addedUserProfile).isPresent();
 
         boolean exists = userProfileRepository.exists(userProfile.getId());
         assertThat(exists).isTrue();

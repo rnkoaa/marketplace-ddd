@@ -39,14 +39,14 @@ public class UserProfileRepositoryImpl implements UserProfileRepository {
     }
 
     @Override
-    public UserProfile add(UserProfile entity) {
+    public Optional<UserProfile> add(UserProfile entity) {
         var userProfileEntity = UserProfileEntity.create(entity);
         var userExists = fetchRecord(entity.getId().toString());
 
         UserProfileRecord userProfileRecord = UserProfileMapper.convert(userProfileEntity);
 
         userProfileRecord.setUpdated(Instant.now().toString());
-        Optional<UserProfileRecord> optionalUser = userExists.map(existingUser -> {
+        return userExists.map(existingUser -> {
             userProfileRecord.setCreated(existingUser.getCreated());
             return dslContext.update(Tables.USER_PROFILE)
                 .set(userProfileRecord)
@@ -58,8 +58,8 @@ public class UserProfileRepositoryImpl implements UserProfileRepository {
                 .set(userProfileRecord)
                 .returning(Tables.USER_PROFILE.ID)
                 .fetchOptional();
-        }).filter(it -> it.getId() != null);
-        return optionalUser.isPresent() ? entity : null;
+        }).filter(it -> it.getId() != null)
+            .map(it -> entity);
     }
 
     private Optional<UserProfileRecord> fetchRecord(String id) {

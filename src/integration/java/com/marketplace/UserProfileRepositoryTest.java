@@ -23,124 +23,122 @@ import org.junit.jupiter.api.Test;
 @Disabled
 public class UserProfileRepositoryTest extends AbstractContainerInitializer {
 
-  String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
-  ApplicationContext context;
-  UserProfileRepository userProfileRepository;
+    String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
+    ApplicationContext context;
+    UserProfileRepository userProfileRepository;
 
-  @BeforeEach
-  void setup() throws IOException {
-    ApplicationConfig config =
-        ConfigLoader.loadClasspathResource("application.yml", ApplicationConfig.class);
+    @BeforeEach
+    void setup() throws IOException {
+        ApplicationConfig config =
+            ConfigLoader.loadClasspathResource("application.yml", ApplicationConfig.class);
 
-    context = DaggerApplicationContext.builder().config(config).build();
+        context = DaggerApplicationContext.builder().config(config).build();
 
 //    String hosts = mongoDBContainer.getHost();
 //    int port = mongoDBContainer.getMappedPort(27017);
 //    mongoConfig = new MongoConfig(hosts, "test_db", port);
 //    config = ImmutableApplicationConfig.copyOf(config).withMongo(mongoConfig);
 //    mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
-    userProfileRepository = context.getUserProfileRepository();
-  }
+        userProfileRepository = context.getUserProfileRepository();
+    }
 
-  @AfterEach
-  public void cleanup() {
-    userProfileRepository.deleteAll();
-  }
+    @AfterEach
+    public void cleanup() {
+        userProfileRepository.deleteAll();
+    }
 
-  @Test
-  @Disabled
-  void userProfileCanBeCreated() throws IOException {
-    CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
-    assertThat(command).isNotNull();
-    assertThat(command.getFirstName()).isNotBlank();
-    assertThat(command.getMiddleName()).isNotBlank();
-    assertThat(command.getLastName()).isNotBlank();
+    @Test
+    @Disabled
+    void userProfileCanBeCreated() throws IOException {
+        CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
+        assertThat(command).isNotNull();
+        assertThat(command.getFirstName()).isNotBlank();
+        assertThat(command.getMiddleName()).isNotBlank();
+        assertThat(command.getLastName()).isNotBlank();
 
-    UserProfile userProfile =
-        new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
+        UserProfile userProfile =
+            new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
-    UserProfile add = userProfileRepository.add(userProfile);
+        var addedUserProfile = userProfileRepository.add(userProfile);
+        assertThat(addedUserProfile).isPresent();
+    }
 
-    assertThat(add).isNotNull();
-  }
+    @Test
+    @Disabled
+    void userProfileCanBeCreatedAndLoaded() throws IOException {
+        CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
+        assertThat(command).isNotNull();
+        assertThat(command.getFirstName()).isNotBlank();
+        assertThat(command.getMiddleName()).isNotBlank();
+        assertThat(command.getLastName()).isNotBlank();
 
-  @Test
-  @Disabled
-  void userProfileCanBeCreatedAndLoaded() throws IOException {
-    CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
-    assertThat(command).isNotNull();
-    assertThat(command.getFirstName()).isNotBlank();
-    assertThat(command.getMiddleName()).isNotBlank();
-    assertThat(command.getLastName()).isNotBlank();
+        UserProfile userProfile =
+            new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
-    UserProfile userProfile =
-        new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
+        var addedUserProfile = userProfileRepository.add(userProfile);
+        assertThat(addedUserProfile).isPresent();
 
-    UserProfile add = userProfileRepository.add(userProfile);
+        Optional<UserProfile> load = userProfileRepository.load(addedUserProfile.get().getId());
+        assertThat(load).isPresent();
 
-    assertThat(add).isNotNull();
+        UserProfile savedUserProfile = load.get();
 
-    Optional<UserProfile> load = userProfileRepository.load(add.getId());
-    assertThat(load).isPresent();
+        assertThat(savedUserProfile.getId()).isNotNull();
+        assertThat(savedUserProfile.getChanges()).hasSize(1);
+    }
 
-    UserProfile savedUserProfile = load.get();
+    @Test
+    @Disabled
+    void userProfileCanBeUpdated() throws IOException {
+        CreateUserProfileCommand createUserProfileCmd = UserProfileFixture.loadCreateUserProfileDto();
+        UpdateUserProfileCommand updateUserProfileCommand =
+            UserProfileFixture.loadUpdateUserProfileDto();
+        assertThat(createUserProfileCmd).isNotNull();
+        assertThat(createUserProfileCmd.getFirstName()).isNotBlank();
+        assertThat(createUserProfileCmd.getMiddleName()).isNotBlank();
+        assertThat(createUserProfileCmd.getLastName()).isNotBlank();
 
-    assertThat(savedUserProfile.getId()).isNotNull();
-    assertThat(savedUserProfile.getChanges()).hasSize(1);
-  }
+        UserProfile userProfile =
+            new UserProfile(
+                UserId.from(insertId),
+                createUserProfileCmd.fullName(),
+                new DisplayName(createUserProfileCmd.getDisplayName()));
 
-  @Test
-  @Disabled
-  void userProfileCanBeUpdated() throws IOException {
-    CreateUserProfileCommand createUserProfileCmd = UserProfileFixture.loadCreateUserProfileDto();
-    UpdateUserProfileCommand updateUserProfileCommand =
-        UserProfileFixture.loadUpdateUserProfileDto();
-    assertThat(createUserProfileCmd).isNotNull();
-    assertThat(createUserProfileCmd.getFirstName()).isNotBlank();
-    assertThat(createUserProfileCmd.getMiddleName()).isNotBlank();
-    assertThat(createUserProfileCmd.getLastName()).isNotBlank();
+        var addedUserProfile = userProfileRepository.add(userProfile);
+        assertThat(addedUserProfile).isPresent();
 
-    UserProfile userProfile =
-        new UserProfile(
-            UserId.from(insertId),
-            createUserProfileCmd.fullName(),
-            new DisplayName(createUserProfileCmd.getDisplayName()));
+        var profile = addedUserProfile.get();
 
-    UserProfile add = userProfileRepository.add(userProfile);
+        profile.updatePhoto(updateUserProfileCommand.getPhotoUrl());
+        var secondSaved = userProfileRepository.add(profile);
+        assertThat(secondSaved).isPresent();
 
-    assertThat(add).isNotNull();
+        Optional<UserProfile> load = userProfileRepository.load(profile.getId());
+        assertThat(load).isPresent();
 
-    add.updatePhoto(updateUserProfileCommand.getPhotoUrl());
-    UserProfile secondSaved = userProfileRepository.add(add);
-    assertThat(secondSaved).isNotNull();
+        UserProfile savedUserProfile = load.get();
 
-    Optional<UserProfile> load = userProfileRepository.load(add.getId());
-    assertThat(load).isPresent();
+        assertThat(savedUserProfile.getId()).isNotNull();
+        assertThat(savedUserProfile.getChanges()).hasSize(2);
+        assertThat(savedUserProfile.getPhotoUrl()).isEqualTo("http://photos.me/user-2.jpg");
+    }
 
-    UserProfile savedUserProfile = load.get();
+    @Test
+    @Disabled
+    void userProfileCanBeCreatedAndShownToExist() throws IOException {
+        CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
+        assertThat(command).isNotNull();
+        assertThat(command.getFirstName()).isNotBlank();
+        assertThat(command.getMiddleName()).isNotBlank();
+        assertThat(command.getLastName()).isNotBlank();
 
-    assertThat(savedUserProfile.getId()).isNotNull();
-    assertThat(savedUserProfile.getChanges()).hasSize(2);
-    assertThat(savedUserProfile.getPhotoUrl()).isEqualTo("http://photos.me/user-2.jpg");
-  }
+        UserProfile userProfile =
+            new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
-  @Test
-  @Disabled
-  void userProfileCanBeCreatedAndShownToExist() throws IOException {
-    CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
-    assertThat(command).isNotNull();
-    assertThat(command.getFirstName()).isNotBlank();
-    assertThat(command.getMiddleName()).isNotBlank();
-    assertThat(command.getLastName()).isNotBlank();
+        var addedUserProfile = userProfileRepository.add(userProfile);
+        assertThat(addedUserProfile).isPresent();
 
-    UserProfile userProfile =
-        new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
-
-    UserProfile add = userProfileRepository.add(userProfile);
-
-    assertThat(add).isNotNull();
-
-    boolean exists = userProfileRepository.exists(add.getId());
-    assertThat(exists).isTrue();
-  }
+        boolean exists = userProfileRepository.exists(addedUserProfile.get().getId());
+        assertThat(exists).isTrue();
+    }
 }

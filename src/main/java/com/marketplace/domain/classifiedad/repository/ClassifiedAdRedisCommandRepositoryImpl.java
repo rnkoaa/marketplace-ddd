@@ -3,7 +3,6 @@ package com.marketplace.domain.classifiedad.repository;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import com.marketplace.domain.repository.RedisTemplate;
-
 import java.util.Optional;
 
 public class ClassifiedAdRedisCommandRepositoryImpl implements ClassifiedAdCommandRepository {
@@ -24,9 +23,9 @@ public class ClassifiedAdRedisCommandRepositoryImpl implements ClassifiedAdComma
     }
 
     @Override
-    public ClassifiedAd add(ClassifiedAd entity) {
+    public Optional<ClassifiedAd> add(ClassifiedAd entity) {
         redisTemplate.put(myId(entity.getId()), entity);
-        return entity;
+        return Optional.of(entity);
     }
 
     private String myId(ClassifiedAdId id) {

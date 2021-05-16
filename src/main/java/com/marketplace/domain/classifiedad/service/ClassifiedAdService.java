@@ -60,7 +60,7 @@ public class ClassifiedAdService {
         Optional<UUID> mayBeClassifiedAdId = command.getClassifiedAdId();
         return mayBeClassifiedAdId
             .flatMap(classifiedAdId -> classifiedAdCommandRepository.load(new ClassifiedAdId(classifiedAdId)))
-            .map(classifiedAd -> {
+            .flatMap(classifiedAd -> {
                 command.getOwnerId().ifPresent(ownerId -> classifiedAd.updateOwner(new UserId(ownerId)));
                 command.getTitle().ifPresent(title -> classifiedAd.updateTitle(new ClassifiedAdTitle(title)));
                 command.getText().ifPresent(text -> classifiedAd.updateText(new ClassifiedAdText(text)));
@@ -91,19 +91,16 @@ public class ClassifiedAdService {
         Optional<ClassifiedAd> load = classifiedAdCommandRepository
             .load(new ClassifiedAdId(addPictureToClassifiedAd.getClassifiedAdId()));
 
-        return load.map(classifiedAd -> {
-
+        return load.flatMap(classifiedAd -> {
             PictureSize pictureSize = new PictureSize(addPictureToClassifiedAd.getWidth(),
                 addPictureToClassifiedAd.getHeight());
             var pictureId = classifiedAd.addPicture(addPictureToClassifiedAd.getUri(), pictureSize, 0);
-
-            var savedClassifiedAd = classifiedAdCommandRepository.add(classifiedAd);
-
-            return ImmutableAddPictureResponse.builder()
-                .id(pictureId.id())
-                .status(true)
-                .classifiedAdId(savedClassifiedAd.getId().id())
-                .build();
+            return classifiedAdCommandRepository.add(classifiedAd)
+                .map(res -> ImmutableAddPictureResponse.builder()
+                    .id(pictureId.id())
+                    .status(true)
+                    .classifiedAdId(res.getId().id())
+                    .build());
         }).orElse(ImmutableAddPictureResponse
             .builder()
             .status(false)
@@ -116,15 +113,16 @@ public class ClassifiedAdService {
         Optional<ClassifiedAd> load = classifiedAdCommandRepository
             .load(new ClassifiedAdId(pictureDto.getClassifiedAdId()));
 
-        return load.map(classifiedAd -> {
+        return load.flatMap(classifiedAd -> {
             PictureSize pictureSize = new PictureSize(pictureDto.getWidth(), pictureDto.getHeight());
             var pictureId = classifiedAd.resizePicture(new PictureId(pictureDto.getId()), pictureSize);
-            var savedClassifiedAd = classifiedAdCommandRepository.add(classifiedAd);
-            return ImmutableResizePictureResponse.builder()
-                .classifiedAdId(savedClassifiedAd.getId().id())
-                .id(pictureId.id())
-                .status(true)
-                .build();
+            return classifiedAdCommandRepository.add(classifiedAd)
+                .map(res -> ImmutableResizePictureResponse.builder()
+                    .classifiedAdId(res.getId().id())
+                    .id(pictureId.id())
+                    .status(true)
+                    .build());
+
         }).orElseGet(() -> ImmutableResizePictureResponse.builder()
             .status(false)
             .message("classifiedAd not found to be updated")
@@ -137,7 +135,7 @@ public class ClassifiedAdService {
 
     public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdOwner command) {
         Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository.load(new ClassifiedAdId(command.getId()));
-        return mayBe.map(classifiedAd -> {
+        return mayBe.flatMap(classifiedAd -> {
             if (command.getOwnerId() != null) {
                 classifiedAd.updateOwner(new UserId(command.getOwnerId()));
             }
@@ -158,7 +156,7 @@ public class ClassifiedAdService {
     public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdTitle command) {
         Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository
             .load(new ClassifiedAdId(command.getClassifiedAdId()));
-        return mayBe.map(classifiedAd -> {
+        return mayBe.flatMap(classifiedAd -> {
             if (!Strings.isNullOrEmpty(command.getTitle())) {
                 classifiedAd.updateTitle(new ClassifiedAdTitle(command.getTitle()));
                 return classifiedAdCommandRepository.add(classifiedAd);
@@ -181,7 +179,7 @@ public class ClassifiedAdService {
     public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdText command) {
         Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository
             .load(new ClassifiedAdId(command.getClassifiedAdId()));
-        return mayBe.map(classifiedAd -> {
+        return mayBe.flatMap(classifiedAd -> {
             if (!Strings.isNullOrEmpty(command.getText())) {
                 classifiedAd.updateText(new ClassifiedAdText(command.getText()));
                 return classifiedAdCommandRepository.add(classifiedAd);
@@ -205,7 +203,7 @@ public class ClassifiedAdService {
     public CommandHandlerResult<UpdateClassifiedAdResponse> handle(ApproveClassifiedAd command) {
         Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository
             .load(new ClassifiedAdId(command.getClassifiedAdId()));
-        return mayBe.map(classifiedAd -> {
+        return mayBe.flatMap(classifiedAd -> {
             if (command.getApproverId() != null) {
                 classifiedAd.approve(UserId.from(command.getApproverId()));
                 return classifiedAdCommandRepository.add(classifiedAd);
@@ -228,7 +226,7 @@ public class ClassifiedAdService {
     public CommandHandlerResult<UpdateClassifiedAdResponse> handle(PublishClassifiedAd command) {
         Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository
             .load(new ClassifiedAdId(command.getClassifiedAdId()));
-        return mayBe.map(classifiedAd -> {
+        return mayBe.flatMap(classifiedAd -> {
             classifiedAd.requestToPublish();
             return classifiedAdCommandRepository.add(classifiedAd);
         }).map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
@@ -247,7 +245,7 @@ public class ClassifiedAdService {
     public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdPrice command) {
         Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository
             .load(new ClassifiedAdId(command.getClassifiedAdId()));
-        return mayBe.map(classifiedAd -> {
+        return mayBe.flatMap(classifiedAd -> {
             Price price = new Price(new Money(command.getAmount(), command.getCurrency()));
             classifiedAd.updatePrice(price);
             return classifiedAdCommandRepository.add(classifiedAd);
@@ -268,7 +266,7 @@ public class ClassifiedAdService {
     public CommandHandlerResult<UpdateClassifiedAdResponse> handle(AddPicturesToClassifiedAd command) {
         Optional<ClassifiedAd> mayBe = classifiedAdCommandRepository
             .load(new ClassifiedAdId(command.getClassifiedAdId()));
-        return mayBe.map(classifiedAd -> {
+        return mayBe.flatMap(classifiedAd -> {
 //      Price price = new Price(new Money(command.getAmount(), command.getCurrency()));
             List<PictureDto> pictures = command.getPictures();
             pictures.forEach(pic -> {

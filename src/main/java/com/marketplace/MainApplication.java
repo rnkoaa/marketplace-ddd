@@ -20,11 +20,11 @@ public class MainApplication {
     public void start() throws IOException {
         ApplicationConfig config = ConfigLoader.loadClasspathResource("application.yml", ApplicationConfig.class);
         ApplicationContext context = DaggerApplicationContext.
-                builder()
-                .config(config)
-                .build();
-        SparkServer server = context.getServer();
-        server.run();
+            builder()
+            .config(config)
+            .build();
+        context.getServer()
+            .run();
     }
 
     public void run() throws InterruptedException {

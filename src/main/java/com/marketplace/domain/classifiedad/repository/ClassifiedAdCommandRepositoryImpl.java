@@ -3,29 +3,50 @@ package com.marketplace.domain.classifiedad.repository;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
 
-import java.util.*;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.List;
+import java.util.Optional;
 
+@Named
+@Singleton
 public class ClassifiedAdCommandRepositoryImpl implements ClassifiedAdCommandRepository {
-    Map<ClassifiedAdId, ClassifiedAd> cache = new HashMap<>();
+
+    @Inject
+    public ClassifiedAdCommandRepositoryImpl() {
+    }
 
     @Override
     public boolean exists(ClassifiedAdId id) {
-        return cache.containsKey(id);
+        return load(id).isPresent();
     }
 
     @Override
     public Optional<ClassifiedAd> load(ClassifiedAdId id) {
-        return Optional.ofNullable(cache.get(id));
+//    Optional<ClassifiedAdEntity> found = mongoTemplate.findById(id.id(), collectionName, ClassifiedAdEntity.class);
+//    return found.map(it -> {
+//      System.out.println(it);
+//      return it.toClassifiedAd();
+//    });
+        return Optional.empty();
     }
 
     @Override
-    public ClassifiedAd add(ClassifiedAd entity) {
-        Objects.requireNonNull(entity, "entity cannot be null");
-        ClassifiedAdId id = entity.getId();
-        if (id == null) {
-            throw new IllegalArgumentException("entity id cannot be null");
-        }
-        cache.put(id, entity);
-        return entity;
+    public Optional<ClassifiedAd> add(ClassifiedAd entity) {
+//    var classifiedAdEntity = new ClassifiedAdEntity(entity);
+//    ClassifiedAdEntity save = mongoTemplate.add(classifiedAdEntity, entity.getId().id(), collectionName, ClassifiedAdEntity.class);
+//    if (save != null) {
+//      return entity;
+//    }
+//    return null;
+        return Optional.empty();
+    }
+
+    @Override
+    public List<ClassifiedAd> findAll() {
+//    List<ClassifiedAdEntity> all = mongoTemplate.findAll(collectionName, ClassifiedAdEntity.class);
+//    return all.stream().map(ClassifiedAdEntity::toClassifiedAd).collect(Collectors.toList());
+        return List.of();
     }
 }
