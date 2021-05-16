@@ -28,14 +28,14 @@ public abstract class BaseRepositoryTest extends AbstractContainerInitializer {
         classifiedAdCommandRepository = context.getClassifiedAdRepository();
         classifiedAdService = context.getClassifiedAdService();
 
-        dslContext.delete(Tables.USER_PROFILE)
-            .execute();
+        dslContext.delete(Tables.CLASSIFIED_AD).execute();
+        dslContext.delete(Tables.USER_PROFILE).execute();
     }
 
     @AfterEach
     public void cleanup() {
-        dslContext.delete(Tables.USER_PROFILE)
-            .execute();
+        dslContext.delete(Tables.CLASSIFIED_AD).execute();
+        dslContext.delete(Tables.USER_PROFILE).execute();
     }
 
 }

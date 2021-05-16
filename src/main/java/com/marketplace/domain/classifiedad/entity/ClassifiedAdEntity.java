@@ -177,7 +177,7 @@ public class ClassifiedAdEntity {
                     .id(pic.getId())
                     .build())
                 .collect(Collectors.toList());
-            builder.addAllPrictures(pictureDtos);
+            builder.addAllPictures(pictureDtos);
         }
         if (approvedBy != null) {
             builder.approver(approvedBy);

@@ -7,10 +7,12 @@ public enum ClassifiedAdState {
   MARKED_AS_SOLD,
   APPROVED;
 
-  static ClassifiedAdState fromString(String name) {
-    return switch (name) {
+  public static ClassifiedAdState fromString(String name) {
+
+    return switch (name.toUpperCase()) {
       case "PENDING_REVIEW" -> PENDING_REVIEW;
       case "ACTIVE" -> ACTIVE;
+      case "APPROVED" -> APPROVED;
       case "INACTIVE" -> INACTIVE;
       case "MARKED_AS_SOLD" -> MARKED_AS_SOLD;
       default -> INACTIVE;

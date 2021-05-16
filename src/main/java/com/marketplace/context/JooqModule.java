@@ -13,18 +13,30 @@ import org.jooq.impl.DSL;
 
 @Module
 public abstract class JooqModule {
+
     @Provides
     @Singleton
     public static DSLContext provideDSLContext(ApplicationConfig applicationConfig) {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(applicationConfig.getDb().getUrl());
+
+            // we always need a foreign key support
+            enableForeignKeySupport(conn);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
         if (conn == null) {
             return null;
         }
+        //
         return DSL.using(conn, SQLDialect.SQLITE);
+    }
+
+    private static void enableForeignKeySupport(Connection conn) throws SQLException {
+        var stmt = conn.createStatement();
+        String sql = "PRAGMA foreign_keys = ON;";
+        stmt.execute(sql);
+        stmt.close();
     }
 }
