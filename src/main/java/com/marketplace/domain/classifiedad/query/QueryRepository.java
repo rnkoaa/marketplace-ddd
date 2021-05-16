@@ -8,4 +8,6 @@ public interface QueryRepository<T, U>{
   Optional<T> findById(U id);
 
   List<T> findAll();
+
+  Optional<T> save(T value);
 }

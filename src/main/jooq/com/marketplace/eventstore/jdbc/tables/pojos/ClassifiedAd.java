@@ -20,6 +20,7 @@ public class ClassifiedAd implements Serializable {
     private final String owner;
     private final String title;
     private final String text;
+    private final String status;
     private final String price;
     private final String pictures;
     private final String created;
@@ -31,6 +32,7 @@ public class ClassifiedAd implements Serializable {
         this.owner = value.owner;
         this.title = value.title;
         this.text = value.text;
+        this.status = value.status;
         this.price = value.price;
         this.pictures = value.pictures;
         this.created = value.created;
@@ -43,6 +45,7 @@ public class ClassifiedAd implements Serializable {
         String owner,
         String title,
         String text,
+        String status,
         String price,
         String pictures,
         String created,
@@ -53,6 +56,7 @@ public class ClassifiedAd implements Serializable {
         this.owner = owner;
         this.title = title;
         this.text = text;
+        this.status = status;
         this.price = price;
         this.pictures = pictures;
         this.created = created;
@@ -95,6 +99,13 @@ public class ClassifiedAd implements Serializable {
     }
 
     /**
+     * Getter for <code>classified_ad.status</code>.
+     */
+    public String getStatus() {
+        return this.status;
+    }
+
+    /**
      * Getter for <code>classified_ad.price</code>.
      */
     public String getPrice() {
@@ -131,6 +142,7 @@ public class ClassifiedAd implements Serializable {
         sb.append(", ").append(owner);
         sb.append(", ").append(title);
         sb.append(", ").append(text);
+        sb.append(", ").append(status);
         sb.append(", ").append(price);
         sb.append(", ").append(pictures);
         sb.append(", ").append(created);

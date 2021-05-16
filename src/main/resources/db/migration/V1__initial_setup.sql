@@ -9,8 +9,6 @@ create table event_data
     created        TEXt NOT NULL
 );
 
--- [jooq ignore start]
-
 CREATE
     INDEX idx_event_data_aggregate_id
     ON event_data (aggregate_id);
@@ -18,7 +16,6 @@ CREATE
 CREATE
     INDEX idx_event_data_aggregate_name
     ON event_data (aggregate_name);
--- [jooq ignore end]
 
 create table user_profile
 (
@@ -35,36 +32,18 @@ create table user_profile
 create table classified_ad
 (
     id               TEXT PRIMARY KEY,
-
-    -- [jooq ignore start]
-    -- uuid
-    -- [jooq ignore end]
-    approver         TEXT NOT NULL,
-
-    -- [jooq ignore start]
-    -- uuid
-    -- [jooq ignore end]
+    approver         TEXT,
     owner            TEXT NOT NULL,
-
     title            TEXT NOT NULL,
     text             TEXT,
-
-    -- [jooq ignore start]
-    -- json blog
-    -- [jooq ignore end]
+    status           TEXT NOT NULL,
     price            TEXT,
-
-    -- [jooq ignore start]
-    -- json blog
-    -- [jooq ignore end]
     pictures         TEXT,
     created          TEXT NOT NULL,
     updated          TEXT NOT NULL, -- timestamp,
 
     FOREIGN KEY (owner) REFERENCES user_profile (id)
 );
-
--- [jooq ignore start]
 
 CREATE
     INDEX idx_classified_ad_owner_id
@@ -73,4 +52,3 @@ CREATE
 CREATE
     INDEX idx_classified_ad_approver_id
     ON classified_ad (approver);
--- [jooq ignore end]

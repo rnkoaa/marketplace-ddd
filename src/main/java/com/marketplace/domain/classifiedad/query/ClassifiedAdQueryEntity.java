@@ -23,7 +23,7 @@ public interface ClassifiedAdQueryEntity {
 
   Optional<PriceDto> getPrice();
 
-  List<PictureDto> getPrictures();
+  List<PictureDto> getPictures();
 
   ClassifiedAdState getState();
 

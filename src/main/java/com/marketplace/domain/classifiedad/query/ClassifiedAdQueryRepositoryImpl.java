@@ -1,13 +1,13 @@
 package com.marketplace.domain.classifiedad.query;
 
-import com.marketplace.domain.classifiedad.entity.ClassifiedAdEntity;
+import static com.marketplace.eventstore.jdbc.Tables.CLASSIFIED_AD;
 
 import com.marketplace.eventstore.jdbc.Tables;
 import com.marketplace.eventstore.jdbc.tables.records.ClassifiedAdRecord;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,28 +26,38 @@ public class ClassifiedAdQueryRepositoryImpl implements ClassifiedAdQueryReposit
 
     @Override
     public Optional<ClassifiedAdQueryEntity> findById(UUID id) {
-        Optional<ClassifiedAdRecord> maybeClassifiedAdRecord = dslContext.selectOne()
-            .from(Tables.CLASSIFIED_AD)
-            .where(Tables.CLASSIFIED_AD.ID.eq(id.toString()))
-            .fetchOptionalInto(ClassifiedAdRecord.class);
-
-        return maybeClassifiedAdRecord.map(ClassifiedAdQueryEntityMapper::convert);
+        return fetchRecord(id)
+            .map(ClassifiedAdQueryEntityMapper::convert);
     }
 
     @Override
     public List<ClassifiedAdQueryEntity> findAll() {
         List<ClassifiedAdRecord> classifiedAdRecords = dslContext.select()
-            .from(Tables.CLASSIFIED_AD)
+            .from(CLASSIFIED_AD)
             .fetchInto(ClassifiedAdRecord.class);
 
         return convertRecords(classifiedAdRecords);
     }
 
     @Override
+    public Optional<ClassifiedAdQueryEntity> save(ClassifiedAdQueryEntity entity) {
+        var classifiedAdExists = fetchRecord(entity.getId());
+
+        ClassifiedAdRecord classifiedAdRecord = ClassifiedAdQueryEntityMapper.convert(entity);
+        classifiedAdRecord.setUpdated(Instant.now().toString());
+        return classifiedAdExists
+            .map(existingAd -> updateClassifiedAd(classifiedAdRecord, existingAd))
+            .or(() -> insertClassifiedAd(classifiedAdRecord))
+            .filter(it -> it.getId() != null)
+            .map(ClassifiedAdQueryEntityMapper::convert);
+    }
+
+
+    @Override
     public List<ClassifiedAdQueryEntity> findByOwner(UUID ownerId) {
         List<ClassifiedAdRecord> classifiedAdRecords = dslContext.select()
-            .from(Tables.CLASSIFIED_AD)
-            .where(Tables.CLASSIFIED_AD.OWNER.eq(ownerId.toString()))
+            .from(CLASSIFIED_AD)
+            .where(CLASSIFIED_AD.OWNER.eq(ownerId.toString()))
             .fetchInto(ClassifiedAdRecord.class);
 
         return convertRecords(classifiedAdRecords);
@@ -64,9 +74,27 @@ public class ClassifiedAdQueryRepositoryImpl implements ClassifiedAdQueryReposit
         return findAll();
     }
 
-    List<ClassifiedAdQueryEntity> convert(List<ClassifiedAdEntity> entities) {
-        return entities.stream()
-            .map(ClassifiedAdEntity::toClassifiedAdReadEntity)
-            .collect(Collectors.toList());
+    private Optional<ClassifiedAdRecord> insertClassifiedAd(ClassifiedAdRecord classifiedAdRecord) {
+        classifiedAdRecord.setCreated(Instant.now().toString());
+        return dslContext.insertInto(CLASSIFIED_AD)
+            .set(classifiedAdRecord)
+            .returning(CLASSIFIED_AD.ID, CLASSIFIED_AD.OWNER, CLASSIFIED_AD.STATUS)
+            .fetchOptional();
+    }
+
+    private ClassifiedAdRecord updateClassifiedAd(ClassifiedAdRecord classifiedAdRecord,
+        ClassifiedAdRecord existingAd) {
+        classifiedAdRecord.setCreated(existingAd.getCreated());
+        return dslContext.update(CLASSIFIED_AD)
+            .set(classifiedAdRecord)
+            .returning(CLASSIFIED_AD.ID, CLASSIFIED_AD.OWNER, CLASSIFIED_AD.STATUS)
+            .fetchOne();
+    }
+
+    private Optional<ClassifiedAdRecord> fetchRecord(UUID id) {
+        return dslContext.select()
+            .from(CLASSIFIED_AD)
+            .where(CLASSIFIED_AD.ID.eq(id.toString()))
+            .fetchOptionalInto(ClassifiedAdRecord.class);
     }
 }
