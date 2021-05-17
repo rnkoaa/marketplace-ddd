@@ -7,7 +7,8 @@ import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
-import com.marketplace.domain.userprofile.repository.UserProfileRepository;
+import com.marketplace.domain.userprofile.repository.UserProfileCommandRepository;
+import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,16 +19,16 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class UserProfileServiceTest {
+class UserProfileCommandServiceTest {
 
     @Mock
-    UserProfileRepository userProfileRepository;
+    UserProfileCommandRepository userProfileCommandRepository;
 
-    private UserProfileService userProfileService;
+    private UserProfileCommandService userProfileCommandService;
 
     @BeforeEach
     void setup() {
-        userProfileService = new UserProfileService(userProfileRepository);
+        userProfileCommandService = new UserProfileCommandService(userProfileCommandRepository);
     }
 
     @Test
@@ -43,9 +44,9 @@ class UserProfileServiceTest {
         var expectedUserProfile = new UserProfile(UserId.from(expectedUserId), createCommand.fullName(),
             createCommand.displayName());
 
-        Mockito.when(userProfileRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.of(expectedUserProfile));
-        CommandHandlerResult<CreateUserProfileResult> handle = userProfileService.handle(createCommand);
+        CommandHandlerResult<CreateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
         assertThat(handle).isNotNull();
 
         assertThat(handle.isSuccessful()).isTrue();
@@ -65,9 +66,9 @@ class UserProfileServiceTest {
             .displayName("tucci")
             .build();
 
-        Mockito.when(userProfileRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.empty());
-        CommandHandlerResult<CreateUserProfileResult> handle = userProfileService.handle(createCommand);
+        CommandHandlerResult<CreateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
         assertThat(handle).isNotNull();
 
         assertThat(handle.isSuccessful()).isFalse();
@@ -89,13 +90,13 @@ class UserProfileServiceTest {
 
         var expectedUserProfile = new UserProfile(UserId.from(expectedUserId), fullName, new DisplayName("tucciivowi"));
 
-        Mockito.when(userProfileRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.of(expectedUserProfile));
 
-        Mockito.when(userProfileRepository.load(expectedUserProfile.getId()))
+        Mockito.when(userProfileCommandRepository.load(expectedUserProfile.getId()))
             .thenReturn(Optional.of(expectedUserProfile));
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileService.handle(createCommand);
+        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
         assertThat(handle).isNotNull();
 
         assertThat(handle.isSuccessful()).isTrue();
@@ -114,10 +115,10 @@ class UserProfileServiceTest {
             .photoUrl("https://tucciivowi.files.wordpress.com/2019/06/tucci-3.jpg?w=1680")
             .build();
 
-        Mockito.when(userProfileRepository.load(UserId.from(expectedUserId)))
+        Mockito.when(userProfileCommandRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.empty());
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileService.handle(updateCommand);
+        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
         assertThat(handle).isNotNull();
 
         assertThat(handle.isSuccessful()).isFalse();
@@ -138,13 +139,13 @@ class UserProfileServiceTest {
 
         var expectedUserProfile = new UserProfile(UserId.from(expectedUserId), fullName, new DisplayName("tucciivowi"));
 
-        Mockito.when(userProfileRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.empty());
 
-        Mockito.when(userProfileRepository.load(UserId.from(expectedUserId)))
+        Mockito.when(userProfileCommandRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.of(expectedUserProfile));
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileService.handle(updateCommand);
+        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
         assertThat(handle).isNotNull();
 
         assertThat(handle.isSuccessful()).isFalse();
@@ -167,13 +168,13 @@ class UserProfileServiceTest {
 
         var expectedUserProfile = new UserProfile(UserId.from(expectedUserId), fullName, new DisplayName("tucciivowi"));
 
-        Mockito.when(userProfileRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.of(expectedUserProfile));
 
-        Mockito.when(userProfileRepository.load(expectedUserProfile.getId()))
+        Mockito.when(userProfileCommandRepository.load(expectedUserProfile.getId()))
             .thenReturn(Optional.of(expectedUserProfile));
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileService.handle(updateCommand);
+        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
         assertThat(handle).isNotNull();
 
         assertThat(handle.isSuccessful()).isTrue();
@@ -193,10 +194,10 @@ class UserProfileServiceTest {
             .lastName("Ivowi")
             .build();
 
-        Mockito.when(userProfileRepository.load(UserId.from(expectedUserId)))
+        Mockito.when(userProfileCommandRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.empty());
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileService.handle(updateCommand);
+        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
         assertThat(handle).isNotNull();
 
         assertThat(handle.isSuccessful()).isFalse();
@@ -218,13 +219,13 @@ class UserProfileServiceTest {
 
         var expectedUserProfile = new UserProfile(UserId.from(expectedUserId), fullName, new DisplayName("tucciivowi"));
 
-        Mockito.when(userProfileRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.empty());
 
-        Mockito.when(userProfileRepository.load(UserId.from(expectedUserId)))
+        Mockito.when(userProfileCommandRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.of(expectedUserProfile));
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileService.handle(updateCommand);
+        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
         assertThat(handle).isNotNull();
 
         assertThat(handle.isSuccessful()).isFalse();

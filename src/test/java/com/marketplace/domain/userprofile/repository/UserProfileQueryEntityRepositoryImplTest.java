@@ -3,12 +3,12 @@ package com.marketplace.domain.userprofile.repository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class UserProfileRepositoryImplTest {
+class UserProfileQueryEntityRepositoryImplTest {
     private final String userIdStr = "4fdd7238-9f90-407b-a863-c423a2090c97";
 
 //    private final MongoTemplate mongoTemplate = Mockito.mock(MongoTemplate.class);
 
-    private UserProfileRepository userProfileRepository;
+    private UserProfileQueryRepository userProfileQueryRepository;
 
     @BeforeEach
     public void setup() {

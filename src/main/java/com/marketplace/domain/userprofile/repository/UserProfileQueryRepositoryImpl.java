@@ -1,12 +1,12 @@
 package com.marketplace.domain.userprofile.repository;
 
-import com.marketplace.domain.shared.UserId;
-import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.domain.userprofile.entity.UserProfileEntity;
 import com.marketplace.eventstore.jdbc.Tables;
 import com.marketplace.eventstore.jdbc.tables.records.UserProfileRecord;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -14,36 +14,38 @@ import org.jooq.DSLContext;
 
 @Named
 @Singleton
-public class UserProfileRepositoryImpl implements UserProfileRepository {
+public class UserProfileQueryRepositoryImpl implements UserProfileQueryRepository {
 
     private final DSLContext dslContext;
 
     @Inject
-    public UserProfileRepositoryImpl(DSLContext dslContext) {
+    public UserProfileQueryRepositoryImpl(DSLContext dslContext) {
         this.dslContext = dslContext;
     }
 
     @Override
-    public boolean exists(UserId id) {
-        return load(id).isPresent();
-    }
-
-    @Override
-    public Optional<UserProfile> load(UserId id) {
-
+    public Optional<UserProfileEntity> findById(UUID id) {
         Optional<UserProfileRecord> optionalUser = fetchRecord(id.toString());
 
         return optionalUser
-            .map(UserProfileMapper::convert)
-            .map(UserProfileEntity::toUserProfile);
+            .map(UserProfileMapper::convert);
     }
 
     @Override
-    public Optional<UserProfile> add(UserProfile entity) {
-        var userProfileEntity = UserProfileEntity.create(entity);
+    public List<UserProfileEntity> findAll() {
+        return dslContext.select()
+            .from(Tables.USER_PROFILE)
+            .fetchInto(UserProfileRecord.class)
+            .stream()
+            .map(UserProfileMapper::convert)
+            .toList();
+    }
+
+    @Override
+    public Optional<UserProfileEntity> save(UserProfileEntity entity) {
         var userExists = fetchRecord(entity.getId().toString());
 
-        UserProfileRecord userProfileRecord = UserProfileMapper.convert(userProfileEntity);
+        UserProfileRecord userProfileRecord = UserProfileMapper.convert(entity);
 
         userProfileRecord.setUpdated(Instant.now().toString());
         return userExists.map(existingUser -> {
@@ -69,8 +71,4 @@ public class UserProfileRepositoryImpl implements UserProfileRepository {
             .fetchOptionalInto(UserProfileRecord.class);
     }
 
-    @Override
-    public void deleteAll() {
-        dslContext.delete(Tables.USER_PROFILE).execute();
-    }
 }

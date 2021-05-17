@@ -11,7 +11,7 @@ import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.domain.userprofile.controller.CreateUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.UpdateUserProfileCommand;
-import com.marketplace.domain.userprofile.repository.UserProfileRepository;
+import com.marketplace.domain.userprofile.repository.UserProfileCommandRepository;
 import com.marketplace.fixtures.UserProfileFixture;
 import java.io.IOException;
 import java.util.Optional;
@@ -21,11 +21,11 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Disabled
-public class UserProfileRepositoryTest extends AbstractContainerInitializer {
+public class UserProfileCommandRepositoryTest extends AbstractContainerInitializer {
 
     String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
     ApplicationContext context;
-    UserProfileRepository userProfileRepository;
+    UserProfileCommandRepository userProfileCommandRepository;
 
     @BeforeEach
     void setup() throws IOException {
@@ -39,12 +39,12 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
 //    mongoConfig = new MongoConfig(hosts, "test_db", port);
 //    config = ImmutableApplicationConfig.copyOf(config).withMongo(mongoConfig);
 //    mongoClient = MongoConfigModule.provideMongoClient(mongoConfig);
-        userProfileRepository = context.getUserProfileRepository();
+        userProfileCommandRepository = context.getUserProfileCommandRepository();
     }
 
     @AfterEach
     public void cleanup() {
-        userProfileRepository.deleteAll();
+        userProfileCommandRepository.deleteAll();
     }
 
     @Test
@@ -59,7 +59,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
         UserProfile userProfile =
             new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
-        var addedUserProfile = userProfileRepository.add(userProfile);
+        var addedUserProfile = userProfileCommandRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
     }
 
@@ -75,10 +75,10 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
         UserProfile userProfile =
             new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
-        var addedUserProfile = userProfileRepository.add(userProfile);
+        var addedUserProfile = userProfileCommandRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
 
-        Optional<UserProfile> load = userProfileRepository.load(addedUserProfile.get().getId());
+        Optional<UserProfile> load = userProfileCommandRepository.load(addedUserProfile.get().getId());
         assertThat(load).isPresent();
 
         UserProfile savedUserProfile = load.get();
@@ -105,16 +105,16 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
                 createUserProfileCmd.fullName(),
                 new DisplayName(createUserProfileCmd.getDisplayName()));
 
-        var addedUserProfile = userProfileRepository.add(userProfile);
+        var addedUserProfile = userProfileCommandRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
 
         var profile = addedUserProfile.get();
 
         profile.updatePhoto(updateUserProfileCommand.getPhotoUrl());
-        var secondSaved = userProfileRepository.add(profile);
+        var secondSaved = userProfileCommandRepository.add(profile);
         assertThat(secondSaved).isPresent();
 
-        Optional<UserProfile> load = userProfileRepository.load(profile.getId());
+        Optional<UserProfile> load = userProfileCommandRepository.load(profile.getId());
         assertThat(load).isPresent();
 
         UserProfile savedUserProfile = load.get();
@@ -136,10 +136,10 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
         UserProfile userProfile =
             new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
-        var addedUserProfile = userProfileRepository.add(userProfile);
+        var addedUserProfile = userProfileCommandRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
 
-        boolean exists = userProfileRepository.exists(addedUserProfile.get().getId());
+        boolean exists = userProfileCommandRepository.exists(addedUserProfile.get().getId());
         assertThat(exists).isTrue();
     }
 }
