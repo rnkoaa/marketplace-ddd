@@ -21,11 +21,12 @@ import org.slf4j.LoggerFactory;
 public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
     private static final EventClassCache eventClassCache = EventClassCache.getInstance();
-    private final ObjectMapper objectMapper = new ObjectMapperBuilder().build();
+    private final ObjectMapper objectMapper;
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcEventStoreRepositoryImpl.class);
     private final DSLContext dslContext;
 
-    public JdbcEventStoreRepositoryImpl(DSLContext dslContext) {
+    public JdbcEventStoreRepositoryImpl(ObjectMapper objectMapper, DSLContext dslContext) {
+        this.objectMapper = objectMapper;
         this.dslContext = dslContext;
     }
 
