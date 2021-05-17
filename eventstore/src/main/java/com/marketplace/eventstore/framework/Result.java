@@ -76,7 +76,7 @@ public sealed abstract class Result<T> {
 
     public abstract boolean isError();
 
-    public final static class Success<T> extends Result<T> {
+    private final static class Success<T> extends Result<T> {
 
         private final T value;
 

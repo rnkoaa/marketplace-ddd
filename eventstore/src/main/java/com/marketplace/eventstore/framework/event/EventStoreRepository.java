@@ -4,7 +4,7 @@ import com.marketplace.cqrs.event.Event;
 import com.marketplace.eventstore.framework.Result;
 import java.util.List;
 
-public interface EventStoreRepository<T, U> {
+public interface EventStoreRepository<U> {
 
     /**
      * Load all events for an aggregate using {@param aggregateName}
@@ -49,7 +49,7 @@ public interface EventStoreRepository<T, U> {
      * @param event       The event being saved for the aggregate
      * @return the number of rows affected.
      */
-    Result<Integer> save(U aggregateId, T event);
+    Result<Integer> save(U aggregateId, Event event);
 
     /**
      * persist multiple events for an aggregate
@@ -58,7 +58,7 @@ public interface EventStoreRepository<T, U> {
      *                        event.aggregateName} is not null
      * @return internal id of the row persisted.
      */
-    Result<Integer> save(T event);
+    Result<Integer> save(Event event);
 
     /**
      * persist multiple events for an aggregate
@@ -69,7 +69,7 @@ public interface EventStoreRepository<T, U> {
      * @param expectedVersion the expected current version of the aggregate
      * @return internal id of the row persisted.
      */
-    Result<Integer> save(U aggregateId, List<T> events, int expectedVersion);
+    Result<Integer> save(U aggregateId, List<Event> events, int expectedVersion);
 
     /**
      * save an event for
@@ -80,7 +80,7 @@ public interface EventStoreRepository<T, U> {
      * @param expectedVersion the expected current version of the aggregate
      * @return internal id of the row persisted.
      */
-    Result<Integer> save(U aggregateId, T event, int expectedVersion);
+    Result<Integer> save(U aggregateId, Event event, int expectedVersion);
 
     /**
      * save an event for
@@ -90,7 +90,7 @@ public interface EventStoreRepository<T, U> {
      * @param expectedVersion the expected current version of the aggregate
      * @return internal id of the row persisted.
      */
-    Result<Integer> save(T event, int expectedVersion);
+    Result<Integer> save(Event event, int expectedVersion);
 
     /**
      * Provide the latest version of the aggregate.
