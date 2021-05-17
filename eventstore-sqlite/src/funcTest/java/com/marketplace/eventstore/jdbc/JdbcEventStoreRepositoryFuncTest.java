@@ -28,7 +28,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 
     public JdbcEventStoreRepositoryFuncTest() throws SQLException {
         super();
-        jdbcEventStoreRepository = new JdbcEventStoreRepositoryImpl(dslContext);
+        jdbcEventStoreRepository = new JdbcEventStoreRepositoryImpl(objectMapper, dslContext);
     }
 
     @Test
@@ -144,6 +144,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         // then
         assertThat(events).isNotNull().hasSize(3);
     }
+
     @Test
     void testLoadEventsUsingAggregateName() {
         List<Event> aggregateEvents = TestEvents.aggregateEvents;
