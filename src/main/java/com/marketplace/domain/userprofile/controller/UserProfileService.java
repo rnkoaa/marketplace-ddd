@@ -20,9 +20,8 @@ public class UserProfileService {
 
     public CommandHandlerResult<CreateUserProfileResult> handle(CreateUserProfileCommand command) {
         var userId = UserId.newId();
-        var fullName = new FullName(command.getFirstName(), command.getMiddleName(), command.getLastName());
         var displayName = new DisplayName(command.getDisplayName());
-        UserProfile userProfile = new UserProfile(userId, fullName, displayName);
+        UserProfile userProfile = new UserProfile(userId, command.fullName(), displayName);
         Optional<UserProfile> saved = userProfileRepository.add(userProfile);
         return saved.map(user -> ImmutableCommandHandlerResult.<CreateUserProfileResult>builder()
             .result(ImmutableCreateUserProfileResult.builder().id(user.getId().id()).build())
@@ -41,7 +40,9 @@ public class UserProfileService {
                 return doUserProfileUpdate(command.getUserId(), userProfile);
             })
             .orElse(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
-                .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
+                .result(ImmutableUpdateUserProfileResult.builder()
+                    .id(command.getUserId())
+                    .build())
                 .isSuccessful(false)
                 .message("user with id " + command.getUserId().toString() + " was not found to be updated.")
                 .build());
@@ -70,8 +71,7 @@ public class UserProfileService {
 
     private Optional<ImmutableCommandHandlerResult<UpdateUserProfileResult>> updateUserFullName(
         UpdateUserFullNameCommand command, UserProfile userProfile) {
-        var fullName = new FullName(command.getFirstName(), command.getMiddleName(), command.getLastName());
-        userProfile.updateUserFullName(fullName);
+        userProfile.updateUserFullName(command.fullName());
         return doUserProfileUpdate(command.getUserId(), userProfile);
     }
 

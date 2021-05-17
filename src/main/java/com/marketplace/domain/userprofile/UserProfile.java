@@ -128,4 +128,5 @@ public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
   public int hashCode() {
     return Objects.hash(id, fullName, displayName, photoUrl);
   }
+
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
+import java.util.Optional;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -13,28 +14,30 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableCreateUserProfileCommand.class)
 public abstract class CreateUserProfileCommand {
 
-  @JsonProperty("first_name")
-  public abstract String getFirstName();
+    @JsonProperty("first_name")
+    public abstract String getFirstName();
 
-  @JsonProperty("last_name")
-  public abstract String getLastName();
+    @JsonProperty("last_name")
+    public abstract String getLastName();
 
-  @JsonProperty("middle_name")
-  public abstract String getMiddleName();
+    @JsonProperty("middle_name")
+    public abstract Optional<String> getMiddleName();
 
-  @JsonProperty("display_name")
-  public abstract String getDisplayName();
+    @JsonProperty("display_name")
+    public abstract String getDisplayName();
 
-  @JsonProperty("photo_url")
-  public abstract String getPhotoUrl();
+    @JsonProperty("photo_url")
+    public abstract Optional<String> getPhotoUrl();
 
-  @JsonIgnore
-  public DisplayName displayName() {
-    return new DisplayName(getDisplayName());
-  }
+    @JsonIgnore
+    public DisplayName displayName() {
+        return new DisplayName(getDisplayName());
+    }
 
-  @JsonIgnore
-  public FullName fullName() {
-    return new FullName(getFirstName(), getMiddleName(), getLastName());
-  }
+    @JsonIgnore
+    public FullName fullName() {
+        return new FullName(getFirstName(),
+            getMiddleName().orElse(""),
+            getLastName());
+    }
 }

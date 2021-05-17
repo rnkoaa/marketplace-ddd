@@ -53,7 +53,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
         CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
         assertThat(command).isNotNull();
         assertThat(command.getFirstName()).isNotBlank();
-        assertThat(command.getMiddleName()).isNotBlank();
+        assertThat(command.getMiddleName()).isPresent();
         assertThat(command.getLastName()).isNotBlank();
 
         UserProfile userProfile =
@@ -69,7 +69,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
         CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
         assertThat(command).isNotNull();
         assertThat(command.getFirstName()).isNotBlank();
-        assertThat(command.getMiddleName()).isNotBlank();
+        assertThat(command.getMiddleName()).isPresent();
         assertThat(command.getLastName()).isNotBlank();
 
         UserProfile userProfile =
@@ -95,7 +95,8 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
             UserProfileFixture.loadUpdateUserProfileDto();
         assertThat(createUserProfileCmd).isNotNull();
         assertThat(createUserProfileCmd.getFirstName()).isNotBlank();
-        assertThat(createUserProfileCmd.getMiddleName()).isNotBlank();
+        assertThat(createUserProfileCmd.getMiddleName()).isPresent();
+        assertThat(createUserProfileCmd.getMiddleName().get()).isNotBlank();
         assertThat(createUserProfileCmd.getLastName()).isNotBlank();
 
         UserProfile userProfile =
@@ -129,7 +130,7 @@ public class UserProfileRepositoryTest extends AbstractContainerInitializer {
         CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
         assertThat(command).isNotNull();
         assertThat(command.getFirstName()).isNotBlank();
-        assertThat(command.getMiddleName()).isNotBlank();
+        assertThat(command.getMiddleName()).isPresent();
         assertThat(command.getLastName()).isNotBlank();
 
         UserProfile userProfile =
