@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.eventbus.EventBus;
 import com.marketplace.cqrs.event.Event;
+import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.EventListener;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.eventstore.framework.event.EventStream;
@@ -25,62 +26,58 @@ import reactor.test.StepVerifier;
 
 @SuppressWarnings("UnstableApiUsage")
 class InMemoryEventStoreTest {
+
+    //
+    private EventStore eventStore;
+    private final ClassifiedAdEventProcessor eventProcessor = Mockito.mock(ClassifiedAdEventProcessor.class);
+    private final EventListener classifiedAdEventListener = new ClassifiedAdEventListener(eventProcessor);
+    //
+    InMemoryEventPublisher eventPublisher;
+
+    //
+    @BeforeEach
+    void setup() {
+        var eventBus = new EventBus();
+        eventPublisher = new InMemoryEventPublisher(eventBus);
+        eventStore = new InMemoryEventStore(eventPublisher);
+        eventPublisher.registerListener(classifiedAdEventListener);
+    }
+
+    //
+    @AfterEach
+    void cleanup() {
+        eventPublisher.close();
+    }
+
+    //
+    @Test
+    void emptyEventStoreWithoutEvents() {
+        assertThat(eventStore.size()).isEqualTo(0);
+    }
+
+    //
+    @Test
+    void createAndUpdateTitleInEventStore() {
+        String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
+        String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
+        var classifiedAdCreated = new ClassifiedAdCreated(ownerId1, classifiedAdId1);
+
+        String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
+        Result<Boolean> appendResult = eventStore.append(streamId, 0, classifiedAdCreated);
+        assertThat(appendResult.isPresent()).isTrue();
+        assertThat(appendResult.get()).isTrue();
+
+        assertThat(eventStore.size()).isEqualTo(1);
+
+        var classifiedAdTextUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
 //
-//  private EventStore eventStore;
-//  private final ClassifiedAdEventProcessor eventProcessor = Mockito.mock(ClassifiedAdEventProcessor.class);
-//  private final EventListener classifiedAdEventListener = new ClassifiedAdEventListener(eventProcessor);
+        EventStream eventStream = eventStore.load(streamId);
+        assertThat(eventStream.getVersion()).isEqualTo(0);
 //
-//  InMemoryEventPublisher eventPublisher;
-//
-//  @BeforeEach
-//  void setup() {
-//    var eventBus = new EventBus();
-//    eventPublisher = new InMemoryEventPublisher(eventBus);
-//    eventStore = new InMemoryEventStore(eventPublisher);
-//    eventPublisher.registerListener(classifiedAdEventListener);
-//  }
-//
-//  @AfterEach
-//  void cleanup() {
-//    eventPublisher.close();
-//  }
-//
-//  @Test
-//  void emptyEventStoreWithoutEvents() {
-//    StepVerifier.create(eventStore.size())
-//        .expectNext(0L)
-//        .expectComplete()
-//        .verify();
-//  }
-//
-//  @Test
-//  void createAndUpdateTitleInEventStore() {
-//    String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
-//    String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
-//    var classifiedAdCreated = new ClassifiedAdCreated(ownerId1, classifiedAdId1);
-//
-//    String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
-//    eventStore.append(streamId, 0, classifiedAdCreated).block();
-//
-//    StepVerifier.create(eventStore.size())
-//        .expectNext(1L)
-//        .expectComplete()
-//        .verify();
-//
-//    var classifiedAdTextUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
-////
-//    Mono<EventStream<Event>> eventStreamPublisher = eventStore.load(streamId);
-//    StepVerifier.create(eventStreamPublisher)
-//        .assertNext(eventStream -> {
-//          assertThat(eventStream.getVersion()).isEqualTo(0);
-//        })
-//        .expectComplete()
-//        .verify();
-//
-//    Mono<OperationResult> appendResult = eventStreamPublisher.flatMap(eventStream -> {
-//      int expectedVersion = eventStream.getVersion() + 1;
-//      return eventStore.append(streamId, expectedVersion, classifiedAdTextUpdated);
-//    });
+//        Mono<OperationResult> appendResult = eventStreamPublisher.flatMap(eventStream -> {
+//            int expectedVersion = eventStream.getVersion() + 1;
+//            return eventStore.append(streamId, expectedVersion, classifiedAdTextUpdated);
+//        });
 //
 //    StepVerifier.create(appendResult)
 //        .assertNext(result -> {
@@ -95,7 +92,7 @@ class InMemoryEventStoreTest {
 //        })
 //        .expectComplete()
 //        .verify();
-//  }
+  }
 //
 //  @Test
 //  void multipleEventsCanBeAdded() {
@@ -234,4 +231,5 @@ class InMemoryEventStoreTest {
 //        new ClassifiedAdTextUpdated(aggregateId, "test classified ad text");
 //    return List.of(classifiedAdCreated, classifiedAdTextUpdated);
 //  }
+
 }
