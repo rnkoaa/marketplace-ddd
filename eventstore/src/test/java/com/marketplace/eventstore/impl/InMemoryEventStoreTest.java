@@ -55,7 +55,6 @@ class InMemoryEventStoreTest {
         assertThat(eventStore.size()).isEqualTo(0);
     }
 
-    //
     @Test
     void createAndUpdateTitleInEventStore() {
         String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
@@ -73,27 +72,16 @@ class InMemoryEventStoreTest {
 //
         EventStream eventStream = eventStore.load(streamId);
         assertThat(eventStream.getVersion()).isEqualTo(0);
-//
-//        Mono<OperationResult> appendResult = eventStreamPublisher.flatMap(eventStream -> {
-//            int expectedVersion = eventStream.getVersion() + 1;
-//            return eventStore.append(streamId, expectedVersion, classifiedAdTextUpdated);
-//        });
-//
-//    StepVerifier.create(appendResult)
-//        .assertNext(result -> {
-//          assertThat(result).isInstanceOf(Success.class);
-//        })
-//        .expectComplete()
-//        .verify();
-//
-//    StepVerifier.create(eventStore.load(streamId))
-//        .assertNext(eventStream -> {
-//          assertThat(eventStream.getVersion()).isEqualTo(1);
-//        })
-//        .expectComplete()
-//        .verify();
-  }
-//
+        int expectedVersion = eventStream.getVersion() + 1;
+        Result<Boolean> updateAppendResult = eventStore.append(streamId, expectedVersion, classifiedAdTextUpdated);
+        assertThat(updateAppendResult.isPresent()).isTrue();
+        assertThat(updateAppendResult.get()).isTrue();
+
+        EventStream updatedEventStream = eventStore.load(streamId);
+        assertThat(updatedEventStream.size()).isEqualTo(2);
+    }
+
+    //
 //  @Test
 //  void multipleEventsCanBeAdded() {
 //    String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
@@ -198,38 +186,29 @@ class InMemoryEventStoreTest {
 //        .verify();
 //  }
 //
-//  @Test
-//  void publishSavesEventAndPublishes() {
-//    String classifiedAdId = "9d5d69ee-eadd-4352-942e-47935e194d22";
-//    String ownerId = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
-//
-//    String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId);
-//
-//    var classifiedAdCreated = new ClassifiedAdCreated(ownerId, classifiedAdId);
-//
-//    eventStore.publish(streamId, 0, classifiedAdCreated)
-//        .block();
-//    StepVerifier.create(eventStore.size())
-//        .expectNext(1L)
-//        .expectComplete()
-//        .verify();
-////
-//    StepVerifier.create(eventStore.load(streamId))
-//        .assertNext(eventStream -> {
-//          assertThat(eventStream.size()).isEqualTo(2);
-//          assertThat(eventStream.getVersion()).isEqualTo(0);
-//        })
-//        .expectComplete()
-//        .verify();
-//
-//    verify(eventProcessor, times(1)).create(classifiedAdCreated);
-//  }
-//
-//  List<Event> createEventsAggregate(UUID aggregateId, UUID ownerId) {
-//    var classifiedAdCreated = new ClassifiedAdCreated(ownerId, aggregateId);
-//    var classifiedAdTextUpdated =
-//        new ClassifiedAdTextUpdated(aggregateId, "test classified ad text");
-//    return List.of(classifiedAdCreated, classifiedAdTextUpdated);
-//  }
+    @Test
+    void publishSavesEventAndPublishes() {
+        String classifiedAdId = "9d5d69ee-eadd-4352-942e-47935e194d22";
+        String ownerId = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
+
+        String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId);
+
+        var classifiedAdCreated = new ClassifiedAdCreated(ownerId, classifiedAdId);
+
+        eventStore.publish(streamId, 0, classifiedAdCreated);
+        assertThat(eventStore.size()).isEqualTo(1);
+
+        EventStream eventStream = eventStore.load(streamId);
+        assertThat(eventStream.size()).isEqualTo(1);
+        assertThat(eventStream.getVersion()).isEqualTo(0);
+        verify(eventProcessor, times(1)).create(classifiedAdCreated);
+    }
+
+    List<Event> createEventsAggregate(UUID aggregateId, UUID ownerId) {
+        var classifiedAdCreated = new ClassifiedAdCreated(ownerId, aggregateId);
+        var classifiedAdTextUpdated =
+            new ClassifiedAdTextUpdated(aggregateId, "test classified ad text");
+        return List.of(classifiedAdCreated, classifiedAdTextUpdated);
+    }
 
 }
