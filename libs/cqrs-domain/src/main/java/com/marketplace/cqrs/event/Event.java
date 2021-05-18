@@ -29,6 +29,10 @@ public interface Event {
      */
     UUID getAggregateId();
 
+    default String getStreamId(){
+        return String.format("%s:%s", getAggregateName(), getAggregateId().toString());
+    }
+
     /**
      * @return name of the class from which this aggregate was published from
      */

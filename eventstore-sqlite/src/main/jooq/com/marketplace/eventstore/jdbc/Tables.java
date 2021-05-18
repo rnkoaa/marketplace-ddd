@@ -5,6 +5,7 @@ package com.marketplace.eventstore.jdbc;
 
 
 import com.marketplace.eventstore.jdbc.tables.EventData;
+import com.marketplace.eventstore.jdbc.tables.FlywaySchemaHistory;
 
 
 /**
@@ -14,7 +15,12 @@ import com.marketplace.eventstore.jdbc.tables.EventData;
 public class Tables {
 
     /**
-     * The table <code>EVENT_DATA</code>.
+     * The table <code>event_data</code>.
      */
     public static final EventData EVENT_DATA = EventData.EVENT_DATA;
+
+    /**
+     * The table <code>flyway_schema_history</code>.
+     */
+    public static final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
 }

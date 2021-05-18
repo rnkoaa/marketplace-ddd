@@ -15,6 +15,8 @@ public class TestEvents {
 
     public static final UUID aggregateId = UUID.fromString("0a4a2dfc-eb10-45ec-9f8c-4d05e9dab6fe");
     public static String aggregateName = "ClassifiedAd:0a4a2dfc-eb10-45ec-9f8c-4d05e9dab6fe";
+
+    public static String streamId = "ClassifiedAd:0a4a2dfc-eb10-45ec-9f8c-4d05e9dab6fe";
     public static final UUID createdEventId = UUID
         .fromString("a7c92883-5406-4ea5-a1c4-8d9d6b7ee9bc");
     public static final UUID titleUpdatedEventId = UUID

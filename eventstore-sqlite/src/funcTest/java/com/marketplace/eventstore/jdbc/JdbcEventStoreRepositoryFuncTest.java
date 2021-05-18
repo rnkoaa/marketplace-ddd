@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import org.jooq.Record1;
+import org.jooq.exception.DataAccessException;
 import org.junit.jupiter.api.Test;
 
 class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
@@ -33,18 +34,18 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 
     @Test
     void saveNewEventWithExpectedVersion() {
-        Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent, 1);
+        Result<Boolean> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent, 1);
 
         assertThat(save.isPresent()).isTrue();
 
-        assertThat(save.get()).isGreaterThan(0);
+        assertThat(save.get()).isTrue();
     }
 
     @Test
     void testSaveMultipleEventsAtExpectedVersion() {
         List<Event> aggregateEvents = TestEvents.aggregateEvents;
 
-        Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.aggregateId, aggregateEvents, 1);
+        Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
 
         assertThat(save.isPresent()).isTrue();
 
@@ -64,7 +65,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
     @Test
     void testSaveNewEvent() {
 
-        Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
+        Result<Boolean> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
 
         assertThat(save.isPresent()).isTrue();
 
@@ -97,7 +98,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
     @Test
     void testCannotSaveTheSameEventTwice() {
 
-        Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
+        Result<Boolean> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
 
         assertThat(save.isPresent()).isTrue();
 
@@ -105,13 +106,13 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 //        DataAccessException
         TestCreatedEvent testCreatedEventCopy = ImmutableTestCreatedEvent.copyOf(TestEvents.testCreatedEvent)
             .withVersion(2L);
-        Result<Integer> second = jdbcEventStoreRepository.save(testCreatedEventCopy);
+        Result<Boolean> second = jdbcEventStoreRepository.save(testCreatedEventCopy);
 
         assertThat(second.isPresent()).isFalse();
         assertThat(second.isError()).isTrue();
 
         assertThat(second.getError()).isNotNull();
-        assertThat(second.getError().getClass()).isEqualTo(Exception.class);
+        assertThat(second.getError().getClass()).isEqualTo(DataAccessException.class);
     }
 
     @Test
@@ -121,14 +122,14 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
             .withId(UUID.fromString("c48e89e4-7219-44cf-9ae4-7df3d49fc9da"));
 
         assertThat(testCreatedEventCopy.getVersion()).isEqualByComparingTo(TestEvents.testCreatedEvent.getVersion());
-        Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
+        Result<Boolean> save = jdbcEventStoreRepository.save(TestEvents.testCreatedEvent);
 
         assertThat(save.isPresent()).isTrue();
-        assertThat(save.get()).isNotNull().isGreaterThan(0);
+        assertThat(save.get()).isNotNull().isTrue();
 
         // Duplicate key since the event id is the same
 //        DataAccessException
-        Result<Integer> save1 = jdbcEventStoreRepository.save(testCreatedEventCopy);
+        Result<Boolean> save1 = jdbcEventStoreRepository.save(testCreatedEventCopy);
         assertThat(save1.isPresent()).isFalse();
     }
 
@@ -137,9 +138,9 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         List<Event> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
-        jdbcEventStoreRepository.save(TestEvents.aggregateId, aggregateEvents, 1);
+        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
 
-        List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateId);
+        List<Event> events = jdbcEventStoreRepository.load(TestEvents.streamId);
 
         // then
         assertThat(events).isNotNull().hasSize(3);
@@ -150,7 +151,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         List<Event> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
-        jdbcEventStoreRepository.save(TestEvents.aggregateId, aggregateEvents, 1);
+        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
 
         List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateName);
 
@@ -160,7 +161,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 
     @Test
     void testLoadMissingAggregates() {
-        List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateId);
+        List<Event> events = jdbcEventStoreRepository.load(TestEvents.streamId);
 
         // then
         assertThat(events).isNotNull().hasSize(0);
@@ -172,9 +173,9 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         List<Event> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
-        jdbcEventStoreRepository.save(TestEvents.aggregateId, aggregateEvents, 1);
+        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
 
-        List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateId, 2);
+        List<Event> events = jdbcEventStoreRepository.load(TestEvents.streamId, 2);
 
         // then
         assertThat(events).isNotNull().hasSize(2);
@@ -185,7 +186,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         List<Event> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
-        jdbcEventStoreRepository.save(TestEvents.aggregateId, aggregateEvents, 1);
+        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
 
         List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateName, 2);
 
