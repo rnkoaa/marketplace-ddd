@@ -16,6 +16,7 @@ import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventPr
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdTextUpdated;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdTitleUpdated;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdCreated;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdTitleUpdated;
 import java.util.List;
 import java.util.UUID;
 import org.assertj.core.api.AssertionsForClassTypes;
@@ -57,7 +58,7 @@ class InMemoryEventStoreTest {
         String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
         String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId1);
         String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
-        var classifiedAdCreated = new ImmutableClassifiedAdCreated.Builder()
+        var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
             .owner(UUID.fromString(ownerId1))
             .id(UUID.fromString(classifiedAdId1))
             .aggregateId(UUID.fromString(classifiedAdId1))
@@ -71,12 +72,16 @@ class InMemoryEventStoreTest {
 
         assertThat(eventStore.size()).isEqualTo(1);
 
-        var classifiedAdTextUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
+        var classifiedAdTitleUpdated = ImmutableClassifiedAdTitleUpdated.builder()
+            .title("test title")
+            .id(UUID.randomUUID())
+            .aggregateId(UUID.fromString(classifiedAdId1))
+            .build();
         EventStream eventStream = eventStore.load(streamId);
         assertThat(eventStream.getVersion()).isEqualTo(0);
 
         int expectedVersion = eventStream.getVersion() + 1;
-        Result<Boolean> updateAppendResult = eventStore.append(streamId, expectedVersion, classifiedAdTextUpdated);
+        Result<Boolean> updateAppendResult = eventStore.append(streamId, expectedVersion, classifiedAdTitleUpdated);
         assertThat(updateAppendResult.isPresent()).isTrue();
         assertThat(updateAppendResult.get()).isTrue();
 
@@ -88,7 +93,7 @@ class InMemoryEventStoreTest {
     void multipleEventsCanBeAdded() {
         String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
         String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
-        var classifiedAdCreated = new ImmutableClassifiedAdCreated.Builder()
+        var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
             .owner(UUID.fromString(ownerId1))
             .id(UUID.fromString(classifiedAdId1))
             .aggregateId(UUID.fromString(classifiedAdId1))
@@ -98,7 +103,12 @@ class InMemoryEventStoreTest {
 
         String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
 
-        var classifiedAdTitleUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
+//        var classifiedAdTitleUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
+        var classifiedAdTitleUpdated = ImmutableClassifiedAdTitleUpdated.builder()
+            .title("test title")
+            .id(UUID.randomUUID())
+            .aggregateId(UUID.fromString(classifiedAdId1))
+            .build();
         var appendResult =
             eventStore.append(streamId, 0, List.of(classifiedAdCreated, classifiedAdTitleUpdated));
 
@@ -113,7 +123,7 @@ class InMemoryEventStoreTest {
     void canCreateEventStoreWithNewEvent() {
         String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
         String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
-        var classifiedAdCreated = new ImmutableClassifiedAdCreated.Builder()
+        var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
             .owner(UUID.fromString(ownerId1))
             .id(UUID.fromString(classifiedAdId1))
             .aggregateId(UUID.fromString(classifiedAdId1))
@@ -178,7 +188,7 @@ class InMemoryEventStoreTest {
 
         String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId);
 
-        var classifiedAdCreated = new ImmutableClassifiedAdCreated.Builder()
+        var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
             .owner(UUID.fromString(ownerId))
             .id(UUID.fromString(classifiedAdId))
             .aggregateId(UUID.fromString(classifiedAdId))
@@ -196,7 +206,7 @@ class InMemoryEventStoreTest {
     }
 
     List<Event> createEventsAggregate(UUID aggregateId, UUID ownerId) {
-        var classifiedAdCreated = new ImmutableClassifiedAdCreated.Builder()
+        var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
             .owner(ownerId)
             .id(aggregateId)
             .aggregateId(aggregateId)

@@ -17,8 +17,8 @@ import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdCreated
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventListener;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventProcessor;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdTextUpdated;
-import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdTitleUpdated;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdCreated;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdTitleUpdated;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -74,13 +74,17 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
 
 //        assertThat(eventStore.size()).isEqualTo(1);
 
-        var classifiedAdTextUpdated = new ClassifiedAdTitleUpdated(classifiedAdId, "test title");
+        var classifiedAdTitleUpdated = ImmutableClassifiedAdTitleUpdated.builder()
+            .title("test title")
+            .id(UUID.randomUUID())
+            .aggregateId(UUID.fromString(classifiedAdId))
+            .build();
         EventStream eventStream = eventStore.load(streamId);
         assertThat(eventStream.size()).isEqualTo(1);
         assertThat(eventStream.getVersion()).isEqualTo(0);
 
         int expectedVersion = eventStream.getVersion() + 1;
-        Result<Boolean> updateAppendResult = eventStore.append(streamId, expectedVersion, classifiedAdTextUpdated);
+        Result<Boolean> updateAppendResult = eventStore.append(streamId, expectedVersion, classifiedAdTitleUpdated);
         assertThat(updateAppendResult.isPresent()).isTrue();
         assertThat(updateAppendResult.get()).isTrue();
 //
@@ -102,8 +106,11 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
 
         String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId);
 
-        var classifiedAdTitleUpdated = new ClassifiedAdTitleUpdated(classifiedAdId, "test title");
-        var appendResult =
+        var classifiedAdTitleUpdated = ImmutableClassifiedAdTitleUpdated.builder()
+            .title("test title")
+            .id(UUID.randomUUID())
+            .aggregateId(UUID.fromString(classifiedAdId))
+            .build();         var appendResult =
             eventStore.append(streamId, 0, List.of(classifiedAdCreated, classifiedAdTitleUpdated));
 
         assertThat(appendResult.isPresent()).isTrue();
