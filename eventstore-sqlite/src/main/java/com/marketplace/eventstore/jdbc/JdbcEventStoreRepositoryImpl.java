@@ -72,6 +72,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
         Result<String> result = serializeJson(objectMapper, event);
         Result<EventDataRecord> savedResult = createFromEvent(event, (int) expectedVersion, result)
+            .map(eventDataRecord -> eventDataRecord.setAggregateName(event.getStreamId()))
             .map(eventDataRecord -> dslContext.insertInto(EVENT_DATA)
                 .set(eventDataRecord)
                 .returning(EVENT_DATA.ID)
@@ -112,6 +113,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
             })
             .filter(Result::isPresent)
             .map(Result::get)
+            .map(eventDataRecord -> eventDataRecord.setAggregateName(streamId))
             .toList();
 
         int[] execute = dslContext.batchStore(eventDataRecords).execute();
