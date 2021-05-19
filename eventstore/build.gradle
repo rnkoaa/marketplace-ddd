@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'java-test-fixtures'
 }
 
 group 'com.marketplace'
@@ -7,6 +8,30 @@ group 'com.marketplace'
 repositories {
     mavenLocal()
     mavenCentral()
+}
+
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+
+    testFixturesCompileOnly {
+        extendsFrom annotationProcessor
+    }
+
+    funcTestImplementation {
+        extendsFrom testImplementation
+    }
+    funcTestRuntime {
+        extendsFrom testRuntimeClasspath
+    }
+
+    funcTestRuntimeOnly {
+        extendsFrom testRuntimeOnly
+    }
+
+    flywayMigration
 }
 
 dependencies {
@@ -24,6 +49,17 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
     testImplementation('io.projectreactor:reactor-test:3.4.0')
 
+    testFixturesImplementation project(":libs:cqrs-domain")
+    testFixturesImplementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    testFixturesImplementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    testFixturesImplementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    testFixturesImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
+
+    testFixturesCompileOnly("org.immutables:value:${immutablesVersion}")
+    testFixturesAnnotationProcessor("org.immutables:value:${immutablesVersion}")
+//    annotationProcessor("org.immutables:value:${immutablesVersion}")
+    testFixturesApi "com.google.guava:guava:30.0-jre"
+
 }
 
 test {
@@ -39,3 +75,4 @@ tasks.withType(Test) {
 tasks.withType(JavaExec) {
     jvmArgs += "--enable-preview"
 }
+

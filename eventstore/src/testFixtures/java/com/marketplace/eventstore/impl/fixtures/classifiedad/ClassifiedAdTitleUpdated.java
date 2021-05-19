@@ -1,5 +1,6 @@
 package com.marketplace.eventstore.impl.fixtures.classifiedad;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.marketplace.cqrs.event.Event;
 
 import java.util.UUID;
@@ -9,6 +10,7 @@ public class ClassifiedAdTitleUpdated implements Event {
   private final String title;
   private final UUID aggregateId;
 
+  @JsonCreator
   public ClassifiedAdTitleUpdated(UUID id, UUID aggregateId, String title) {
     this.id = id;
     this.title = title;
@@ -37,8 +39,14 @@ public class ClassifiedAdTitleUpdated implements Event {
     return title;
   }
 
+
   @Override
   public String getAggregateName() {
     return ClassifiedAd.class.getSimpleName();
+  }
+
+  @Override
+  public String getStreamId() {
+    return String.format("%s:%s", getAggregateName(), getAggregateId());
   }
 }

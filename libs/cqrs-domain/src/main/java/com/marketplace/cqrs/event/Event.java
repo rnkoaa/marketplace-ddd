@@ -1,14 +1,23 @@
 package com.marketplace.cqrs.event;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.Instant;
 import java.util.UUID;
+import org.immutables.value.Value;
+import org.immutables.value.Value.Style.ImplementationVisibility;
 
-
+@JsonSerialize // Jackson automatic integration, why not?
+@Value.Style(
+    typeAbstract = "Abstract*",
+    typeImmutable = "*",
+    visibility = ImplementationVisibility.PUBLIC)
 public interface Event {
 
     /**
      * @return time when event was created
      */
+
+    @Value.Default
     default Instant getCreatedAt() {
         return Instant.now();
     }
@@ -16,8 +25,6 @@ public interface Event {
     default long getVersion() {
         return 0;
     }
-
-
 
     /**
      * @return the id of the current event
@@ -29,13 +36,15 @@ public interface Event {
      */
     UUID getAggregateId();
 
-    default String getStreamId(){
+    @Value.Default
+    default String getStreamId() {
         return String.format("%s:%s", getAggregateName(), getAggregateId().toString());
     }
 
     /**
      * @return name of the class from which this aggregate was published from
      */
+    @Value.Default
     default String getAggregateName() {
         return getClass().getSimpleName();
     }

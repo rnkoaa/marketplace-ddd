@@ -19,7 +19,7 @@ public class InMemoryEventPublisher implements EventPublisher<Event>, AutoClosea
         this.listeners = new ArrayList<>();
     }
 
-    void registerListener(EventListener eventListener) {
+    public void registerListener(EventListener eventListener) {
         this.eventBus.register(eventListener);
         this.listeners.add(eventListener);
     }

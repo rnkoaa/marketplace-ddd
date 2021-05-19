@@ -1,6 +1,5 @@
 package com.marketplace.eventstore.jdbc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.cqrs.event.Event;
 import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.EventPublisher;
@@ -12,14 +11,12 @@ import java.util.List;
 public class JdbcEventStoreImpl implements EventStore {
 
     private final JdbcEventStoreRepository eventStoreRepository;
-    private final ObjectMapper objectMapper;
     private final EventPublisher<Event> eventPublisher;
 
-    public JdbcEventStoreImpl(ObjectMapper objectMapper,
+    public JdbcEventStoreImpl(
         EventPublisher<Event> eventPublisher,
         JdbcEventStoreRepository eventStoreRepository) {
         this.eventStoreRepository = eventStoreRepository;
-        this.objectMapper = objectMapper;
         this.eventPublisher = eventPublisher;
     }
 
@@ -61,7 +58,6 @@ public class JdbcEventStoreImpl implements EventStore {
 
     @Override
     public Long size() {
-//        return eventStoreRepository.;
         return 0L;
     }
 
@@ -94,7 +90,7 @@ public class JdbcEventStoreImpl implements EventStore {
 
     @Override
     public Result<Boolean> publish(String streamId, int expectedVersion, Event event) {
-         eventPublisher.publish(streamId, event);
-         return Result.of(true);
+        eventPublisher.publish(streamId, event);
+        return Result.of(true);
     }
 }

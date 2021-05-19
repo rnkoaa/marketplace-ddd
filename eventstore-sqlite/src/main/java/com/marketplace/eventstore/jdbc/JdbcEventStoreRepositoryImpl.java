@@ -130,6 +130,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         eventClassCache.put(event.getClass());
         Result<String> result = serializeJson(objectMapper, event);
         Result<EventDataRecord> savedResult = createFromEvent(event, expectedVersion, result)
+            .map(eventDataRecord -> eventDataRecord.setAggregateName(streamId))
             .map(eventDataRecord ->
                 dslContext.insertInto(EVENT_DATA)
                     .set(eventDataRecord)
