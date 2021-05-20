@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.marketplace.common.ObjectMapperBuilder;
-import com.marketplace.cqrs.event.Event;
+import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.eventstore.framework.event.EventStream;
@@ -30,7 +30,7 @@ import org.mockito.Mockito;
 class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
 
     final ObjectMapper objectMapper = new ObjectMapperBuilder().build();
-    private EventStore eventStore;
+    private final EventStore<VersionedEvent> eventStore;
     private final ClassifiedAdEventProcessor eventProcessor = Mockito.mock(ClassifiedAdEventProcessor.class);
     InMemoryEventPublisher eventPublisher;
 
@@ -75,7 +75,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             .aggregateName(aggregateName)
             .streamId(streamId)
             .build();
-        EventStream eventStream = eventStore.load(streamId);
+        EventStream<VersionedEvent> eventStream = eventStore.load(streamId);
         assertThat(eventStream.size()).isEqualTo(1);
         assertThat(eventStream.getVersion()).isEqualTo(1);
 
@@ -84,7 +84,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
         assertThat(updateAppendResult.isPresent()).isTrue();
         assertThat(updateAppendResult.get()).isTrue();
 
-        EventStream updatedEventStream = eventStore.load(streamId);
+        EventStream<VersionedEvent> updatedEventStream = eventStore.load(streamId);
         assertThat(updatedEventStream.size()).isEqualTo(2);
     }
 
@@ -111,7 +111,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             eventStore.append(streamId, 1, List.of(classifiedAdCreated, classifiedAdTitleUpdated));
 
         assertThat(appendResult.isPresent()).isTrue();
-        EventStream eventStream = eventStore.load(streamId);
+        EventStream<VersionedEvent> eventStream = eventStore.load(streamId);
         assertThat(eventStream.size()).isEqualTo(2);
         assertThat(eventStream.getVersion()).isEqualTo(2);
     }
@@ -130,7 +130,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
         String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId);
         eventStore.append(streamId, 1, classifiedAdCreated);
 
-        EventStream eventStream = eventStore.load(streamId);
+        EventStream<VersionedEvent> eventStream = eventStore.load(streamId);
         assertThat(eventStream.size()).isEqualTo(1);
         assertThat(eventStream.getVersion()).isEqualTo(1);
     }
@@ -175,11 +175,11 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1)))
         ;
 
-        EventStream eventStream = eventStore.load(streamId);
+        EventStream<VersionedEvent> eventStream = eventStore.load(streamId);
         assertThat(eventStream.size()).isEqualTo(2);
         assertThat(eventStream.getVersion()).isEqualTo(2);
 
-        EventStream nextVersionEventStream = eventStore.load(streamId, 2);
+        EventStream<VersionedEvent> nextVersionEventStream = eventStore.load(streamId, 2);
         assertThat(nextVersionEventStream.size()).isEqualTo(1);
         assertThat(nextVersionEventStream.getVersion()).isEqualTo(2);
     }
@@ -203,13 +203,13 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
         eventStore.publish(streamId, 1, classifiedAdCreated);
         assertThat(eventStore.load(streamId).size()).isEqualTo(1);
 
-        EventStream eventStream = eventStore.load(streamId);
+        EventStream<VersionedEvent> eventStream = eventStore.load(streamId);
         assertThat(eventStream.size()).isEqualTo(1);
         assertThat(eventStream.getVersion()).isEqualTo(1);
         verify(eventProcessor, times(1)).create(classifiedAdCreated);
     }
 
-    List<Event> createEventsAggregate(UUID aggregateId, UUID ownerId) {
+    List<VersionedEvent> createEventsAggregate(UUID aggregateId, UUID ownerId) {
         var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
             .owner(ownerId)
             .id(UUID.randomUUID())
