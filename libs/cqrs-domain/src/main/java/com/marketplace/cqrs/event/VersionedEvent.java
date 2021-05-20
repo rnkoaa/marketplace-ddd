@@ -6,7 +6,6 @@ import org.immutables.value.Value;
 public interface VersionedEvent extends Event {
 
   @Value.Default
-  @Override
   default long getVersion() {
     return 0;
   }

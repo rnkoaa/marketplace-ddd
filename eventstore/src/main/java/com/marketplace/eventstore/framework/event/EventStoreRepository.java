@@ -1,6 +1,7 @@
 package com.marketplace.eventstore.framework.event;
 
 import com.marketplace.cqrs.event.Event;
+import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.eventstore.framework.Result;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface EventStoreRepository {
      *                      lots of events
      * @return list of events for the aggregate.
      */
-    List<Event> load(String aggregateName, int fromVersion);
+    List<VersionedEvent> load(String aggregateName, int fromVersion);
 
     /**
      * Load all events of an aggregate using the {@param aggregateName}
@@ -22,7 +23,7 @@ public interface EventStoreRepository {
      * @param aggregateName the name of the aggregate to load
      * @return all events related to the aggregate
      */
-    List<Event> load(String aggregateName);
+    List<VersionedEvent> load(String aggregateName);
 
     /**
      * Save an event for an aggregate
@@ -31,7 +32,7 @@ public interface EventStoreRepository {
      * @param event       The event being saved for the aggregate
      * @return the number of rows affected.
      */
-    Result<Boolean> save(String streamId, Event event);
+    Result<Boolean> save(String streamId, VersionedEvent event);
 
     /**
      * persist multiple events for an aggregate
@@ -40,7 +41,7 @@ public interface EventStoreRepository {
      *                        event.aggregateName} is not null
      * @return internal id of the row persisted.
      */
-    Result<Boolean> save(Event event);
+    Result<Boolean> save(VersionedEvent event);
 
     /**
      * persist multiple events for an aggregate
@@ -51,7 +52,7 @@ public interface EventStoreRepository {
      * @param expectedVersion the expected current version of the aggregate
      * @return internal id of the row persisted.
      */
-    Result<Integer> save(String streamId, List<Event> events, int expectedVersion);
+    Result<Integer> save(String streamId, List<VersionedEvent> events, int expectedVersion);
 
     /**
      * save an event for
@@ -62,7 +63,7 @@ public interface EventStoreRepository {
      * @param expectedVersion the expected current version of the aggregate
      * @return internal id of the row persisted.
      */
-    Result<Boolean> save(String streamId, Event event, int expectedVersion);
+    Result<Boolean> save(String streamId, VersionedEvent event, int expectedVersion);
 
     /**
      * save an event for
@@ -72,7 +73,7 @@ public interface EventStoreRepository {
      * @param expectedVersion the expected current version of the aggregate
      * @return internal id of the row persisted.
      */
-    Result<Boolean> save(Event event, int expectedVersion);
+    Result<Boolean> save(VersionedEvent event, int expectedVersion);
 
     /**
      * Provide the latest version of the aggregate.

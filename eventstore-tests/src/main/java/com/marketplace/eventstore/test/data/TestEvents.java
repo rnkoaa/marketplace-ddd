@@ -1,6 +1,7 @@
 package com.marketplace.eventstore.test.data;
 
 import com.marketplace.cqrs.event.Event;
+import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.eventstore.test.events.ImmutableTestCreatedEvent;
 import com.marketplace.eventstore.test.events.ImmutableTestTextUpdatedEvent;
 import com.marketplace.eventstore.test.events.ImmutableTestTitleUpdatedEvent;
@@ -73,7 +74,7 @@ public class TestEvents {
         .text("item is being sold as is; seller has good deal")
         .build();
 
-    public static List<Event> aggregateEvents = List.of(
+    public static List<VersionedEvent> aggregateEvents = List.of(
         testCreatedEvent,
         testTitleUpdatedEvent,
         testTextUpdatedEvent

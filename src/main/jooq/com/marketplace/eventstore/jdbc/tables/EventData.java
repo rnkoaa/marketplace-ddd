@@ -124,7 +124,7 @@ public class EventData extends TableImpl<EventDataRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.IDX_EVENT_DATA_AGGREGATE_ID, Indexes.IDX_EVENT_DATA_AGGREGATE_NAME);
+        return Arrays.<Index>asList(Indexes.IDX_EVENT_DATA_AGGREGATE_ID, Indexes.IDX_EVENT_DATA_AGGREGATE_NAME, Indexes.IDX_EVENT_DATA_AGGREGATE_NAME_VERSION);
     }
 
     @Override

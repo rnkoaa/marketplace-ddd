@@ -4,7 +4,7 @@ import com.marketplace.cqrs.event.Event;
 import java.time.Instant;
 import java.util.List;
 
-public interface EventStream {
+public interface EventStream<T> {
 
     /**
      * The Name of the stream This is an optional field
@@ -28,7 +28,7 @@ public interface EventStream {
     /**
      * @return all events that make up the stream sorted in ascending order
      */
-    List<Event> getEvents();
+    List<T> getEvents();
 
     /**
      * Append an event to the stream with the expectedVersion of the current stream
@@ -36,14 +36,14 @@ public interface EventStream {
      * @param event           event to be appended
      * @param expectedVersion the current version of the stream
      */
-    void append(Event event, int expectedVersion);
+    void append(T event, int expectedVersion);
 
     /**
      * All events that have not been persisted yet.
      *
      * @return all events that are yet to be persisted.
      */
-    List<Event> getChanges();
+    List<T> getChanges();
 
     /**
      * @return the number of events in the current stream
