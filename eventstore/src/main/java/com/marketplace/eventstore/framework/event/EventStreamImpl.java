@@ -9,6 +9,7 @@ import java.util.List;
 public class EventStreamImpl implements EventStream {
 
     private List<Event> events;
+    private List<Event> changes;
     private final String id;
     private final String name;
     private int version;
@@ -26,6 +27,7 @@ public class EventStreamImpl implements EventStream {
     public EventStreamImpl(String id, String name, int version, List<Event> events) {
         this(id, name, version, Instant.now(), Instant.now());
         this.events = events;
+        this.changes = new ArrayList<>();
     }
 
     public EventStreamImpl(
@@ -36,6 +38,7 @@ public class EventStreamImpl implements EventStream {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.events = new ArrayList<>();
+        this.changes = new ArrayList<>();
     }
 
     @Override
@@ -69,10 +72,15 @@ public class EventStreamImpl implements EventStream {
     }
 
     @Override
-    public void append(Event entity, int expectedVersion) {
-        this.events.add(entity);
+    public void append(Event event, int expectedVersion) {
         this.version = expectedVersion;
         this.updatedAt = Instant.now();
+        this.changes.add(event);
+    }
+
+    @Override
+    public List<Event> getChanges(){
+        return changes;
     }
 
     @Override

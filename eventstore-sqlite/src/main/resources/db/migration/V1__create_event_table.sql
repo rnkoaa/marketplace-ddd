@@ -7,7 +7,9 @@ create table event_data
     event_type     TEXT NOT NULL,
     event_version  integer,
     data           TEXT NOT NULL,
-    created        TEXt NOT NULL
+    created        TEXt NOT NULL,
+    check(event_version > 0),
+    check(length(id) > 0)
 );
 
 -- [jooq ignore start]
@@ -18,4 +20,8 @@ CREATE
 CREATE
     INDEX idx_event_data_aggregate_name
     ON event_data (aggregate_name);
+
+CREATE
+    INDEX idx_event_data_aggregate_name_version
+    ON event_data (aggregate_name, event_version);
 -- [jooq ignore end]

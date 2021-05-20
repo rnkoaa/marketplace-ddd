@@ -16,8 +16,8 @@ import com.marketplace.eventstore.impl.InMemoryEventPublisher;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdCreated;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventListener;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventProcessor;
-import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdTextUpdated;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdCreated;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdTextUpdated;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdTitleUpdated;
 import java.sql.SQLException;
 import java.util.List;
@@ -51,17 +51,12 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
     }
 
     @Test
-    void emptyEventStoreWithoutEvents() {
-        assertThat(eventStore.size()).isEqualTo(0);
-    }
-
-    @Test
     void createAndUpdateTitleInEventStore() {
         String classifiedAdId = "9d5d69ee-eadd-4352-942e-47935e194d22";
         String ownerId = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
         String aggregateName = ClassifiedAdCreated.class.getSimpleName();
         String streamId = String.format("%s:%s", aggregateName, classifiedAdId);
-        var classifiedAdCreated =  ImmutableClassifiedAdCreated.builder()
+        var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
             .owner(UUID.fromString(ownerId))
             .id(UUID.fromString(classifiedAdId))
             .aggregateId(UUID.fromString(classifiedAdId))
@@ -69,7 +64,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
 //            .aggregateId()
             .build();
 
-        Result<Boolean> appendResult = eventStore.append(streamId, 0, classifiedAdCreated);
+        Result<Boolean> appendResult = eventStore.append(streamId, 1, classifiedAdCreated);
         assertThat(appendResult.isPresent()).isTrue();
         assertThat(appendResult.get()).isTrue();
 
@@ -82,7 +77,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             .build();
         EventStream eventStream = eventStore.load(streamId);
         assertThat(eventStream.size()).isEqualTo(1);
-        assertThat(eventStream.getVersion()).isEqualTo(0);
+        assertThat(eventStream.getVersion()).isEqualTo(1);
 
         int expectedVersion = eventStream.getVersion() + 1;
         Result<Boolean> updateAppendResult = eventStore.append(streamId, expectedVersion, classifiedAdTitleUpdated);
@@ -113,12 +108,12 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             .aggregateName(ClassifiedAdCreated.class.getSimpleName())
             .build();
         var appendResult =
-            eventStore.append(streamId, 0, List.of(classifiedAdCreated, classifiedAdTitleUpdated));
+            eventStore.append(streamId, 1, List.of(classifiedAdCreated, classifiedAdTitleUpdated));
 
         assertThat(appendResult.isPresent()).isTrue();
         EventStream eventStream = eventStore.load(streamId);
         assertThat(eventStream.size()).isEqualTo(2);
-        assertThat(eventStream.getVersion()).isEqualTo(1);
+        assertThat(eventStream.getVersion()).isEqualTo(2);
     }
 
     @Test
@@ -130,12 +125,14 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             .id(UUID.fromString(classifiedAdId))
             .aggregateId(UUID.fromString(classifiedAdId))
             .aggregateName(ClassifiedAdCreated.class.getSimpleName())
-//            .aggregateId()
             .build();
 
         String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId);
-        eventStore.append(streamId, 0, classifiedAdCreated);
-        assertThat(eventStore.size()).isEqualTo(1);
+        eventStore.append(streamId, 1, classifiedAdCreated);
+
+        EventStream eventStream = eventStore.load(streamId);
+        assertThat(eventStream.size()).isEqualTo(1);
+        assertThat(eventStream.getVersion()).isEqualTo(1);
     }
 
     //
@@ -149,7 +146,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
 
         eventStore.append(
             streamId,
-            0,
+            1,
             createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1))
         );
 
@@ -157,10 +154,12 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
 
         eventStore.append(
             streamId2,
-            0,
+            1,
             createEventsAggregate(UUID.fromString(classifiedAdId2), UUID.fromString(ownerId1))
         );
 //        assertThat(eventStore.size()).isEqualTo(2);
+        assertThat(eventStore.load(streamId).size()).isEqualTo(2);
+        assertThat(eventStore.load(streamId2).size()).isEqualTo(2);
     }
 
     //
@@ -172,14 +171,17 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
 
         eventStore.append(
             streamId,
-            0,
+            1,
             createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1)))
         ;
 
-//        assertThat(eventStore.size()).isEqualTo(1);
         EventStream eventStream = eventStore.load(streamId);
         assertThat(eventStream.size()).isEqualTo(2);
-        assertThat(eventStream.getVersion()).isEqualTo(1);
+        assertThat(eventStream.getVersion()).isEqualTo(2);
+
+        EventStream nextVersionEventStream = eventStore.load(streamId, 2);
+        assertThat(nextVersionEventStream.size()).isEqualTo(1);
+        assertThat(nextVersionEventStream.getVersion()).isEqualTo(2);
     }
 
     //
@@ -198,25 +200,30 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
 //            .aggregateId()
             .build();
 
-        eventStore.publish(streamId, 0, classifiedAdCreated);
-        assertThat(eventStore.size()).isEqualTo(1);
+        eventStore.publish(streamId, 1, classifiedAdCreated);
+        assertThat(eventStore.load(streamId).size()).isEqualTo(1);
 
         EventStream eventStream = eventStore.load(streamId);
         assertThat(eventStream.size()).isEqualTo(1);
-        assertThat(eventStream.getVersion()).isEqualTo(0);
+        assertThat(eventStream.getVersion()).isEqualTo(1);
         verify(eventProcessor, times(1)).create(classifiedAdCreated);
     }
 
     List<Event> createEventsAggregate(UUID aggregateId, UUID ownerId) {
         var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
             .owner(ownerId)
-            .id(aggregateId)
+            .id(UUID.randomUUID())
             .aggregateId(aggregateId)
             .aggregateName(ClassifiedAdCreated.class.getSimpleName())
-//            .aggregateId()
             .build();
-        var classifiedAdTextUpdated =
-            new ClassifiedAdTextUpdated(aggregateId, "test classified ad text");
+
+        var classifiedAdTextUpdated = ImmutableClassifiedAdTextUpdated.builder()
+            .id(UUID.randomUUID())
+            .aggregateId(aggregateId)
+            .text("test classified ad text")
+            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+            .build();
+
         return List.of(classifiedAdCreated, classifiedAdTextUpdated);
     }
 }

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.common.ObjectMapperBuilder;
 import com.marketplace.cqrs.event.Event;
 import com.marketplace.eventstore.framework.Result;
-import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdCreated;
+import com.marketplace.eventstore.framework.event.InvalidVersionException;
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
 import com.marketplace.eventstore.test.data.TestEvents;
 import com.marketplace.eventstore.test.events.ImmutableTestCreatedEvent;
@@ -193,14 +193,6 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 
         // then
         assertThat(events).isNotNull().hasSize(2);
-    }
-
-    @Test
-    void testDeserializeEvent() {
-        String message = """
-            {"id":"30b7f062-d144-473b-a1f7-647fd134a581","owner":"89b69f4f-e36e-4f2b-baa0-d47057e02117","aggregate_id":"9d5d69ee-eadd-4352-942e-47935e194d22","aggregate_name":"ClassifiedAd","stream_id":"ClassifiedAd:9d5d69ee-eadd-4352-942e-47935e194d22","created_at":"2021-05-19T02:06:40.430836Z","version":0}            """;
-        var result = deserializeJSON(objectMapper, message, ImmutableClassifiedAdCreated.class);
-        assertThat(result.isPresent()).isTrue();
     }
 
     public static <T> Result<T> deserializeJSON(ObjectMapper objectMapper, String json, Class<T> clzz) {

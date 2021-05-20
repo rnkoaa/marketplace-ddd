@@ -28,8 +28,7 @@ public class JdbcEventStoreImpl implements EventStore {
             return new EventStreamImpl(streamId, "", 0, List.of());
         }
 
-        int version = (int) events.get(events.size() - 1).getVersion();
-        return new EventStreamImpl(streamId, "", version, events);
+        return new EventStreamImpl(streamId, "", getVersion(streamId), events);
 
     }
 
@@ -41,8 +40,7 @@ public class JdbcEventStoreImpl implements EventStore {
             return new EventStreamImpl(streamId, "", 0, List.of());
         }
 
-        int version = (int) events.get(events.size() - 1).getVersion();
-        return new EventStreamImpl(streamId, "", version, events);
+        return new EventStreamImpl(streamId, "", getVersion(streamId), events);
     }
 
     @Override
@@ -84,13 +82,25 @@ public class JdbcEventStoreImpl implements EventStore {
 
     @Override
     public Result<Boolean> publish(String streamId, int expectedVersion, List<Event> events) {
-        eventPublisher.publish(streamId, events);
-        return Result.of(true);
+        Result<Integer> filter = eventStoreRepository.save(streamId, events, expectedVersion)
+            .filter(res -> res != null && res > 0);
+
+        if (filter.isPresent()) {
+            events.forEach(event -> {
+                eventPublisher.publish(streamId, event);
+            });
+            return Result.of(true);
+        }
+
+        return Result.error("error publishing events");
     }
 
     @Override
     public Result<Boolean> publish(String streamId, int expectedVersion, Event event) {
-        eventPublisher.publish(streamId, event);
-        return Result.of(true);
+        Result<Boolean> save = eventStoreRepository.save(streamId, event, expectedVersion);
+        return save.map(res -> {
+            eventPublisher.publish(streamId, event);
+            return true;
+        });
     }
 }

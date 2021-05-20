@@ -11,12 +11,16 @@ import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.InvalidVersionException;
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
+
+    record EventDataVersion(int version, Event event){}
 
     private static final EventClassCache eventClassCache = EventClassCache.getInstance();
     private final ObjectMapper objectMapper;
@@ -63,7 +67,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         int latestVersion = getVersion(streamId);
         int nextVersion = latestVersion + 1;
 
-        if ((expectedVersion != 0) && (nextVersion != expectedVersion)) {
+        if ((expectedVersion == 0) || (nextVersion != expectedVersion)) {
             String errMessage = "invalid expected version, latest version is %d, expected version is %d";
             return Result.error(new InvalidVersionException(String.format(errMessage, latestVersion, expectedVersion)));
         }
@@ -93,23 +97,24 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
     @Override
     public Result<Boolean> save(Event event) {
-        return save(event.getAggregateName(), event);
+        return save(event.getStreamId(), event);
     }
 
     @Override
     public Result<Integer> save(String streamId, List<Event> events, int expectedVersion) {
         int latestVersion = getVersion(streamId);
         int nextVersion = latestVersion + 1;
-        if ((expectedVersion != 0) && (nextVersion != expectedVersion)) {
+        if ((expectedVersion == 0) || (nextVersion != expectedVersion)) {
             String errMessage = "invalid expected version, latest version is %d, expected version is %d";
             return Result.error(new InvalidVersionException(String.format(errMessage, latestVersion, expectedVersion)));
         }
 
-        List<EventDataRecord> eventDataRecords = events.stream()
-            .peek(event -> eventClassCache.put(event.getClass()))
-            .map(event -> {
-                Result<String> result = serializeJson(objectMapper, event);
-                return createFromEvent(event, (int) event.getVersion(), result);
+        List<EventDataRecord> eventDataRecords =  IntStream.range(0, events.size())
+            .mapToObj(index -> new EventDataVersion(nextVersion + index, events.get(index)))
+            .peek(eventVersion -> eventClassCache.put(eventVersion.event.getClass()))
+            .map(eventVersion -> {
+                Result<String> result = serializeJson(objectMapper, eventVersion.event);
+                return createFromEvent(eventVersion.event, eventVersion.version, result);
             })
             .filter(Result::isPresent)
             .map(Result::get)
@@ -124,7 +129,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     public Result<Boolean> save(String streamId, Event event, int expectedVersion) {
         int latestVersion = getVersion(streamId);
         int nextVersion = latestVersion + 1;
-        if ((expectedVersion != 0) && (nextVersion != expectedVersion)) {
+        if ((expectedVersion == 0) || (nextVersion != expectedVersion)) {
             String errMessage = "invalid expected version, latest version is %d, expected version is %d";
             return Result.error(new InvalidVersionException(String.format(errMessage, latestVersion, expectedVersion)));
         }

@@ -38,6 +38,9 @@ public interface Event {
 
     @Value.Default
     default String getStreamId() {
+        if(getAggregateName().contains(":")) {
+            return getAggregateName();
+        }
         return String.format("%s:%s", getAggregateName(), getAggregateId().toString());
     }
 

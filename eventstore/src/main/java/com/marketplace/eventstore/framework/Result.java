@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public sealed abstract class Result<T> {
 
@@ -13,6 +14,8 @@ public sealed abstract class Result<T> {
     // onFailure
 
     public abstract Result<T> filter(Predicate<T> p, String message);
+
+    public abstract Result<T> filter(Predicate<T> p);
 
     public abstract <U> Result<U> map(Function<T, U> func);
 
@@ -88,6 +91,15 @@ public sealed abstract class Result<T> {
         public Result<T> filter(Predicate<T> p, String message) {
             try {
                 return p.test(this.value) ? success(this.value) : error(message);
+            } catch (Exception ex) {
+                return error(ex);
+            }
+        }
+
+        @Override
+        public Result<T> filter(Predicate<T> p) {
+            try {
+                return p.test(this.value) ? success(this.value) : error("not found");
             } catch (Exception ex) {
                 return error(ex);
             }
@@ -185,6 +197,11 @@ public sealed abstract class Result<T> {
         }
 
         @Override
+        public Result<T> filter(Predicate<T> p) {
+            return error(this.exception);
+        }
+
+        @Override
         public <U> Result<U> map(Function<T, U> func) {
             return error(this.exception);
         }
@@ -250,6 +267,11 @@ public sealed abstract class Result<T> {
 
         @Override
         public Result<T> filter(Predicate<T> p, String message) {
+            return empty();
+        }
+
+        @Override
+        public Result<T> filter(Predicate<T> p) {
             return empty();
         }
 

@@ -16,6 +16,7 @@ import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventPr
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdTextUpdated;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdTitleUpdated;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdCreated;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdTextUpdated;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdTitleUpdated;
 import java.util.List;
 import java.util.UUID;
@@ -208,12 +209,17 @@ class InMemoryEventStoreTest {
     List<Event> createEventsAggregate(UUID aggregateId, UUID ownerId) {
         var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
             .owner(ownerId)
-            .id(aggregateId)
+            .id(UUID.randomUUID())
             .aggregateId(aggregateId)
             .aggregateName(ClassifiedAdCreated.class.getSimpleName())
             .build();
-        var classifiedAdTextUpdated =
-            new ClassifiedAdTextUpdated(aggregateId, "test classified ad text");
+        var classifiedAdTextUpdated = ImmutableClassifiedAdTextUpdated.builder()
+            .id(UUID.randomUUID())
+            .aggregateId(aggregateId)
+            .text("test text")
+            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+            .build();
+
         return List.of(classifiedAdCreated, classifiedAdTextUpdated);
     }
 }
