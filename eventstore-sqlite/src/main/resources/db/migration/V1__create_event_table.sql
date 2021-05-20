@@ -1,6 +1,5 @@
 create table event_data
 (
---    id             VARCHAR(40) PRIMARY KEY,
     id             TEXT PRIMARY KEY,
     aggregate_name TEXT NULL,
     aggregate_id   TEXT NOT NULL,
