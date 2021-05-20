@@ -1,16 +1,9 @@
 package com.marketplace.cqrs.event;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.Instant;
 import java.util.UUID;
 import org.immutables.value.Value;
-import org.immutables.value.Value.Style.ImplementationVisibility;
 
-@JsonSerialize // Jackson automatic integration, why not?
-@Value.Style(
-    typeAbstract = "Abstract*",
-    typeImmutable = "*",
-    visibility = ImplementationVisibility.PUBLIC)
 public interface Event {
 
     /**
@@ -20,10 +13,6 @@ public interface Event {
     @Value.Default
     default Instant getCreatedAt() {
         return Instant.now();
-    }
-
-    default long getVersion() {
-        return 0;
     }
 
     /**

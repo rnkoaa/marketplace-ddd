@@ -7,6 +7,7 @@ import static org.jooq.impl.DSL.max;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.cqrs.event.Event;
+import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.InvalidVersionException;
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
-    record EventDataVersion(int version, Event event){}
+    record EventDataVersion(int version, VersionedEvent event){}
 
     private static final EventClassCache eventClassCache = EventClassCache.getInstance();
     private final ObjectMapper objectMapper;
@@ -33,7 +34,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     }
 
     @Override
-    public List<Event> load(String aggregateName, int fromVersion) {
+    public List<VersionedEvent> load(String aggregateName, int fromVersion) {
         org.jooq.Result<EventDataRecord> fetch = dslContext.selectFrom(EVENT_DATA)
             .where(EVENT_DATA.AGGREGATE_NAME.eq(aggregateName)
                 .and(EVENT_DATA.EVENT_VERSION.ge(fromVersion)))
@@ -48,7 +49,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     }
 
     @Override
-    public List<Event> load(String aggregateName) {
+    public List<VersionedEvent> load(String aggregateName) {
         org.jooq.Result<EventDataRecord> fetch = dslContext.selectFrom(EVENT_DATA)
             .where(EVENT_DATA.AGGREGATE_NAME.eq(aggregateName))
             .orderBy(EVENT_DATA.CREATED.asc())
@@ -62,7 +63,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     }
 
     @Override
-    public Result<Boolean> save(String streamId, Event event) {
+    public Result<Boolean> save(String streamId, VersionedEvent event) {
         long expectedVersion = event.getVersion();
         int latestVersion = getVersion(streamId);
         int nextVersion = latestVersion + 1;
@@ -96,12 +97,12 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     }
 
     @Override
-    public Result<Boolean> save(Event event) {
+    public Result<Boolean> save(VersionedEvent event) {
         return save(event.getStreamId(), event);
     }
 
     @Override
-    public Result<Integer> save(String streamId, List<Event> events, int expectedVersion) {
+    public Result<Integer> save(String streamId, List<VersionedEvent> events, int expectedVersion) {
         int latestVersion = getVersion(streamId);
         int nextVersion = latestVersion + 1;
         if ((expectedVersion == 0) || (nextVersion != expectedVersion)) {
@@ -126,7 +127,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     }
 
     @Override
-    public Result<Boolean> save(String streamId, Event event, int expectedVersion) {
+    public Result<Boolean> save(String streamId, VersionedEvent event, int expectedVersion) {
         int latestVersion = getVersion(streamId);
         int nextVersion = latestVersion + 1;
         if ((expectedVersion == 0) || (nextVersion != expectedVersion)) {
@@ -158,7 +159,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     }
 
     @Override
-    public Result<Boolean> save(Event event, int expectedVersion) {
+    public Result<Boolean> save(VersionedEvent event, int expectedVersion) {
         return save(event.getStreamId(), event, expectedVersion);
     }
 
@@ -196,7 +197,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         return 0;
     }
 
-    private static Result<Event> convertFromEventDataRecord(ObjectMapper objectMapper,
+    private static Result<VersionedEvent> convertFromEventDataRecord(ObjectMapper objectMapper,
         EventDataRecord eventDataRecord) {
         String data = eventDataRecord.getData();
         String eventType = eventDataRecord.getEventType();
@@ -207,7 +208,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
         Result<Class<?>> classResult = eventClassCache.get(eventType);
         return classResult.flatmap(clzz -> deserializeJSON(objectMapper, data, clzz))
-            .map(e -> (Event) e);
+            .map(e -> (VersionedEvent) e);
     }
 
     private static Result<String> serializeJson(ObjectMapper objectMapper, Object object) {

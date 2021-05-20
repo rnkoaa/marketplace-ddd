@@ -8,8 +8,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.common.ObjectMapperBuilder;
 import com.marketplace.cqrs.event.Event;
+import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.eventstore.framework.Result;
-import com.marketplace.eventstore.framework.event.InvalidVersionException;
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
 import com.marketplace.eventstore.test.data.TestEvents;
 import com.marketplace.eventstore.test.events.ImmutableTestCreatedEvent;
@@ -44,7 +44,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 
     @Test
     void testSaveMultipleEventsAtExpectedVersion() {
-        List<Event> aggregateEvents = TestEvents.aggregateEvents;
+        List<VersionedEvent> aggregateEvents = TestEvents.aggregateEvents;
 
         Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
 
@@ -136,12 +136,12 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 
     @Test
     void testAllEventsForAggregateCanBeLoaded() {
-        List<Event> aggregateEvents = TestEvents.aggregateEvents;
+        List<VersionedEvent> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
         jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
 
-        List<Event> events = jdbcEventStoreRepository.load(TestEvents.streamId);
+        List<VersionedEvent> events = jdbcEventStoreRepository.load(TestEvents.streamId);
 
         // then
         assertThat(events).isNotNull().hasSize(3);
@@ -149,12 +149,12 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 
     @Test
     void testLoadEventsUsingAggregateName() {
-        List<Event> aggregateEvents = TestEvents.aggregateEvents;
+        List<VersionedEvent> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
         jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
 
-        List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateName);
+        List<VersionedEvent> events = jdbcEventStoreRepository.load(TestEvents.aggregateName);
 
         // then
         assertThat(events).isNotNull().hasSize(3);
@@ -162,7 +162,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 
     @Test
     void testLoadMissingAggregates() {
-        List<Event> events = jdbcEventStoreRepository.load(TestEvents.streamId);
+        List<VersionedEvent> events = jdbcEventStoreRepository.load(TestEvents.streamId);
 
         // then
         assertThat(events).isNotNull().hasSize(0);
@@ -171,12 +171,12 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 
     @Test
     void testLoadEventsFromVersion() {
-        List<Event> aggregateEvents = TestEvents.aggregateEvents;
+        List<VersionedEvent> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
         jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
 
-        List<Event> events = jdbcEventStoreRepository.load(TestEvents.streamId, 2);
+        List<VersionedEvent> events = jdbcEventStoreRepository.load(TestEvents.streamId, 2);
 
         // then
         assertThat(events).isNotNull().hasSize(2);
@@ -184,12 +184,12 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 
     @Test
     void testLoadEventsUsingAggregateNameFromVersion() {
-        List<Event> aggregateEvents = TestEvents.aggregateEvents;
+        List<VersionedEvent> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
         jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
 
-        List<Event> events = jdbcEventStoreRepository.load(TestEvents.aggregateName, 2);
+        List<VersionedEvent> events = jdbcEventStoreRepository.load(TestEvents.aggregateName, 2);
 
         // then
         assertThat(events).isNotNull().hasSize(2);

@@ -4,7 +4,7 @@ import com.marketplace.cqrs.event.Event;
 import com.marketplace.eventstore.framework.Result;
 import java.util.List;
 
-public interface EventStore {
+public interface EventStore<T extends Event> {
 
     /**
      * Load all events of the stream from the beginning
@@ -12,7 +12,7 @@ public interface EventStore {
      * @param streamId id of the stream to load
      * @return an {@link EventStream} of events. If there are no events, the stream will be empty
      */
-    EventStream load(String streamId);
+    EventStream<T> load(String streamId);
 
     /**
      * Load all events of the stream ignoring all events prior to {@param fromVersion}
@@ -21,7 +21,7 @@ public interface EventStore {
      * @param fromVersion load events from the eventstore excluding all events prior to this version
      * @return an {@link EventStream} of events. If there are no events, the stream will be empty
      */
-    EventStream load(String streamId, int fromVersion);
+    EventStream<T> load(String streamId, int fromVersion);
 
     /**
      * Adds a list of events to the end of the event stream
@@ -33,7 +33,7 @@ public interface EventStore {
      * @return a {@link Result (Success)  } if the append was successful and a {@link Result (Failure) } if the append
      * operation failed.
      */
-    Result<Boolean> append(String streamId, int expectedVersion, List<Event> events);
+    Result<Boolean> append(String streamId, int expectedVersion, List<T> events);
 
     /**
      * Adds an event to the end of the event stream
@@ -45,7 +45,7 @@ public interface EventStore {
      * @return a {@link Result (Success)} if the append was successful and a {@link Result (Failure)} if the append
      * operation failed.
      */
-    Result<Boolean> append(String streamId, int expectedVersion, Event event);
+    Result<Boolean> append(String streamId, int expectedVersion, T event);
 
     /**
      * The size of the event store, how many streams do we have, that is how many aggregates do we have
@@ -78,7 +78,7 @@ public interface EventStore {
      * @param streamId the id of the stream to append to then publish onto
      * @param event    event being processed
      */
-    Result<Boolean> publish(String streamId, Event event);
+    Result<Boolean> publish(String streamId, T event);
 
     /**
      * appends a list of events to the end of the event stream then publishes those events to any subscribers that may
@@ -91,7 +91,7 @@ public interface EventStore {
      * @param events          the events to be appended
      * @return a {@link Result } if the append was successfull and a {@link Result} if the append operation failed.
      */
-    Result<Boolean> publish(String streamId, int expectedVersion, List<Event> events);
+    Result<Boolean> publish(String streamId, int expectedVersion, List<T> events);
 
     /**
      * Appends an event to the end of the event stream then subsequently publishes the event to any subscriber,
@@ -103,5 +103,5 @@ public interface EventStore {
      * @return a {@link Result (Success) } if the append was successfull and a {@link Result (Failure) } if the append
      * operation failed.
      */
-    Result<Boolean> publish(String streamId, int expectedVersion, Event event);
+    Result<Boolean> publish(String streamId, int expectedVersion, T event);
 }

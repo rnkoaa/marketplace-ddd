@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import reactor.core.publisher.Mono;
 
-public class InMemoryEventStore implements EventStore {
+public class InMemoryEventStore implements EventStore<Event> {
 
     private final EventPublisher<Event> eventPublisher;
 
@@ -19,7 +19,7 @@ public class InMemoryEventStore implements EventStore {
     }
 
     @Override
-    public EventStream load(String streamId) {
+    public EventStream<Event> load(String streamId) {
         List<EventRecord> eventStream = entityStore.get(streamId);
         if (eventStream == null || eventStream.size() == 0) {
             return new EventStreamImpl(streamId, "", 0, List.of());

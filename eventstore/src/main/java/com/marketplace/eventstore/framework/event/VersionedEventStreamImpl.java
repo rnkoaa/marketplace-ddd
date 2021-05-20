@@ -1,37 +1,36 @@
 package com.marketplace.eventstore.framework.event;
 
 import com.marketplace.cqrs.event.Event;
-
 import com.marketplace.cqrs.event.VersionedEvent;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventStreamImpl implements EventStream<Event> {
+public class VersionedEventStreamImpl implements EventStream<VersionedEvent> {
 
-    private List<Event> events;
-    private List<Event> changes;
+    private List<VersionedEvent> events;
+    private List<VersionedEvent> changes;
     private final String id;
     private final String name;
     private int version;
     private final Instant createdAt;
     private Instant updatedAt;
 
-    public EventStreamImpl(String id, String name, int version, Instant createdAt) {
+    public VersionedEventStreamImpl(String id, String name, int version, Instant createdAt) {
         this(id, name, version, createdAt, Instant.now());
     }
 
-    public EventStreamImpl(String id) {
+    public VersionedEventStreamImpl(String id) {
         this(id, "", 0, Instant.now(), Instant.now());
     }
 
-    public EventStreamImpl(String id, String name, int version, List<Event> events) {
+    public VersionedEventStreamImpl(String id, String name, int version, List<VersionedEvent> events) {
         this(id, name, version, Instant.now(), Instant.now());
         this.events = events;
         this.changes = new ArrayList<>();
     }
 
-    public EventStreamImpl(
+    public VersionedEventStreamImpl(
         String id, String name, int version, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.name = name;
@@ -58,7 +57,7 @@ public class EventStreamImpl implements EventStream<Event> {
     }
 
     @Override
-    public List<Event> getEvents() {
+    public List<VersionedEvent> getEvents() {
         return events;
     }
 
@@ -73,14 +72,14 @@ public class EventStreamImpl implements EventStream<Event> {
     }
 
     @Override
-    public void append(Event event, int expectedVersion) {
+    public void append(VersionedEvent event, int expectedVersion) {
         this.version = expectedVersion;
         this.updatedAt = Instant.now();
         this.changes.add(event);
     }
 
     @Override
-    public List<Event> getChanges(){
+    public List<VersionedEvent> getChanges(){
         return changes;
     }
 
