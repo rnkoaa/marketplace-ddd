@@ -5,6 +5,7 @@ package com.marketplace.eventstore.jdbc.tables;
 
 
 import com.marketplace.eventstore.jdbc.DefaultSchema;
+import com.marketplace.eventstore.jdbc.Indexes;
 import com.marketplace.eventstore.jdbc.Keys;
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
 
@@ -13,9 +14,10 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row8;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -35,7 +37,7 @@ public class EventData extends TableImpl<EventDataRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>EVENT_DATA</code>
+     * The reference instance of <code>event_data</code>
      */
     public static final EventData EVENT_DATA = new EventData();
 
@@ -48,44 +50,39 @@ public class EventData extends TableImpl<EventDataRecord> {
     }
 
     /**
-     * The column <code>EVENT_DATA.ID</code>.
+     * The column <code>event_data.id</code>.
      */
-    public final TableField<EventDataRecord, Integer> ID = createField(DSL.name("ID"), SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<EventDataRecord, String> ID = createField(DSL.name("id"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>EVENT_DATA.EVENT_ID</code>.
+     * The column <code>event_data.aggregate_name</code>.
      */
-    public final TableField<EventDataRecord, String> EVENT_ID = createField(DSL.name("EVENT_ID"), SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<EventDataRecord, String> AGGREGATE_NAME = createField(DSL.name("aggregate_name"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>EVENT_DATA.AGGREGATE_NAME</code>.
+     * The column <code>event_data.aggregate_id</code>.
      */
-    public final TableField<EventDataRecord, String> AGGREGATE_NAME = createField(DSL.name("AGGREGATE_NAME"), SQLDataType.CLOB, this, "");
+    public final TableField<EventDataRecord, String> AGGREGATE_ID = createField(DSL.name("aggregate_id"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
-     * The column <code>EVENT_DATA.AGGREGATE_ID</code>.
+     * The column <code>event_data.event_type</code>.
      */
-    public final TableField<EventDataRecord, String> AGGREGATE_ID = createField(DSL.name("AGGREGATE_ID"), SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<EventDataRecord, String> EVENT_TYPE = createField(DSL.name("event_type"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
-     * The column <code>EVENT_DATA.EVENT_TYPE</code>.
+     * The column <code>event_data.event_version</code>.
      */
-    public final TableField<EventDataRecord, String> EVENT_TYPE = createField(DSL.name("EVENT_TYPE"), SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<EventDataRecord, Integer> EVENT_VERSION = createField(DSL.name("event_version"), SQLDataType.INTEGER, this, "");
 
     /**
-     * The column <code>EVENT_DATA.EVENT_VERSION</code>.
+     * The column <code>event_data.data</code>.
      */
-    public final TableField<EventDataRecord, Integer> EVENT_VERSION = createField(DSL.name("EVENT_VERSION"), SQLDataType.INTEGER, this, "");
+    public final TableField<EventDataRecord, String> DATA = createField(DSL.name("data"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
-     * The column <code>EVENT_DATA.DATA</code>.
+     * The column <code>event_data.created</code>.
      */
-    public final TableField<EventDataRecord, String> DATA = createField(DSL.name("DATA"), SQLDataType.CLOB.nullable(false), this, "");
-
-    /**
-     * The column <code>EVENT_DATA.CREATED</code>.
-     */
-    public final TableField<EventDataRecord, String> CREATED = createField(DSL.name("CREATED"), SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<EventDataRecord, String> CREATED = createField(DSL.name("created"), SQLDataType.CLOB.nullable(false), this, "");
 
     private EventData(Name alias, Table<EventDataRecord> aliased) {
         this(alias, aliased, null);
@@ -96,24 +93,24 @@ public class EventData extends TableImpl<EventDataRecord> {
     }
 
     /**
-     * Create an aliased <code>EVENT_DATA</code> table reference
+     * Create an aliased <code>event_data</code> table reference
      */
     public EventData(String alias) {
         this(DSL.name(alias), EVENT_DATA);
     }
 
     /**
-     * Create an aliased <code>EVENT_DATA</code> table reference
+     * Create an aliased <code>event_data</code> table reference
      */
     public EventData(Name alias) {
         this(alias, EVENT_DATA);
     }
 
     /**
-     * Create a <code>EVENT_DATA</code> table reference
+     * Create a <code>event_data</code> table reference
      */
     public EventData() {
-        this(DSL.name("EVENT_DATA"), null);
+        this(DSL.name("event_data"), null);
     }
 
     public <O extends Record> EventData(Table<O> child, ForeignKey<O, EventDataRecord> key) {
@@ -126,13 +123,18 @@ public class EventData extends TableImpl<EventDataRecord> {
     }
 
     @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.IDX_EVENT_DATA_AGGREGATE_ID, Indexes.IDX_EVENT_DATA_AGGREGATE_NAME);
+    }
+
+    @Override
     public UniqueKey<EventDataRecord> getPrimaryKey() {
-        return Keys.CONSTRAINT_5;
+        return Keys.PK_EVENT_DATA;
     }
 
     @Override
     public List<UniqueKey<EventDataRecord>> getKeys() {
-        return Arrays.<UniqueKey<EventDataRecord>>asList(Keys.CONSTRAINT_5);
+        return Arrays.<UniqueKey<EventDataRecord>>asList(Keys.PK_EVENT_DATA);
     }
 
     @Override
@@ -162,11 +164,11 @@ public class EventData extends TableImpl<EventDataRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row8 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row8<Integer, String, String, String, String, Integer, String, String> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public Row7<String, String, String, String, Integer, String, String> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }

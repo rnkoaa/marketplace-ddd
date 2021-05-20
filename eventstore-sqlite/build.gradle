@@ -2,6 +2,8 @@ plugins {
     id 'java-library'
     id 'idea'
     id 'nu.studer.jooq'
+    id "org.flywaydb.flyway"
+
 }
 
 sourceSets {
@@ -45,6 +47,8 @@ configurations {
     funcTestRuntimeOnly {
         extendsFrom testRuntimeOnly
     }
+
+    flywayMigration
 }
 
 dependencies {
@@ -63,7 +67,7 @@ dependencies {
     // 2.11.3
     implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion"
+//    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion"
     implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
 
@@ -87,10 +91,22 @@ dependencies {
     funcTestImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
 
     funcTestImplementation project(":eventstore-tests")
+    flywayMigration "org.xerial:sqlite-jdbc:$sqliteVersion"
+
+    funcTestImplementation(testFixtures(project(":eventstore")))
+
 }
 
 test {
     useJUnitPlatform()
+}
+
+// https://flywaydb.org/documentation/usage/gradle/migrate
+flyway {
+    driver = 'org.sqlite.JDBC'
+    url = "jdbc:sqlite:${projectDir}/src/main/resources/db/marketplace.db"
+//    locations = ["classpath:migration"]
+    locations = ["filesystem:${projectDir}/src/main/resources/db/migration"]
 }
 
 jooq {
@@ -103,32 +119,14 @@ jooq {
 
             generationTool {
                 logging = org.jooq.meta.jaxb.Logging.WARN
-//                jdbc {
-//                    driver = 'org.sqlite.JDBC'
-//                    url = 'jdbc:sqlite:src/main/resources/db/eventstore.db'
-//                }
+                jdbc {
+                    driver = 'org.sqlite.JDBC'
+                    url = 'jdbc:sqlite:src/main/resources/db/marketplace.db'
+                }
                 generator {
                     name = 'org.jooq.codegen.DefaultGenerator'
                     database {
-                        name = "org.jooq.meta.extensions.ddl.DDLDatabase"
-                        properties {
-                            property {
-                                key = "scripts"
-                                value = "src/main/resources/db/schema.sql"
-                            }
-                            property {
-                                key = "sort"
-                                value = "semantic"
-                            }
-                            property {
-                                key = "parseIgnoreCommentStart"
-                                value = "[jooq ignore start]"
-                            }
-                            property {
-                                key = "parseIgnoreCommentStop"
-                                value = "[jooq ignore end]"
-                            }
-                        }
+                        name = 'org.jooq.meta.sqlite.SQLiteDatabase'
                     }
                     generate {
                         relations = true
@@ -149,6 +147,8 @@ jooq {
     }
 }
 
+generateJooq.dependsOn(flywayMigrate)
+
 task funcTest(type: Test) {
     description = 'Runs the functional tests.'
     group = 'verification'
@@ -163,3 +163,10 @@ funcTest {
 }
 
 check.dependsOn funcTest
+
+clean {
+    doLast {
+        println "deleting marketplace.db"
+        delete("src/main/resources/db/marketplace.db")
+    }
+}

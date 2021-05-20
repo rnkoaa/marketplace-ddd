@@ -19,7 +19,7 @@ public interface Repository<T, U> {
      * @param entity
      * @return
      */
-    T add(T entity);
+    Optional<T> add(T entity);
 
     default String entityId(U id, Class<T> tClass) {
         return String.format("%s:%s", tClass.getSimpleName(), id.toString());

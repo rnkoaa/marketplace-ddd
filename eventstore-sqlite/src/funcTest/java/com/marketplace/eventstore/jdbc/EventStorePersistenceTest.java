@@ -19,11 +19,11 @@ public class EventStorePersistenceTest extends AbstractJdbcFuncTest {
     static String aggregateType = "ClassifiedAd";
 
     static List<EventMetadata> eventMetadata = List.of(
-        EventMetadata.of(aggregateType, "bf336e78-dc40-44f9-acec-57cf755987d9", aggregateId, "CreateClassifiedAd"),
+        EventMetadata.of(aggregateType, "bf336e78-dc40-44f9-acec-57cf755987d9", aggregateId, "CreateClassifiedAd", 1),
         EventMetadata
-            .of(aggregateType, "361b79f3-bfab-448e-8178-07ef679f34cd", aggregateId, "UpdateClassifiedAdTitle", 1),
+            .of(aggregateType, "361b79f3-bfab-448e-8178-07ef679f34cd", aggregateId, "UpdateClassifiedAdTitle", 2),
         EventMetadata
-            .of(aggregateType, "b975119e-e09e-42e7-9999-a443758f672e", aggregateId, "AddPictureToClassifiedAd", 2)
+            .of(aggregateType, "b975119e-e09e-42e7-9999-a443758f672e", aggregateId, "AddPictureToClassifiedAd", 3)
     );
 
     public EventStorePersistenceTest() throws SQLException {
@@ -61,7 +61,8 @@ public class EventStorePersistenceTest extends AbstractJdbcFuncTest {
 
         EventDataRecord eventDataRecord = returning.fetchOne();
         assertThat(eventDataRecord).isNotNull();
-        assertThat(eventDataRecord.getId()).isNotNull().isGreaterThan(0);
+        assertThat(eventDataRecord.getId()).isNotNull().isNotEmpty()
+            .isEqualTo(eventId);
     }
 
     @Test
@@ -115,7 +116,7 @@ public class EventStorePersistenceTest extends AbstractJdbcFuncTest {
 
         assertThat(integerRecord1).isNotNull();
         int maxValue = integerRecord1.get("event_version", Integer.class);
-        assertThat(maxValue).isEqualByComparingTo(2);
+        assertThat(maxValue).isEqualByComparingTo(3);
     }
 
     @Test
@@ -126,7 +127,7 @@ public class EventStorePersistenceTest extends AbstractJdbcFuncTest {
         assertThat(execute).isNotEmpty().hasSize(3);
 
         Record1<Integer> integerRecord1 = dslContext.select(
-            countDistinct(EVENT_DATA.EVENT_ID).as("event_count")
+            countDistinct(EVENT_DATA.ID).as("event_count")
         ).from(EVENT_DATA)
             .where(EVENT_DATA.AGGREGATE_NAME.eq(eventMetadata.get(0).aggregateName()))
             .fetchOne();
@@ -184,7 +185,6 @@ public class EventStorePersistenceTest extends AbstractJdbcFuncTest {
             .map(entry -> {
                 String eventData = String.format(eventDataFormat, entry.aggregateId());
                 return new EventDataRecord(
-                    null,
                     entry.eventId(),
                     entry.aggregateName(),
                     entry.aggregateId,
@@ -204,7 +204,6 @@ public class EventStorePersistenceTest extends AbstractJdbcFuncTest {
             }
             """;
         return new EventDataRecord(
-            null,
             eventId,
             "ClassifiedAd:" + aggregateId,
             aggregateId,

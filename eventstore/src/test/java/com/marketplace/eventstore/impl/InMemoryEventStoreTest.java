@@ -6,8 +6,7 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.eventbus.EventBus;
 import com.marketplace.cqrs.event.Event;
-import com.marketplace.eventstore.framework.OperationResult;
-import com.marketplace.eventstore.framework.OperationResult.Success;
+import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.EventListener;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.eventstore.framework.event.EventStream;
@@ -16,8 +15,12 @@ import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventLi
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventProcessor;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdTextUpdated;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdTitleUpdated;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdCreated;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdTextUpdated;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ImmutableClassifiedAdTitleUpdated;
 import java.util.List;
 import java.util.UUID;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,212 +31,195 @@ import reactor.test.StepVerifier;
 @SuppressWarnings("UnstableApiUsage")
 class InMemoryEventStoreTest {
 
-  private EventStore<Event> eventStore;
-  private final ClassifiedAdEventProcessor eventProcessor = Mockito.mock(ClassifiedAdEventProcessor.class);
-  private final EventListener classifiedAdEventListener = new ClassifiedAdEventListener(eventProcessor);
+    private EventStore eventStore;
+    private final ClassifiedAdEventProcessor eventProcessor = Mockito.mock(ClassifiedAdEventProcessor.class);
+    private final EventListener classifiedAdEventListener = new ClassifiedAdEventListener(eventProcessor);
+    InMemoryEventPublisher eventPublisher;
 
-  InMemoryEventPublisher eventPublisher;
+    @BeforeEach
+    void setup() {
+        var eventBus = new EventBus();
+        eventPublisher = new InMemoryEventPublisher(eventBus);
+        eventStore = new InMemoryEventStore(eventPublisher);
+        eventPublisher.registerListener(classifiedAdEventListener);
+    }
 
-  @BeforeEach
-  void setup() {
-    var eventBus = new EventBus();
-    eventPublisher = new InMemoryEventPublisher(eventBus);
-    eventStore = new InMemoryEventStore(eventPublisher);
-    eventPublisher.registerListener(classifiedAdEventListener);
-  }
+    @AfterEach
+    void cleanup() {
+        eventPublisher.close();
+    }
 
-  @AfterEach
-  void cleanup() {
-    eventPublisher.close();
-  }
+    @Test
+    void emptyEventStoreWithoutEvents() {
+        assertThat(eventStore.size()).isEqualTo(0);
+    }
 
-  @Test
-  void emptyEventStoreWithoutEvents() {
-    StepVerifier.create(eventStore.size())
-        .expectNext(0L)
-        .expectComplete()
-        .verify();
-  }
+    @Test
+    void createAndUpdateTitleInEventStore() {
+        String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
+        String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId1);
+        String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
+        var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
+            .owner(UUID.fromString(ownerId1))
+            .id(UUID.fromString(classifiedAdId1))
+            .aggregateId(UUID.fromString(classifiedAdId1))
+            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+//            .aggregateId()
+            .build();
 
-  @Test
-  void createAndUpdateTitleInEventStore() {
-    String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
-    String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
-    var classifiedAdCreated = new ClassifiedAdCreated(ownerId1, classifiedAdId1);
+        Result<Boolean> appendResult = eventStore.append(streamId, 0, classifiedAdCreated);
+        assertThat(appendResult.isPresent()).isTrue();
+        assertThat(appendResult.get()).isTrue();
 
-    String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
-    eventStore.append(streamId, 0, classifiedAdCreated).block();
+        assertThat(eventStore.size()).isEqualTo(1);
 
-    StepVerifier.create(eventStore.size())
-        .expectNext(1L)
-        .expectComplete()
-        .verify();
+        var classifiedAdTitleUpdated = ImmutableClassifiedAdTitleUpdated.builder()
+            .title("test title")
+            .id(UUID.randomUUID())
+            .aggregateId(UUID.fromString(classifiedAdId1))
+            .build();
+        EventStream eventStream = eventStore.load(streamId);
+        assertThat(eventStream.getVersion()).isEqualTo(0);
 
-    var classifiedAdTextUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
-//
-    Mono<EventStream<Event>> eventStreamPublisher = eventStore.load(streamId);
-    StepVerifier.create(eventStreamPublisher)
-        .assertNext(eventStream -> {
-          assertThat(eventStream.getVersion()).isEqualTo(0);
-        })
-        .expectComplete()
-        .verify();
+        int expectedVersion = eventStream.getVersion() + 1;
+        Result<Boolean> updateAppendResult = eventStore.append(streamId, expectedVersion, classifiedAdTitleUpdated);
+        assertThat(updateAppendResult.isPresent()).isTrue();
+        assertThat(updateAppendResult.get()).isTrue();
 
-    Mono<OperationResult> appendResult = eventStreamPublisher.flatMap(eventStream -> {
-      int expectedVersion = eventStream.getVersion() + 1;
-      return eventStore.append(streamId, expectedVersion, classifiedAdTextUpdated);
-    });
+        EventStream updatedEventStream = eventStore.load(streamId);
+        assertThat(updatedEventStream.size()).isEqualTo(2);
+    }
 
-    StepVerifier.create(appendResult)
-        .assertNext(result -> {
-          assertThat(result).isInstanceOf(Success.class);
-        })
-        .expectComplete()
-        .verify();
+    @Test
+    void multipleEventsCanBeAdded() {
+        String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
+        String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
+        var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
+            .owner(UUID.fromString(ownerId1))
+            .id(UUID.fromString(classifiedAdId1))
+            .aggregateId(UUID.fromString(classifiedAdId1))
+            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+//            .aggregateId()
+            .build();
 
-    StepVerifier.create(eventStore.load(streamId))
-        .assertNext(eventStream -> {
-          assertThat(eventStream.getVersion()).isEqualTo(1);
-        })
-        .expectComplete()
-        .verify();
-  }
+        String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
 
-  @Test
-  void multipleEventsCanBeAdded() {
-    String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
-    String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
-    var classifiedAdCreated = new ClassifiedAdCreated(ownerId1, classifiedAdId1);
+//        var classifiedAdTitleUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
+        var classifiedAdTitleUpdated = ImmutableClassifiedAdTitleUpdated.builder()
+            .title("test title")
+            .id(UUID.randomUUID())
+            .aggregateId(UUID.fromString(classifiedAdId1))
+            .build();
+        var appendResult =
+            eventStore.append(streamId, 0, List.of(classifiedAdCreated, classifiedAdTitleUpdated));
 
-    String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
+        assertThat(appendResult.isPresent()).isTrue();
+        assertThat(eventStore.size()).isEqualTo(1);
+        EventStream eventStream = eventStore.load(streamId);
+        assertThat(eventStream.size()).isEqualTo(2);
+        assertThat(eventStream.getVersion()).isEqualTo(1);
+    }
 
-    var classifiedAdTitleUpdated = new ClassifiedAdTitleUpdated(classifiedAdId1, "test title");
-    var appendResult =
-        eventStore.append(streamId, 0, List.of(classifiedAdCreated, classifiedAdTitleUpdated));
+    @Test
+    void canCreateEventStoreWithNewEvent() {
+        String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
+        String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
+        var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
+            .owner(UUID.fromString(ownerId1))
+            .id(UUID.fromString(classifiedAdId1))
+            .aggregateId(UUID.fromString(classifiedAdId1))
+            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+//            .aggregateId()
+            .build();
 
-    StepVerifier.create(appendResult)
-        .assertNext(result -> {
-          assertThat(result).isInstanceOf(Success.class);
-        })
-        .expectComplete()
-        .verify();
+        String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
+        eventStore.append(streamId, 0, classifiedAdCreated);
+        assertThat(eventStore.size()).isEqualTo(1);
+    }
 
-    StepVerifier.create(eventStore.size())
-        .expectNext(1L)
-        .expectComplete()
-        .verify();
+    //
+    @Test
+    void differentAggregatesWillCreateDifferentStreams() {
+        String classifiedAdId2 = "582a7769-f08a-470d-af65-85ef7ff7969f";
+        String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
+        String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
 
-    StepVerifier.create(eventStore.load(streamId))
-        .assertNext(eventStream -> {
-          assertThat(eventStream.size()).isEqualTo(2);
-          assertThat(eventStream.getVersion()).isEqualTo(1);
-        })
-        .expectComplete()
-        .verify();
-  }
+        String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId1);
 
-  @Test
-  void canCreateEventStoreWithNewEvent() {
-    String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
-    String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
-    var classifiedAdCreated = new ClassifiedAdCreated(ownerId1, classifiedAdId1);
+        eventStore.append(
+            streamId,
+            0,
+            createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1))
+        );
 
-    String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId1);
-    eventStore.append(streamId, 0, classifiedAdCreated).block();
+        String streamId2 = String.format("%s:%s", "ClassifiedAd", classifiedAdId2);
 
-    StepVerifier.create(eventStore.size())
-        .expectNext(1L)
-        .expectComplete()
-        .verify();
-  }
+        eventStore.append(
+            streamId2,
+            0,
+            createEventsAggregate(UUID.fromString(classifiedAdId2), UUID.fromString(ownerId1))
+        );
+        assertThat(eventStore.size()).isEqualTo(2);
+    }
 
-  @Test
-  void differentAggregatesWillCreateDifferentStreams() {
-    String classifiedAdId2 = "582a7769-f08a-470d-af65-85ef7ff7969f";
-    String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
-    String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
+    //
+    @Test
+    void eventsCanBeLoadedFromVersion() {
+        String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
+        String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
+        String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId1);
 
-    String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId1);
+        eventStore.append(
+            streamId,
+            0,
+            createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1)))
+        ;
 
-    eventStore.append(
-        streamId,
-        0,
-        createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1)))
-        .block();
+        assertThat(eventStore.size()).isEqualTo(1);
+        EventStream eventStream = eventStore.load(streamId);
+        assertThat(eventStream.size()).isEqualTo(2);
+        assertThat(eventStream.getVersion()).isEqualTo(1);
+    }
 
-    String streamId2 = String.format("%s:%s", "ClassifiedAd", classifiedAdId2);
+    //
+    @Test
+    void publishSavesEventAndPublishes() {
+        String classifiedAdId = "9d5d69ee-eadd-4352-942e-47935e194d22";
+        String ownerId = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
 
-    eventStore.append(
-        streamId2,
-        0,
-        createEventsAggregate(UUID.fromString(classifiedAdId2), UUID.fromString(ownerId1)))
-        .block();
-//
-    StepVerifier.create(eventStore.size())
-        .expectNext(2L)
-        .expectComplete()
-        .verify();
-  }
+        String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId);
 
-  @Test
-  void eventsCanBeLoadedFromVersion() {
-    String classifiedAdId1 = "9d5d69ee-eadd-4352-942e-47935e194d22";
-    String ownerId1 = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
+        var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
+            .owner(UUID.fromString(ownerId))
+            .id(UUID.fromString(classifiedAdId))
+            .aggregateId(UUID.fromString(classifiedAdId))
+            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+//            .aggregateId()
+            .build();
 
-    String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId1);
-//
-//    var result =
-    eventStore.append(
-        streamId,
-        0,
-        createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1)))
-        .block();
+        eventStore.publish(streamId, 0, classifiedAdCreated);
+        assertThat(eventStore.size()).isEqualTo(1);
 
-    StepVerifier.create(eventStore.size())
-        .expectNext(1L)
-        .expectComplete()
-        .verify();
+        EventStream eventStream = eventStore.load(streamId);
+        assertThat(eventStream.size()).isEqualTo(1);
+        assertThat(eventStream.getVersion()).isEqualTo(0);
+        verify(eventProcessor, times(1)).create(classifiedAdCreated);
+    }
 
-    StepVerifier.create(eventStore.load(streamId))
-        .assertNext(eventStream -> {
-          assertThat(eventStream.size()).isEqualTo(2);
-          assertThat(eventStream.getVersion()).isEqualTo(1);
-        })
-        .expectComplete()
-        .verify();
-  }
+    List<Event> createEventsAggregate(UUID aggregateId, UUID ownerId) {
+        var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
+            .owner(ownerId)
+            .id(UUID.randomUUID())
+            .aggregateId(aggregateId)
+            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+            .build();
+        var classifiedAdTextUpdated = ImmutableClassifiedAdTextUpdated.builder()
+            .id(UUID.randomUUID())
+            .aggregateId(aggregateId)
+            .text("test text")
+            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+            .build();
 
-  @Test
-  void publishSavesEventAndPublishes() {
-    String classifiedAdId = "9d5d69ee-eadd-4352-942e-47935e194d22";
-    String ownerId = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
-
-    String streamId = String.format("%s:%s", "ClassifiedAd", classifiedAdId);
-
-    var classifiedAdCreated = new ClassifiedAdCreated(ownerId, classifiedAdId);
-
-    eventStore.publish(streamId, 0, classifiedAdCreated)
-        .block();
-    StepVerifier.create(eventStore.size())
-        .expectNext(1L)
-        .expectComplete()
-        .verify();
-//
-    StepVerifier.create(eventStore.load(streamId))
-        .assertNext(eventStream -> {
-          assertThat(eventStream.size()).isEqualTo(2);
-          assertThat(eventStream.getVersion()).isEqualTo(0);
-        })
-        .expectComplete()
-        .verify();
-
-    verify(eventProcessor, times(1)).create(classifiedAdCreated);
-  }
-
-  List<Event> createEventsAggregate(UUID aggregateId, UUID ownerId) {
-    var classifiedAdCreated = new ClassifiedAdCreated(ownerId, aggregateId);
-    var classifiedAdTextUpdated =
-        new ClassifiedAdTextUpdated(aggregateId, "test classified ad text");
-    return List.of(classifiedAdCreated, classifiedAdTextUpdated);
-  }
+        return List.of(classifiedAdCreated, classifiedAdTextUpdated);
+    }
 }

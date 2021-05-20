@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractJdbcFuncTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractJdbcFuncTest.class);
 
     private final static String CONNECTION_STRING = "jdbc:sqlite:src/funcTest/resources/db/eventstore.db";
@@ -31,7 +32,8 @@ public abstract class AbstractJdbcFuncTest {
 
     @BeforeEach
     void setup() throws SQLException {
-        dslContext.delete(EVENT_DATA).execute();
+        int count = dslContext.delete(EVENT_DATA).execute();
+        LOGGER.info("cleaning event data {}", count);
     }
 
     @AfterEach
@@ -50,7 +52,7 @@ public abstract class AbstractJdbcFuncTest {
 // delete db file
         File dbFile = new File("src/funcTest/resources/db/eventstore.db");
         if (!dbFile.delete()) {
-           LOGGER.info("unable to delete db file");
+            LOGGER.info("unable to delete db file");
         }
     }
 

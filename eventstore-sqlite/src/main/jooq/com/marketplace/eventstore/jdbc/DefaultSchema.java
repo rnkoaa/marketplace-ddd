@@ -5,6 +5,7 @@ package com.marketplace.eventstore.jdbc;
 
 
 import com.marketplace.eventstore.jdbc.tables.EventData;
+import com.marketplace.eventstore.jdbc.tables.FlywaySchemaHistory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,9 +29,14 @@ public class DefaultSchema extends SchemaImpl {
     public static final DefaultSchema DEFAULT_SCHEMA = new DefaultSchema();
 
     /**
-     * The table <code>EVENT_DATA</code>.
+     * The table <code>event_data</code>.
      */
     public final EventData EVENT_DATA = EventData.EVENT_DATA;
+
+    /**
+     * The table <code>flyway_schema_history</code>.
+     */
+    public final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
 
     /**
      * No further instances allowed
@@ -48,6 +54,7 @@ public class DefaultSchema extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.<Table<?>>asList(
-            EventData.EVENT_DATA);
+            EventData.EVENT_DATA,
+            FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY);
     }
 }
