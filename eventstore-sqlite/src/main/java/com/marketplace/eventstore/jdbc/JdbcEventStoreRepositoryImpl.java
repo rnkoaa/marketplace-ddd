@@ -122,7 +122,6 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
             })
             .filter(Result::isPresent)
             .map(Result::get)
-//            .map(eventDataRecord -> eventDataRecord.setAggregateName(streamId))
             .toList();
 
         int[] execute = dslContext.batchStore(eventDataRecords).execute();
