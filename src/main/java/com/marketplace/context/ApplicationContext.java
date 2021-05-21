@@ -2,11 +2,13 @@ package com.marketplace.context;
 
 import com.marketplace.config.ApplicationConfig;
 import com.marketplace.context.server.SparkServerModule;
+import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepository;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
 import com.marketplace.domain.userprofile.repository.UserProfileCommandRepository;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
+import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.server.SparkServer;
 import dagger.BindsInstance;
 import dagger.Component;
@@ -36,6 +38,8 @@ public interface ApplicationContext {
     DSLContext getDSLContext();
 
     ClassifiedAdQueryRepository getClassifiedAdQueryRepository();
+
+    EventStore<VersionedEvent> getEventStore();
 
     @Component.Builder
     interface Builder {
