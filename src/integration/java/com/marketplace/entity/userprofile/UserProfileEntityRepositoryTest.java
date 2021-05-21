@@ -3,8 +3,8 @@ package com.marketplace.entity.userprofile;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.marketplace.BaseRepositoryTest;
-import com.marketplace.eventstore.jdbc.Tables;
-import com.marketplace.eventstore.jdbc.tables.records.UserProfileRecord;
+import com.marketplace.evenstore.jooq.Tables;
+import com.marketplace.evenstore.jooq.tables.records.UserProfileRecord;
 import java.time.Instant;
 import java.util.List;
 import org.jooq.DSLContext;

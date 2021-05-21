@@ -69,6 +69,7 @@ dependencies {
     implementation project(":libs:common")
     implementation project(":libs:cqrs-domain")
     implementation project(":eventstore")
+//    implementation project(":eventstore-sqlite")
 
     implementation "org.flywaydb:flyway-core:$flywayVersion"
     flywayMigration "org.xerial:sqlite-jdbc:$sqliteVersion"
@@ -230,7 +231,7 @@ jooq {
                         fluentSetters = true
                     }
                     target {
-                        packageName = 'com.marketplace.eventstore.jdbc'
+                        packageName = 'com.marketplace.evenstore.jooq'
                         directory = 'src/main/jooq'  // default (can be omitted)
                     }
                     strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'

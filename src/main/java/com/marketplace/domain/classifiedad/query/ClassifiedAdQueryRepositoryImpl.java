@@ -1,9 +1,8 @@
 package com.marketplace.domain.classifiedad.query;
 
-import static com.marketplace.eventstore.jdbc.Tables.CLASSIFIED_AD;
+import static com.marketplace.evenstore.jooq.Tables.CLASSIFIED_AD;
 
-import com.marketplace.eventstore.jdbc.Tables;
-import com.marketplace.eventstore.jdbc.tables.records.ClassifiedAdRecord;
+import com.marketplace.evenstore.jooq.tables.records.ClassifiedAdRecord;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;

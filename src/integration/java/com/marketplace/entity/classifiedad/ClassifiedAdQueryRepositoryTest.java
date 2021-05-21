@@ -1,23 +1,21 @@
 package com.marketplace.entity.classifiedad;
 
-import static com.marketplace.eventstore.jdbc.Tables.CLASSIFIED_AD;
+import static com.marketplace.evenstore.jooq.Tables.CLASSIFIED_AD;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.marketplace.BaseRepositoryTest;
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import com.marketplace.domain.classifiedad.command.ImmutablePriceDto;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PriceDto;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryEntity;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepository;
 import com.marketplace.domain.classifiedad.query.ImmutableClassifiedAdQueryEntity;
 import com.marketplace.entity.userprofile.UserProfileEntityRepositoryTest;
-import com.marketplace.eventstore.jdbc.tables.records.ClassifiedAdRecord;
+import com.marketplace.evenstore.jooq.tables.records.ClassifiedAdRecord;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

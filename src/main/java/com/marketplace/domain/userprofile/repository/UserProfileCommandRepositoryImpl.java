@@ -1,9 +1,8 @@
 package com.marketplace.domain.userprofile.repository;
 
-import com.marketplace.domain.repository.Repository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.UserProfile;
-import com.marketplace.eventstore.jdbc.Tables;
+import com.marketplace.evenstore.jooq.Tables;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;

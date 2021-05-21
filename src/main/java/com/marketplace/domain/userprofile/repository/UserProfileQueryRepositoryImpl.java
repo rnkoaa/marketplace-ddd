@@ -1,8 +1,8 @@
 package com.marketplace.domain.userprofile.repository;
 
 import com.marketplace.domain.userprofile.entity.UserProfileEntity;
-import com.marketplace.eventstore.jdbc.Tables;
-import com.marketplace.eventstore.jdbc.tables.records.UserProfileRecord;
+import com.marketplace.evenstore.jooq.Tables;
+import com.marketplace.evenstore.jooq.tables.records.UserProfileRecord;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;

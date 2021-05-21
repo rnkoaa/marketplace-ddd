@@ -6,7 +6,7 @@ import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
-import com.marketplace.eventstore.jdbc.Tables;
+import com.marketplace.evenstore.jooq.Tables;
 import java.io.IOException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

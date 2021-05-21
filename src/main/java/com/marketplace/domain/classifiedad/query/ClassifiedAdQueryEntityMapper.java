@@ -6,8 +6,7 @@ import com.marketplace.common.ObjectMapperBuilder;
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PriceDto;
-import com.marketplace.domain.classifiedad.query.ImmutableClassifiedAdQueryEntity.Builder;
-import com.marketplace.eventstore.jdbc.tables.records.ClassifiedAdRecord;
+import com.marketplace.evenstore.jooq.tables.records.ClassifiedAdRecord;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +36,7 @@ public class ClassifiedAdQueryEntityMapper {
     }
 
     public static ClassifiedAdQueryEntity convert(ClassifiedAdRecord classifiedAdRecord) {
-        Builder builder = ImmutableClassifiedAdQueryEntity.builder()
+        ImmutableClassifiedAdQueryEntity.Builder builder = ImmutableClassifiedAdQueryEntity.builder()
             .id(UUID.fromString(classifiedAdRecord.getId()))
             .ownerId(UUID.fromString(classifiedAdRecord.getOwner()))
             .state(ClassifiedAdState.fromString(classifiedAdRecord.getStatus()));

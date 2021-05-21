@@ -2,8 +2,7 @@ package com.marketplace.domain.userprofile.repository;
 
 import com.marketplace.domain.userprofile.entity.ImmutableUserProfileEntity;
 import com.marketplace.domain.userprofile.entity.UserProfileEntity;
-import com.marketplace.eventstore.jdbc.tables.records.UserProfileRecord;
-import java.util.Optional;
+import com.marketplace.evenstore.jooq.tables.records.UserProfileRecord;
 import java.util.UUID;
 
 public class UserProfileMapper {
