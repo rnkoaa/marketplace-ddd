@@ -17,7 +17,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row7;
+import org.jooq.Row8;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -55,9 +55,14 @@ public class EventData extends TableImpl<EventDataRecord> {
     public final TableField<EventDataRecord, String> ID = createField(DSL.name("id"), SQLDataType.CLOB, this, "");
 
     /**
+     * The column <code>event_data.stream_id</code>.
+     */
+    public final TableField<EventDataRecord, String> STREAM_ID = createField(DSL.name("stream_id"), SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
      * The column <code>event_data.aggregate_name</code>.
      */
-    public final TableField<EventDataRecord, String> AGGREGATE_NAME = createField(DSL.name("aggregate_name"), SQLDataType.CLOB, this, "");
+    public final TableField<EventDataRecord, String> AGGREGATE_NAME = createField(DSL.name("aggregate_name"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>event_data.aggregate_id</code>.
@@ -124,7 +129,7 @@ public class EventData extends TableImpl<EventDataRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.IDX_EVENT_DATA_AGGREGATE_ID, Indexes.IDX_EVENT_DATA_AGGREGATE_NAME, Indexes.IDX_EVENT_DATA_AGGREGATE_NAME_VERSION);
+        return Arrays.<Index>asList(Indexes.IDX_EVENT_DATA_AGGREGATE_ID, Indexes.IDX_EVENT_DATA_AGGREGATE_NAME, Indexes.IDX_EVENT_DATA_STREAM_ID, Indexes.IDX_EVENT_DATA_STREAM_ID_VERSION);
     }
 
     @Override
@@ -164,11 +169,11 @@ public class EventData extends TableImpl<EventDataRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row7 type methods
+    // Row8 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<String, String, String, String, Integer, String, String> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public Row8<String, String, String, String, String, Integer, String, String> fieldsRow() {
+        return (Row8) super.fieldsRow();
     }
 }

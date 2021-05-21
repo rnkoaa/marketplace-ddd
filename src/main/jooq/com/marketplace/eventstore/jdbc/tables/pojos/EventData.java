@@ -16,6 +16,7 @@ public class EventData implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String  id;
+    private final String  streamId;
     private final String  aggregateName;
     private final String  aggregateId;
     private final String  eventType;
@@ -25,6 +26,7 @@ public class EventData implements Serializable {
 
     public EventData(EventData value) {
         this.id = value.id;
+        this.streamId = value.streamId;
         this.aggregateName = value.aggregateName;
         this.aggregateId = value.aggregateId;
         this.eventType = value.eventType;
@@ -35,6 +37,7 @@ public class EventData implements Serializable {
 
     public EventData(
         String  id,
+        String  streamId,
         String  aggregateName,
         String  aggregateId,
         String  eventType,
@@ -43,6 +46,7 @@ public class EventData implements Serializable {
         String  created
     ) {
         this.id = id;
+        this.streamId = streamId;
         this.aggregateName = aggregateName;
         this.aggregateId = aggregateId;
         this.eventType = eventType;
@@ -56,6 +60,13 @@ public class EventData implements Serializable {
      */
     public String getId() {
         return this.id;
+    }
+
+    /**
+     * Getter for <code>event_data.stream_id</code>.
+     */
+    public String getStreamId() {
+        return this.streamId;
     }
 
     /**
@@ -105,6 +116,7 @@ public class EventData implements Serializable {
         StringBuilder sb = new StringBuilder("EventData (");
 
         sb.append(id);
+        sb.append(", ").append(streamId);
         sb.append(", ").append(aggregateName);
         sb.append(", ").append(aggregateId);
         sb.append(", ").append(eventType);

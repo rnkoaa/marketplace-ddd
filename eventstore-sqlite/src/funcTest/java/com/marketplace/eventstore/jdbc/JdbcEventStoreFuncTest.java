@@ -13,6 +13,7 @@ import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.eventstore.framework.event.EventStream;
 import com.marketplace.eventstore.impl.InMemoryEventPublisher;
+import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAd;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdCreated;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventListener;
 import com.marketplace.eventstore.impl.fixtures.classifiedad.ClassifiedAdEventProcessor;
@@ -54,7 +55,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
     void createAndUpdateTitleInEventStore() {
         String classifiedAdId = "9d5d69ee-eadd-4352-942e-47935e194d22";
         String ownerId = "89b69f4f-e36e-4f2b-baa0-d47057e02117";
-        String aggregateName = ClassifiedAdCreated.class.getSimpleName();
+        String aggregateName = ClassifiedAd.class.getSimpleName();
         String streamId = String.format("%s:%s", aggregateName, classifiedAdId);
         var classifiedAdCreated = ImmutableClassifiedAdCreated.builder()
             .owner(UUID.fromString(ownerId))
@@ -96,7 +97,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             .owner(UUID.fromString(ownerId))
             .id(UUID.fromString(classifiedAdId))
             .aggregateId(UUID.fromString(classifiedAdId))
-            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+            .aggregateName(ClassifiedAd.class.getSimpleName())
             .build();
 
         String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId);
@@ -105,7 +106,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             .title("test title")
             .id(UUID.randomUUID())
             .aggregateId(UUID.fromString(classifiedAdId))
-            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+            .aggregateName(ClassifiedAd.class.getSimpleName())
             .build();
         var appendResult =
             eventStore.append(streamId, 1, List.of(classifiedAdCreated, classifiedAdTitleUpdated));
@@ -124,7 +125,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             .owner(UUID.fromString(ownerId))
             .id(UUID.fromString(classifiedAdId))
             .aggregateId(UUID.fromString(classifiedAdId))
-            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+            .aggregateName(ClassifiedAd.class.getSimpleName())
             .build();
 
         String streamId = String.format("%s:%s", classifiedAdCreated.getAggregateName(), classifiedAdId);
@@ -196,7 +197,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             .owner(UUID.fromString(ownerId))
             .id(UUID.fromString(classifiedAdId))
             .aggregateId(UUID.fromString(classifiedAdId))
-            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+            .aggregateName(ClassifiedAd.class.getSimpleName())
 //            .aggregateId()
             .build();
 
@@ -214,14 +215,16 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             .owner(ownerId)
             .id(UUID.randomUUID())
             .aggregateId(aggregateId)
-            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+            .aggregateName(ClassifiedAd.class.getSimpleName())
+            .streamId(ClassifiedAd.class.getSimpleName() + ":" + aggregateId)
             .build();
 
         var classifiedAdTextUpdated = ImmutableClassifiedAdTextUpdated.builder()
             .id(UUID.randomUUID())
             .aggregateId(aggregateId)
             .text("test classified ad text")
-            .aggregateName(ClassifiedAdCreated.class.getSimpleName())
+            .streamId(ClassifiedAd.class.getSimpleName() + ":" + aggregateId)
+            .aggregateName(ClassifiedAd.class.getSimpleName())
             .build();
 
         return List.of(classifiedAdCreated, classifiedAdTextUpdated);

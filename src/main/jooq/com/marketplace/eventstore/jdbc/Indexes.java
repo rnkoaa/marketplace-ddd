@@ -29,5 +29,6 @@ public class Indexes {
     public static final Index IDX_CLASSIFIED_AD_OWNER_ID = Internal.createIndex(DSL.name("idx_classified_ad_owner_id"), ClassifiedAd.CLASSIFIED_AD, new OrderField[] { ClassifiedAd.CLASSIFIED_AD.OWNER }, false);
     public static final Index IDX_EVENT_DATA_AGGREGATE_ID = Internal.createIndex(DSL.name("idx_event_data_aggregate_id"), EventData.EVENT_DATA, new OrderField[] { EventData.EVENT_DATA.AGGREGATE_ID }, false);
     public static final Index IDX_EVENT_DATA_AGGREGATE_NAME = Internal.createIndex(DSL.name("idx_event_data_aggregate_name"), EventData.EVENT_DATA, new OrderField[] { EventData.EVENT_DATA.AGGREGATE_NAME }, false);
-    public static final Index IDX_EVENT_DATA_AGGREGATE_NAME_VERSION = Internal.createIndex(DSL.name("idx_event_data_aggregate_name_version"), EventData.EVENT_DATA, new OrderField[] { EventData.EVENT_DATA.AGGREGATE_NAME, EventData.EVENT_DATA.EVENT_VERSION }, false);
+    public static final Index IDX_EVENT_DATA_STREAM_ID = Internal.createIndex(DSL.name("idx_event_data_stream_id"), EventData.EVENT_DATA, new OrderField[] { EventData.EVENT_DATA.STREAM_ID }, false);
+    public static final Index IDX_EVENT_DATA_STREAM_ID_VERSION = Internal.createIndex(DSL.name("idx_event_data_stream_id_version"), EventData.EVENT_DATA, new OrderField[] { EventData.EVENT_DATA.STREAM_ID, EventData.EVENT_DATA.EVENT_VERSION }, false);
 }
