@@ -33,6 +33,7 @@ public class TestEvents {
     public static TestCreatedEvent testCreatedEvent = ImmutableTestCreatedEvent.builder()
         .aggregateId(aggregateId)
         .id(createdEventId)
+        .streamId(streamId)
         .aggregateName(aggregateName)
         .createdAt(Instant.now())
         .version(1L)

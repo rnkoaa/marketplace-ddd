@@ -186,6 +186,7 @@ public class EventStorePersistenceTest extends AbstractJdbcFuncTest {
                 String eventData = String.format(eventDataFormat, entry.aggregateId());
                 return new EventDataRecord(
                     entry.eventId(),
+                    entry.aggregateId,
                     entry.aggregateName(),
                     entry.aggregateId,
                     entry.eventType,
@@ -206,6 +207,7 @@ public class EventStorePersistenceTest extends AbstractJdbcFuncTest {
         return new EventDataRecord(
             eventId,
             "ClassifiedAd:" + aggregateId,
+            "ClassifiedAd",
             aggregateId,
             "ClassifiedAdCreated",
             1,
