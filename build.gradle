@@ -69,7 +69,7 @@ dependencies {
     implementation project(":libs:common")
     implementation project(":libs:cqrs-domain")
     implementation project(":eventstore")
-//    implementation project(":eventstore-sqlite")
+    implementation project(":eventstore-sqlite")
 
     implementation "org.flywaydb:flyway-core:$flywayVersion"
     flywayMigration "org.xerial:sqlite-jdbc:$sqliteVersion"

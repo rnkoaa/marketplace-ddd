@@ -17,7 +17,8 @@ import org.jooq.DSLContext;
     SparkServerModule.class,
     ApplicationModule.class,
     JooqModule.class,
-    ObjectMapperModule.class
+    ObjectMapperModule.class,
+    EventStoreModule.class,
 })
 @Singleton
 public interface ApplicationContext {
