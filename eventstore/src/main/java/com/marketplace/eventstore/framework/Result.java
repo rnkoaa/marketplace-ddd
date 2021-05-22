@@ -1,10 +1,10 @@
 package com.marketplace.eventstore.framework;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public sealed abstract class Result<T> {
 
@@ -21,6 +21,8 @@ public sealed abstract class Result<T> {
 
     public abstract <U> Result<U> flatmap(Function<T, Result<U>> func);
 
+    public abstract Optional<T> toOptional();
+
     public abstract T orElse(T defaultValue);
 
     public abstract T orElse(Supplier<T> defaultValue);
@@ -29,7 +31,7 @@ public sealed abstract class Result<T> {
 
     public abstract Exception getError();
 
-    public static  <T> Result<T> tryOf(Supplier<T> supplier) {
+    public static <T> Result<T> tryOf(Supplier<T> supplier) {
         try {
             return Result.of(supplier.get());
         } catch (Exception e) {
@@ -124,6 +126,11 @@ public sealed abstract class Result<T> {
         }
 
         @Override
+        public Optional<T> toOptional() {
+            return Optional.of(this.value);
+        }
+
+        @Override
         public T orElse(T defaultValue) {
             return this.value;
         }
@@ -212,6 +219,11 @@ public sealed abstract class Result<T> {
         }
 
         @Override
+        public Optional<T> toOptional() {
+            return Optional.empty();
+        }
+
+        @Override
         public T orElse(T defaultValue) {
             return defaultValue;
         }
@@ -243,7 +255,7 @@ public sealed abstract class Result<T> {
 
         @Override
         public T get() {
-           return null;
+            return null;
         }
 
         @Override
@@ -283,6 +295,11 @@ public sealed abstract class Result<T> {
         @Override
         public <U> Result<U> flatmap(Function<T, Result<U>> func) {
             return empty();
+        }
+
+        @Override
+        public Optional<T> toOptional() {
+            return Optional.empty();
         }
 
         @Override

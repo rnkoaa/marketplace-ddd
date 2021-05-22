@@ -12,6 +12,7 @@ import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.InvalidVersionException;
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.IntStream;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -98,7 +99,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
     @Override
     public Result<Boolean> save(VersionedEvent event) {
-        if(event.getStreamId() == null || event.getStreamId().isEmpty()) {
+        if (event.getStreamId() == null || event.getStreamId().isEmpty()) {
             return Result.error("required stream id missing");
         }
         return save(event.getStreamId(), event);
@@ -113,8 +114,11 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
             return Result.error(new InvalidVersionException(String.format(errMessage, latestVersion, expectedVersion)));
         }
 
-        List<EventDataRecord> eventDataRecords = IntStream.range(0, events.size())
-            .mapToObj(index -> new EventDataVersion(nextVersion + index, events.get(index)))
+        // do not attempt to save events that have already been saved
+        List<VersionedEvent> newEvents = filter(streamId, events);
+
+        List<EventDataRecord> eventDataRecords = IntStream.range(0, newEvents.size())
+            .mapToObj(index -> new EventDataVersion(nextVersion + index, newEvents.get(index)))
             .peek(eventVersion -> eventClassCache.put(eventVersion.event.getClass()))
             .map(eventVersion -> {
                 Result<String> result = serializeJson(objectMapper, eventVersion.event);
@@ -226,6 +230,27 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         } catch (JsonProcessingException e) {
             return Result.error(e);
         }
+    }
+
+    private boolean eventExists(String streamId, UUID eventId) {
+        Record1<Integer> countRecord = dslContext.select(
+            countDistinct(EVENT_DATA.ID).as("event_count")
+        ).from(EVENT_DATA)
+            .where(EVENT_DATA.STREAM_ID.eq(streamId)
+                .and(EVENT_DATA.ID.eq(eventId.toString())))
+            .fetchOne();
+
+        if (countRecord == null) {
+            return false;
+        }
+
+        return countRecord.get("event_count", Long.class) > 0;
+    }
+
+    private List<VersionedEvent> filter(String streamId, List<VersionedEvent> events) {
+        return events.stream()
+            .filter(it -> !eventExists(streamId, it.getId()))
+            .toList();
     }
 
     private Result<EventDataRecord> createFromEvent(Event event, int expectedVersion, Result<String> eventDataResult) {

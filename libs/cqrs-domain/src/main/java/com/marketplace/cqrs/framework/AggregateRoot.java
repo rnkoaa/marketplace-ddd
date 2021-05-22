@@ -6,9 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AggregateRoot<T, U extends VersionedEvent> implements InternalEventHandler<U>, EventApplier {
+
     private final List<VersionedEvent> changes;
+    private int version;
+
+    public int getVersion() {
+        return version;
+    }
 
     protected AggregateRoot() {
+        version = 0;
         this.changes = new ArrayList<>();
     }
 
@@ -16,6 +23,7 @@ public abstract class AggregateRoot<T, U extends VersionedEvent> implements Inte
         when(event);
         ensureValidState(event);
         changes.add(event);
+        version++;
     }
 
     public abstract void ensureValidState(VersionedEvent event);
