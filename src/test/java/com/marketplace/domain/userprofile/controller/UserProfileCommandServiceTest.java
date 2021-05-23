@@ -3,12 +3,14 @@ package com.marketplace.domain.userprofile.controller;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.marketplace.cqrs.command.CommandHandlerResult;
+import com.marketplace.cqrs.event.EventId;
+import com.marketplace.cqrs.event.VersionedEvent;
+import com.marketplace.cqrs.framework.AggregateRoot;
+import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
-import com.marketplace.domain.userprofile.repository.UserProfileCommandRepository;
-import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,13 +24,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class UserProfileCommandServiceTest {
 
     @Mock
-    UserProfileCommandRepository userProfileCommandRepository;
+    AggregateStoreRepository aggregateStoreRepository;
 
     private UserProfileCommandService userProfileCommandService;
 
     @BeforeEach
     void setup() {
-        userProfileCommandService = new UserProfileCommandService(userProfileCommandRepository);
+        userProfileCommandService = new UserProfileCommandService(aggregateStoreRepository);
     }
 
     @Test
@@ -44,7 +46,7 @@ class UserProfileCommandServiceTest {
         var expectedUserProfile = new UserProfile(UserId.from(expectedUserId), createCommand.fullName(),
             createCommand.displayName());
 
-        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(aggregateStoreRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.of(expectedUserProfile));
         CommandHandlerResult<CreateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
         assertThat(handle).isNotNull();
@@ -66,7 +68,7 @@ class UserProfileCommandServiceTest {
             .displayName("tucci")
             .build();
 
-        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(aggregateStoreRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.empty());
         CommandHandlerResult<CreateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
         assertThat(handle).isNotNull();
@@ -90,10 +92,10 @@ class UserProfileCommandServiceTest {
 
         var expectedUserProfile = new UserProfile(UserId.from(expectedUserId), fullName, new DisplayName("tucciivowi"));
 
-        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(aggregateStoreRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.of(expectedUserProfile));
 
-        Mockito.when(userProfileCommandRepository.load(expectedUserProfile.getId()))
+        Mockito.when(aggregateStoreRepository.load(expectedUserProfile.getId()))
             .thenReturn(Optional.of(expectedUserProfile));
 
         CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
@@ -115,7 +117,7 @@ class UserProfileCommandServiceTest {
             .photoUrl("https://tucciivowi.files.wordpress.com/2019/06/tucci-3.jpg?w=1680")
             .build();
 
-        Mockito.when(userProfileCommandRepository.load(UserId.from(expectedUserId)))
+        Mockito.when(aggregateStoreRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.empty());
 
         CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
@@ -137,12 +139,13 @@ class UserProfileCommandServiceTest {
             .build();
         var fullName = new FullName("Tucci", "Gokka", "Ivowi");
 
-        var expectedUserProfile = new UserProfile(UserId.from(expectedUserId), fullName, new DisplayName("tucciivowi"));
+        AggregateRoot<EventId, VersionedEvent> expectedUserProfile = new UserProfile(UserId.from(expectedUserId),
+            fullName, new DisplayName("tucciivowi"));
 
-        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(aggregateStoreRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.empty());
 
-        Mockito.when(userProfileCommandRepository.load(UserId.from(expectedUserId)))
+        Mockito.when(aggregateStoreRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.of(expectedUserProfile));
 
         CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
@@ -168,10 +171,10 @@ class UserProfileCommandServiceTest {
 
         var expectedUserProfile = new UserProfile(UserId.from(expectedUserId), fullName, new DisplayName("tucciivowi"));
 
-        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(aggregateStoreRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.of(expectedUserProfile));
 
-        Mockito.when(userProfileCommandRepository.load(expectedUserProfile.getId()))
+        Mockito.when(aggregateStoreRepository.load(expectedUserProfile.getId()))
             .thenReturn(Optional.of(expectedUserProfile));
 
         CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
@@ -194,7 +197,7 @@ class UserProfileCommandServiceTest {
             .lastName("Ivowi")
             .build();
 
-        Mockito.when(userProfileCommandRepository.load(UserId.from(expectedUserId)))
+        Mockito.when(aggregateStoreRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.empty());
 
         CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
@@ -219,10 +222,10 @@ class UserProfileCommandServiceTest {
 
         var expectedUserProfile = new UserProfile(UserId.from(expectedUserId), fullName, new DisplayName("tucciivowi"));
 
-        Mockito.when(userProfileCommandRepository.add(Mockito.any(UserProfile.class)))
+        Mockito.when(aggregateStoreRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.empty());
 
-        Mockito.when(userProfileCommandRepository.load(UserId.from(expectedUserId)))
+        Mockito.when(aggregateStoreRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.of(expectedUserProfile));
 
         CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);

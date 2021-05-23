@@ -4,8 +4,6 @@ import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepository;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepositoryImpl;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepositoryImpl;
-import com.marketplace.domain.userprofile.repository.UserProfileCommandRepository;
-import com.marketplace.domain.userprofile.repository.UserProfileCommandRepositoryImpl;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepositoryImpl;
 import dagger.Binds;
@@ -24,10 +22,6 @@ public abstract class ApplicationModule {
     @Singleton
     abstract ClassifiedAdQueryRepository bindClassifiedAdQueryRepository(
         ClassifiedAdQueryRepositoryImpl impl);
-
-    @Binds
-    @Singleton
-    abstract UserProfileCommandRepository bindUserProfileCommandRepository(UserProfileCommandRepositoryImpl impl);
 
     @Binds
     @Singleton

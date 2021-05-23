@@ -13,7 +13,6 @@ import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.domain.userprofile.controller.CreateUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.UpdateUserProfileCommand;
-import com.marketplace.domain.userprofile.repository.UserProfileCommandRepository;
 import com.marketplace.fixtures.UserProfileFixture;
 import java.io.IOException;
 import java.util.Optional;
@@ -75,9 +74,9 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         var addedUserProfile = aggregateStoreRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
 
-        Optional<UserProfile> load = (Optional<UserProfile>) aggregateStoreRepository
-            .load(addedUserProfile.get().getId());
-//            .map(t -> (UserProfile) t);
+        Optional<UserProfile> load = aggregateStoreRepository
+            .load(addedUserProfile.get().getId())
+            .map(it -> (UserProfile) it);
 
         assertThat(load).isPresent();
 
@@ -117,7 +116,8 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         var secondSaved = aggregateStoreRepository.add(profile);
         assertThat(secondSaved).isPresent();
 
-        Optional<UserProfile> load = (Optional<UserProfile>) aggregateStoreRepository.load(profile.getId());
+        Optional<UserProfile> load = aggregateStoreRepository.load(profile.getId())
+            .map(it -> (UserProfile) it);
         assertThat(load).isPresent();
 
         UserProfile savedUserProfile = load.get();
@@ -162,8 +162,9 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         var addedUserProfile = aggregateStoreRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
 
-        Optional<UserProfile> loadedUserProfile = (Optional<UserProfile>) aggregateStoreRepository
-            .load(userProfile.getId());
+        Optional<UserProfile> loadedUserProfile = aggregateStoreRepository
+            .load(userProfile.getId())
+            .map(it -> (UserProfile) it);
         assertThat(loadedUserProfile).isPresent();
 
         UserProfile profile = loadedUserProfile.get();
@@ -171,7 +172,8 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         var secondSaved = aggregateStoreRepository.add(profile);
         assertThat(secondSaved).isPresent();
 
-        Optional<UserProfile> load = (Optional<UserProfile>) aggregateStoreRepository.load(profile.getId());
+        Optional<UserProfile> load = aggregateStoreRepository.load(profile.getId())
+            .map(it -> (UserProfile) it);
         assertThat(load).isPresent();
 
         UserProfile savedUserProfile = load.get();

@@ -34,7 +34,7 @@ public class AggregateStoreRepository
         return !eventStream.isEmpty();
     }
 
-    public Optional<? extends AggregateRoot<EventId, VersionedEvent>> load(EventId id) {
+    public Optional<AggregateRoot<EventId, VersionedEvent>> load(EventId id) {
         EventStream<VersionedEvent> eventStream = eventEventStore.load(id.getStreamId());
         if (eventStream.isEmpty()) {
             return Optional.empty();

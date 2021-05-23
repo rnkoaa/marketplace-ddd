@@ -7,7 +7,6 @@ import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepository;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
-import com.marketplace.domain.userprofile.repository.UserProfileCommandRepository;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.server.SparkServer;
@@ -31,8 +30,6 @@ public interface ApplicationContext {
     ClassifiedAdCommandRepository getClassifiedAdRepository();
 
     UserProfileQueryRepository getUserProfileQueryRepository();
-
-    UserProfileCommandRepository getUserProfileCommandRepository();
 
     AggregateStoreRepository getAggregateRepository();
 
