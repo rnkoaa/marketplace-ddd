@@ -23,6 +23,18 @@ public abstract class AggregateRoot<T, U extends VersionedEvent> implements Inte
         when(event);
         ensureValidState(event);
         changes.add(event);
+        incrementVersion();
+    }
+
+    public void load(List<VersionedEvent> events) {
+        events.forEach(event -> {
+            when(event);
+            incrementVersion();
+        });
+    }
+
+
+    public void incrementVersion() {
         version++;
     }
 

@@ -79,7 +79,6 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         UserProfile savedUserProfile = load.get();
 
         assertThat(savedUserProfile.getId()).isNotNull();
-        assertThat(savedUserProfile.getChanges()).hasSize(1);
     }
 
     @Test
@@ -114,7 +113,6 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         UserProfile savedUserProfile = load.get();
 
         assertThat(savedUserProfile.getId()).isNotNull();
-        assertThat(savedUserProfile.getChanges()).hasSize(2);
         assertThat(savedUserProfile.getPhotoUrl()).isEqualTo("http://photos.me/user-2.jpg");
         assertThat(savedUserProfile.getVersion()).isEqualTo(2);
     }
@@ -166,7 +164,6 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         UserProfile savedUserProfile = load.get();
 
         assertThat(savedUserProfile.getId()).isNotNull();
-        assertThat(savedUserProfile.getChanges()).hasSize(2);
         assertThat(savedUserProfile.getPhotoUrl()).isEqualTo("http://photos.me/user-2.jpg");
         assertThat(savedUserProfile.getVersion()).isEqualTo(2);
     }

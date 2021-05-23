@@ -1,12 +1,17 @@
 package com.marketplace.cqrs.event;
 
+import java.util.Objects;
 import java.util.UUID;
 
-public record EventId(UUID id) {
-    public EventId {
+public abstract class EventId {
+
+    private final UUID id;
+
+    public EventId(UUID id) {
         if (id == null) {
             throw new IllegalArgumentException("id cannot be null");
         }
+        this.id = id;
     }
 
     @Override
@@ -14,7 +19,23 @@ public record EventId(UUID id) {
         return id.toString();
     }
 
-    static EventId fromString(String uuid) {
-        return new EventId(UUID.fromString(uuid));
+    public UUID id() {
+        return id;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || obj.getClass() != this.getClass())
+            return false;
+        var that = (EventId) obj;
+        return Objects.equals(this.id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 }

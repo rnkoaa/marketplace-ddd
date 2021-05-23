@@ -12,12 +12,9 @@ import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.InvalidVersionException;
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.IntStream;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
@@ -27,7 +24,6 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
     private static final EventClassCache eventClassCache = EventClassCache.getInstance();
     private final ObjectMapper objectMapper;
-    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcEventStoreRepositoryImpl.class);
     private final DSLContext dslContext;
 
     public JdbcEventStoreRepositoryImpl(ObjectMapper objectMapper, DSLContext dslContext) {
@@ -114,11 +110,8 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
             return Result.error(new InvalidVersionException(String.format(errMessage, latestVersion, expectedVersion)));
         }
 
-        // do not attempt to save events that have already been saved
-        List<VersionedEvent> newEvents = filter(streamId, events);
-
-        List<EventDataRecord> eventDataRecords = IntStream.range(0, newEvents.size())
-            .mapToObj(index -> new EventDataVersion(nextVersion + index, newEvents.get(index)))
+        List<EventDataRecord> eventDataRecords = IntStream.range(0, events.size())
+            .mapToObj(index -> new EventDataVersion(nextVersion + index, events.get(index)))
             .peek(eventVersion -> eventClassCache.put(eventVersion.event.getClass()))
             .map(eventVersion -> {
                 Result<String> result = serializeJson(objectMapper, eventVersion.event);
@@ -230,27 +223,6 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         } catch (JsonProcessingException e) {
             return Result.error(e);
         }
-    }
-
-    private boolean eventExists(String streamId, UUID eventId) {
-        Record1<Integer> countRecord = dslContext.select(
-            countDistinct(EVENT_DATA.ID).as("event_count")
-        ).from(EVENT_DATA)
-            .where(EVENT_DATA.STREAM_ID.eq(streamId)
-                .and(EVENT_DATA.ID.eq(eventId.toString())))
-            .fetchOne();
-
-        if (countRecord == null) {
-            return false;
-        }
-
-        return countRecord.get("event_count", Long.class) > 0;
-    }
-
-    private List<VersionedEvent> filter(String streamId, List<VersionedEvent> events) {
-        return events.stream()
-            .filter(it -> !eventExists(streamId, it.getId()))
-            .toList();
     }
 
     private Result<EventDataRecord> createFromEvent(Event event, int expectedVersion, Result<String> eventDataResult) {

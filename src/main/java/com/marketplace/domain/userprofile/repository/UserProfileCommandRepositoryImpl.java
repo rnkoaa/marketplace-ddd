@@ -1,6 +1,7 @@
 package com.marketplace.domain.userprofile.repository;
 
 import com.marketplace.cqrs.event.VersionedEvent;
+import com.marketplace.domain.BaseCommandRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.eventstore.framework.Result;
@@ -14,7 +15,8 @@ import javax.inject.Singleton;
 
 @Named
 @Singleton
-public class UserProfileCommandRepositoryImpl implements UserProfileCommandRepository {
+public class UserProfileCommandRepositoryImpl extends BaseCommandRepository<UserProfile> implements
+    UserProfileCommandRepository {
 
     private final EventStore<VersionedEvent> eventEventStore;
 
@@ -35,7 +37,9 @@ public class UserProfileCommandRepositoryImpl implements UserProfileCommandRepos
         if (eventStream.size() == 0) {
             return Optional.empty();
         }
-        return Optional.of(new UserProfile(eventStream.getEvents()));
+        var userProfile = new UserProfile();
+        userProfile.load(eventStream.getEvents());
+        return Optional.of(userProfile);
     }
 
     @Override
@@ -49,13 +53,6 @@ public class UserProfileCommandRepositoryImpl implements UserProfileCommandRepos
                 userProfile.clearChanges();
                 return userProfile;
             });
-    }
-
-    private String getStreamIdByClass(Class<?> clzz, String aggregateId) {
-        return String.format("%s:%s", clzz.getSimpleName(), aggregateId);
-    }
-    private String getStreamId(Object object, String aggregateId) {
-        return String.format("%s:%s", object.getClass().getSimpleName(), aggregateId);
     }
 
     @Override

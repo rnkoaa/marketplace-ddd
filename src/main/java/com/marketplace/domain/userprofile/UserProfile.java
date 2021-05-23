@@ -42,8 +42,15 @@ public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
         return photoUrl;
     }
 
+    // for initializing aggregate
+    public UserProfile() {
+    }
+
     public UserProfile(List<VersionedEvent> events) {
-        events.forEach(this::apply);
+        events.forEach(event -> {
+            when(event);
+            incrementVersion();
+        });
     }
 
     public UserProfile(UserId id, FullName fullName, DisplayName displayName) {

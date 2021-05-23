@@ -87,9 +87,7 @@ public class JdbcEventStoreImpl implements EventStore<VersionedEvent> {
             .filter(res -> res != null && res > 0);
 
         if (filter.isPresent()) {
-            events.forEach(event -> {
-                eventPublisher.publish(streamId, event);
-            });
+            events.forEach(event -> eventPublisher.publish(streamId, event));
             return Result.of(true);
         }
 
