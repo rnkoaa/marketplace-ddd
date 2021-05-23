@@ -10,27 +10,31 @@ import com.marketplace.eventstore.framework.event.EventStream;
 import io.vavr.control.Try;
 import java.util.List;
 import java.util.Optional;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-public class AggregateStoreRepository implements
-    Repository<AggregateRoot<EventId, VersionedEvent>, EventId> {
+@Named
+@Singleton
+public class AggregateStoreRepository
+   /* Repository<AggregateRoot<EventId, VersionedEvent>, EventId>*/ {
 
     private final AggregateTypeMapper aggregateTypeMapper = AggregateTypeMapper.getInstance();
 
     private final EventStore<VersionedEvent> eventEventStore;
 
+    @Inject
     public AggregateStoreRepository(
         EventStore<VersionedEvent> eventEventStore) {
         this.eventEventStore = eventEventStore;
     }
 
-    @Override
     public boolean exists(EventId id) {
         EventStream<VersionedEvent> eventStream = eventEventStore.load(id.getStreamId());
         return !eventStream.isEmpty();
     }
 
-    @Override
-    public Optional<AggregateRoot<EventId, VersionedEvent>> load(EventId id) {
+    public Optional<? extends AggregateRoot<EventId, VersionedEvent>> load(EventId id) {
         EventStream<VersionedEvent> eventStream = eventEventStore.load(id.getStreamId());
         if (eventStream.isEmpty()) {
             return Optional.empty();
@@ -49,7 +53,6 @@ public class AggregateStoreRepository implements
             .toJavaOptional();
     }
 
-    @Override
     public Optional<AggregateRoot<EventId, VersionedEvent>> add(AggregateRoot<EventId, VersionedEvent> aggregateRoot) {
         aggregateTypeMapper.put(aggregateRoot);
         List<VersionedEvent> changes = aggregateRoot.getChanges();

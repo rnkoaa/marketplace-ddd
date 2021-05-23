@@ -7,6 +7,7 @@ import com.marketplace.config.ApplicationConfig;
 import com.marketplace.config.ConfigLoader;
 import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
+import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.UserProfile;
@@ -26,7 +27,7 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
     String insertId = "0b8a557d-32f6-4268-80d5-6a38df8a9520";
     ApplicationContext context;
     DSLContext dslContext;
-    UserProfileCommandRepository userProfileCommandRepository;
+    AggregateStoreRepository aggregateStoreRepository;
 
     @BeforeEach
     void setup() throws IOException {
@@ -35,7 +36,7 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
 
         context = DaggerApplicationContext.builder().config(config).build();
         dslContext = context.getDSLContext();
-        userProfileCommandRepository = context.getUserProfileCommandRepository();
+        aggregateStoreRepository = context.getAggregateRepository();
         dslContext.delete(EVENT_DATA).execute();
     }
 
@@ -55,11 +56,12 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         UserProfile userProfile =
             new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
-        var addedUserProfile = userProfileCommandRepository.add(userProfile);
+        var addedUserProfile = aggregateStoreRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void userProfileCanBeCreatedAndLoaded() throws IOException {
         CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
         assertThat(command).isNotNull();
@@ -70,18 +72,26 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         UserProfile userProfile =
             new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
-        var addedUserProfile = userProfileCommandRepository.add(userProfile);
+        var addedUserProfile = aggregateStoreRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
 
-        Optional<UserProfile> load = userProfileCommandRepository.load(addedUserProfile.get().getId());
+        Optional<UserProfile> load = (Optional<UserProfile>) aggregateStoreRepository
+            .load(addedUserProfile.get().getId());
+//            .map(t -> (UserProfile) t);
+
         assertThat(load).isPresent();
 
         UserProfile savedUserProfile = load.get();
 
         assertThat(savedUserProfile.getId()).isNotNull();
+        assertThat(savedUserProfile.getVersion()).isEqualTo(1);
+        assertThat(savedUserProfile.getFullName().firstName()).isEqualTo(command.getFirstName());
+        assertThat(savedUserProfile.getFullName().lastName()).isEqualTo(command.getLastName());
+        assertThat(savedUserProfile.getDisplayName()).isEqualTo(command.displayName());
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void userProfileCanBeUpdated() throws IOException {
         CreateUserProfileCommand createUserProfileCmd = UserProfileFixture.loadCreateUserProfileDto();
         UpdateUserProfileCommand updateUserProfileCommand =
@@ -98,16 +108,16 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
                 createUserProfileCmd.fullName(),
                 new DisplayName(createUserProfileCmd.getDisplayName()));
 
-        var addedUserProfile = userProfileCommandRepository.add(userProfile);
+        var addedUserProfile = aggregateStoreRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
 
-        var profile = addedUserProfile.get();
+        var profile = (UserProfile) addedUserProfile.get();
 
         profile.updatePhoto(updateUserProfileCommand.getPhotoUrl());
-        var secondSaved = userProfileCommandRepository.add(profile);
+        var secondSaved = aggregateStoreRepository.add(profile);
         assertThat(secondSaved).isPresent();
 
-        Optional<UserProfile> load = userProfileCommandRepository.load(profile.getId());
+        Optional<UserProfile> load = (Optional<UserProfile>) aggregateStoreRepository.load(profile.getId());
         assertThat(load).isPresent();
 
         UserProfile savedUserProfile = load.get();
@@ -117,6 +127,7 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         assertThat(savedUserProfile.getVersion()).isEqualTo(2);
     }
 
+    //
     @Test
     void userProfileCanBeCreatedAndShownToExist() throws IOException {
         CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
@@ -128,14 +139,15 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         UserProfile userProfile =
             new UserProfile(UserId.from(insertId), command.fullName(), command.displayName());
 
-        var addedUserProfile = userProfileCommandRepository.add(userProfile);
+        var addedUserProfile = aggregateStoreRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
 
-        boolean exists = userProfileCommandRepository.exists(addedUserProfile.get().getId());
+        boolean exists = aggregateStoreRepository.exists(addedUserProfile.get().getId());
         assertThat(exists).isTrue();
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testUserProfileCanBeLoadedAndUpdated() throws IOException {
         CreateUserProfileCommand createUserProfileCmd = UserProfileFixture.loadCreateUserProfileDto();
         UpdateUserProfileCommand updateUserProfileCommand =
@@ -147,18 +159,19 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
                 createUserProfileCmd.fullName(),
                 new DisplayName(createUserProfileCmd.getDisplayName()));
 
-        var addedUserProfile = userProfileCommandRepository.add(userProfile);
+        var addedUserProfile = aggregateStoreRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
 
-        Optional<UserProfile> loadedUserProfile = userProfileCommandRepository.load(userProfile.getId());
+        Optional<UserProfile> loadedUserProfile = (Optional<UserProfile>) aggregateStoreRepository
+            .load(userProfile.getId());
         assertThat(loadedUserProfile).isPresent();
 
         UserProfile profile = loadedUserProfile.get();
         profile.updatePhoto(updateUserProfileCommand.getPhotoUrl());
-        var secondSaved = userProfileCommandRepository.add(profile);
+        var secondSaved = aggregateStoreRepository.add(profile);
         assertThat(secondSaved).isPresent();
 
-        Optional<UserProfile> load = userProfileCommandRepository.load(profile.getId());
+        Optional<UserProfile> load = (Optional<UserProfile>) aggregateStoreRepository.load(profile.getId());
         assertThat(load).isPresent();
 
         UserProfile savedUserProfile = load.get();

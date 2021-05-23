@@ -3,7 +3,6 @@ package com.marketplace.domain;
 import com.marketplace.cqrs.event.EventId;
 import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.cqrs.framework.AggregateRoot;
-import com.marketplace.eventstore.framework.Result;
 import io.vavr.control.Try;
 import java.util.HashMap;
 import java.util.Map;

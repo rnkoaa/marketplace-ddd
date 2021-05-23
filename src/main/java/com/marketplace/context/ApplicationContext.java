@@ -3,6 +3,7 @@ package com.marketplace.context;
 import com.marketplace.config.ApplicationConfig;
 import com.marketplace.context.server.SparkServerModule;
 import com.marketplace.cqrs.event.VersionedEvent;
+import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepository;
 import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
@@ -32,6 +33,8 @@ public interface ApplicationContext {
     UserProfileQueryRepository getUserProfileQueryRepository();
 
     UserProfileCommandRepository getUserProfileCommandRepository();
+
+    AggregateStoreRepository getAggregateRepository();
 
     ClassifiedAdService getClassifiedAdService();
 
