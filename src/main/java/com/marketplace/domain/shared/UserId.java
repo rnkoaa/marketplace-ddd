@@ -2,7 +2,6 @@ package com.marketplace.domain.shared;
 
 import com.marketplace.cqrs.event.EventId;
 import com.marketplace.domain.userprofile.UserProfile;
-import java.util.Objects;
 import java.util.UUID;
 
 public final class UserId extends EventId {
@@ -26,5 +25,10 @@ public final class UserId extends EventId {
     @Override
     public String getStreamId() {
         return String.format("%s:%s", UserProfile.class.getSimpleName(), super.id());
+    }
+
+    @Override
+    public String getAggregateName() {
+        return UserProfile.class.getSimpleName();
     }
 }

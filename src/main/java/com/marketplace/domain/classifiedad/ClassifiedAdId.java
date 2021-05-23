@@ -31,4 +31,9 @@ public final class ClassifiedAdId extends EventId {
         return String.format("%s:%s", ClassifiedAd.class.getSimpleName(), super.id());
     }
 
+    @Override
+    public String getAggregateName() {
+        return ClassifiedAd.class.getSimpleName();
+    }
+
 }

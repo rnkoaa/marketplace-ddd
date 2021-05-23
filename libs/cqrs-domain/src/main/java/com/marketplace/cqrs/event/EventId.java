@@ -25,6 +25,8 @@ public abstract class EventId {
 
     public abstract String getStreamId();
 
+    public abstract String getAggregateName();
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
