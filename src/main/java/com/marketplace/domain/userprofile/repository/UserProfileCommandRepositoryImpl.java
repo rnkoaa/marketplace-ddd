@@ -15,8 +15,8 @@ import javax.inject.Singleton;
 
 @Named
 @Singleton
-public class UserProfileCommandRepositoryImpl extends BaseCommandRepository<UserProfile> implements
-    UserProfileCommandRepository {
+public class UserProfileCommandRepositoryImpl extends
+    BaseCommandRepository<UserProfile> implements UserProfileCommandRepository {
 
     private final EventStore<VersionedEvent> eventEventStore;
 

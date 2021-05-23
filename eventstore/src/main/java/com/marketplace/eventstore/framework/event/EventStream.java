@@ -1,6 +1,5 @@
 package com.marketplace.eventstore.framework.event;
 
-import com.marketplace.cqrs.event.Event;
 import java.time.Instant;
 import java.util.List;
 
@@ -39,13 +38,6 @@ public interface EventStream<T> {
     void append(T event, int expectedVersion);
 
     /**
-     * All events that have not been persisted yet.
-     *
-     * @return all events that are yet to be persisted.
-     */
-    List<T> getChanges();
-
-    /**
      * @return the number of events in the current stream
      */
     int size();
@@ -63,4 +55,6 @@ public interface EventStream<T> {
     default Instant updatedAt() {
         return Instant.now();
     }
+
+    boolean isEmpty();
 }

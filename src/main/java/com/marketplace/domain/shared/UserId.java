@@ -1,13 +1,14 @@
 package com.marketplace.domain.shared;
 
+import com.marketplace.cqrs.event.EventId;
+import com.marketplace.domain.userprofile.UserProfile;
+import java.util.Objects;
 import java.util.UUID;
 
-public record UserId(UUID id) {
+public final class UserId extends EventId {
 
-    public UserId {
-        if (id == null) {
-            throw new IllegalArgumentException("id cannot be null");
-        }
+    public UserId(UUID id) {
+        super(id);
     }
 
     public static UserId newId() {
@@ -23,7 +24,7 @@ public record UserId(UUID id) {
     }
 
     @Override
-    public String toString() {
-        return id.toString();
+    public String getStreamId() {
+        return String.format("%s:%s", UserProfile.class.getSimpleName(), super.id());
     }
 }

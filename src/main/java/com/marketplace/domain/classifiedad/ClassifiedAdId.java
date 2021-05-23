@@ -1,19 +1,19 @@
 package com.marketplace.domain.classifiedad;
 
+import com.marketplace.cqrs.event.EventId;
 import java.util.UUID;
 
-public record ClassifiedAdId(UUID id) {
-    public ClassifiedAdId {
-        if (id == null) {
-            throw new IllegalArgumentException("id cannot be null");
-        }
+public final class ClassifiedAdId extends EventId {
+
+    public ClassifiedAdId(UUID id) {
+        super(id);
     }
 
     public ClassifiedAdId() {
         this(UUID.randomUUID());
     }
 
-    public static ClassifiedAdId newClassifedAdId() {
+    public static ClassifiedAdId newClassifiedAdId() {
         return new ClassifiedAdId(UUID.randomUUID());
     }
 
@@ -21,14 +21,14 @@ public record ClassifiedAdId(UUID id) {
         return new ClassifiedAdId(value);
     }
 
-    @Override
-    public String toString() {
-        return id.toString();
-    }
-
     public static ClassifiedAdId fromString(String uuid) {
         var id = UUID.fromString(uuid);
         return new ClassifiedAdId(id);
+    }
+
+    @Override
+    public String getStreamId() {
+        return String.format("%s:%s", ClassifiedAd.class.getSimpleName(), super.id());
     }
 
 }
