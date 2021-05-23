@@ -109,7 +109,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
             .aggregateName(ClassifiedAd.class.getSimpleName())
             .build();
         var appendResult =
-            eventStore.append(streamId, 1, List.of(classifiedAdCreated, classifiedAdTitleUpdated));
+            eventStore.append(streamId, 2, List.of(classifiedAdCreated, classifiedAdTitleUpdated));
 
         assertThat(appendResult.isPresent()).isTrue();
         EventStream<VersionedEvent> eventStream = eventStore.load(streamId);
@@ -147,7 +147,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
 
         eventStore.append(
             streamId,
-            1,
+            2,
             createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1))
         );
 
@@ -155,7 +155,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
 
         eventStore.append(
             streamId2,
-            1,
+            2,
             createEventsAggregate(UUID.fromString(classifiedAdId2), UUID.fromString(ownerId1))
         );
 //        assertThat(eventStore.size()).isEqualTo(2);
@@ -172,7 +172,7 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
 
         eventStore.append(
             streamId,
-            1,
+            2,
             createEventsAggregate(UUID.fromString(classifiedAdId1), UUID.fromString(ownerId1)))
         ;
 

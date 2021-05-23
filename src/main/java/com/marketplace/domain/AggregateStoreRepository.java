@@ -56,7 +56,6 @@ public class AggregateStoreRepository
     public Optional<AggregateRoot<EventId, VersionedEvent>> add(AggregateRoot<EventId, VersionedEvent> aggregateRoot) {
         aggregateTypeMapper.put(aggregateRoot);
         List<VersionedEvent> changes = aggregateRoot.getChanges();
-        aggregateRoot.getStreamId();
         Result<Boolean> publishResult = eventEventStore
             .publish(aggregateRoot.getStreamId(), aggregateRoot.getVersion(), changes);
         return publishResult.toOptional()

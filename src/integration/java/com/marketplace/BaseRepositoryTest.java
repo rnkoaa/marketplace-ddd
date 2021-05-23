@@ -4,7 +4,7 @@ import com.marketplace.config.ApplicationConfig;
 import com.marketplace.config.ConfigLoader;
 import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
-import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
+import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
 import com.marketplace.evenstore.jooq.Tables;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 public abstract class BaseRepositoryTest extends AbstractContainerInitializer {
 
     ApplicationContext context;
-    ClassifiedAdCommandRepository classifiedAdCommandRepository;
+    AggregateStoreRepository aggregateStoreRepository;
     ClassifiedAdService classifiedAdService;
 
     @BeforeEach
@@ -25,7 +25,7 @@ public abstract class BaseRepositoryTest extends AbstractContainerInitializer {
             builder()
             .config(config)
             .build();
-        classifiedAdCommandRepository = context.getClassifiedAdRepository();
+        aggregateStoreRepository = context.getAggregateRepository();
         classifiedAdService = context.getClassifiedAdService();
 
         dslContext.delete(Tables.CLASSIFIED_AD).execute();

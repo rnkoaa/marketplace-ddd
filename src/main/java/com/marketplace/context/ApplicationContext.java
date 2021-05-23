@@ -5,7 +5,6 @@ import com.marketplace.context.server.SparkServerModule;
 import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepository;
-import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
 import com.marketplace.eventstore.framework.event.EventStore;
@@ -26,8 +25,6 @@ import org.jooq.DSLContext;
 public interface ApplicationContext {
 
     SparkServer getServer();
-
-    ClassifiedAdCommandRepository getClassifiedAdRepository();
 
     UserProfileQueryRepository getUserProfileQueryRepository();
 
