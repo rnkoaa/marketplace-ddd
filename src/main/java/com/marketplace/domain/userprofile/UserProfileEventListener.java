@@ -1,5 +1,6 @@
 package com.marketplace.domain.userprofile;
 
+import com.google.common.eventbus.Subscribe;
 import com.marketplace.domain.userprofile.entity.ImmutableUserProfileEntity;
 import com.marketplace.domain.userprofile.entity.ImmutableUserProfileEntity.Builder;
 import com.marketplace.domain.userprofile.entity.UserProfileEntity;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 @Named
 @Singleton
+@SuppressWarnings("UnstableApiUsage")
 public class UserProfileEventListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserProfileEventListener.class);
@@ -27,6 +29,7 @@ public class UserProfileEventListener {
         this.userProfileQueryRepository = userProfileQueryRepository;
     }
 
+    @Subscribe
     public void onUserCreated(UserRegistered event) {
         UserProfileEntity entity = createFromEvent(event);
         Optional<UserProfileEntity> maybeSaved = userProfileQueryRepository.save(entity);
@@ -35,6 +38,7 @@ public class UserProfileEventListener {
         }
     }
 
+    @Subscribe
     public void onUserFullNameUpdated(UserFullNameUpdated event) {
         Optional<UserProfileEntity> maybeUpdateUserProfile = userProfileQueryRepository.findById(event.getUserId())
             .flatMap(userProfileEntity -> {
@@ -54,6 +58,7 @@ public class UserProfileEventListener {
         }
     }
 
+    @Subscribe
     public void onDisplayNameUpdated(UserDisplayNameUpdated event) {
         Optional<UserProfileEntity> maybeUpdateUserProfile = userProfileQueryRepository.findById(event.getUserId())
             .flatMap(userProfileEntity -> {
@@ -66,6 +71,7 @@ public class UserProfileEventListener {
         }
     }
 
+    @Subscribe
     public void onPhotoAdded(ProfilePhotoUploaded event) {
         Optional<UserProfileEntity> maybeUpdateUserProfile = userProfileQueryRepository.findById(event.getUserId())
             .flatMap(userProfileEntity -> {
@@ -78,6 +84,7 @@ public class UserProfileEventListener {
         }
     }
 
+    @Subscribe
     public static UserProfileEntity createFromEvent(UserRegistered event) {
         Builder builder = ImmutableUserProfileEntity.builder()
             .id(event.getUserId())

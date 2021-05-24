@@ -1,5 +1,6 @@
 package com.marketplace.context;
 
+import com.google.common.eventbus.EventBus;
 import com.marketplace.config.ApplicationConfig;
 import com.marketplace.context.server.SparkServerModule;
 import com.marketplace.cqrs.event.VersionedEvent;
@@ -8,10 +9,12 @@ import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
 import com.marketplace.domain.userprofile.UserProfileEventListener;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
+import com.marketplace.eventstore.framework.event.EventListener;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.server.SparkServer;
 import dagger.BindsInstance;
 import dagger.Component;
+import java.util.List;
 import javax.inject.Singleton;
 import org.jooq.DSLContext;
 
@@ -23,6 +26,7 @@ import org.jooq.DSLContext;
     EventStoreModule.class,
 })
 @Singleton
+@SuppressWarnings("UnstableApiUsage")
 public interface ApplicationContext {
 
     SparkServer getServer();
@@ -38,6 +42,8 @@ public interface ApplicationContext {
     ClassifiedAdQueryRepository getClassifiedAdQueryRepository();
 
     EventStore<VersionedEvent> getEventStore();
+
+    EventBus getEventBus();
 
     UserProfileEventListener getUserProfileEventListener();
 

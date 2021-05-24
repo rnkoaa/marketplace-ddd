@@ -4,11 +4,14 @@ import com.marketplace.config.ApplicationConfig;
 import com.marketplace.config.ConfigLoader;
 import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
+import com.marketplace.eventstore.framework.event.EventListener;
 import com.marketplace.server.SparkServer;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@SuppressWarnings("UnstableApiUsage")
 public class MainApplication {
 
     AtomicBoolean enabled = new AtomicBoolean(true);
@@ -23,6 +26,9 @@ public class MainApplication {
             builder()
             .config(config)
             .build();
+
+        context.getEventBus().register(context.getUserProfileEventListener());
+
         context.getServer()
             .run();
     }
