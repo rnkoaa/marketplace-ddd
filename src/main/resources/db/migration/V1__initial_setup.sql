@@ -31,14 +31,18 @@ CREATE
 create table user_profile
 (
     id              TEXT PRIMARY KEY,
-    firstName       TEXT,                 -- uuid
-    lastName        TEXT,                 -- string
-    middleName      TEXT,                 -- string
-    displayName     TEXT,                 -- json blob
+    first_name      TEXT NOT NULl,                 -- uuid
+    last_name       TEXT NOT NULL,                 -- string
+    middle_name     TEXT,                 -- string
+    display_name    TEXT NOT NULl,                 -- json blob
     photos          TEXT,                 -- json blob
     created         TEXT        NOT NULL, -- timestamp
     updated         TEXT        NOT NULL  -- timestamp
 );
+
+CREATE
+    UNIQUE INDEX idx_user_profile_displayName
+    ON user_profile (display_name);
 
 create table classified_ad
 (

@@ -1,9 +1,8 @@
 package com.marketplace.domain.classifiedad.service;
 
+import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAd;
-import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
-import com.marketplace.domain.classifiedad.repository.ClassifiedAdCommandRepository;
 import com.marketplace.domain.shared.UserId;
 import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,22 +21,22 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class ClassifiedAdServiceTest {
 
     @Mock
-    ClassifiedAdCommandRepository classifiedAdCommandRepository;
+    AggregateStoreRepository aggregateStoreRepository;
 
     ClassifiedAdService classifiedAdService;
 
     @BeforeEach
     void setup() {
-        classifiedAdService = new ClassifiedAdService(classifiedAdCommandRepository);
+        classifiedAdService = new ClassifiedAdService(aggregateStoreRepository);
     }
 
     @Test
     void canBeSaved() {
         var classifiedAd = new ClassifiedAd(new ClassifiedAdId(UUID.randomUUID()), new UserId(UUID.randomUUID()));
 
-        Mockito.when(classifiedAdCommandRepository.add(classifiedAd)).thenReturn(Optional.of(classifiedAd));
+        Mockito.when(aggregateStoreRepository.add(classifiedAd)).thenReturn(Optional.of(classifiedAd));
 
-        var saved = classifiedAdCommandRepository.add(classifiedAd);
+        var saved = aggregateStoreRepository.add(classifiedAd);
         assertThat(saved).isNotNull().isEqualTo(Optional.of(classifiedAd));
     }
 
@@ -53,9 +52,9 @@ class ClassifiedAdServiceTest {
         expectedClassifiedAd.updateText(new ClassifiedAdText("test text"));
         expectedClassifiedAd.updateTitle(new ClassifiedAdTitle("test title"));
 
-        Mockito.when(classifiedAdCommandRepository.load(new ClassifiedAdId(UUID.fromString(uuidString))))
+        Mockito.when(aggregateStoreRepository.load(new ClassifiedAdId(UUID.fromString(uuidString))))
             .thenReturn(Optional.of(classifiedAd));
-        Mockito.when(classifiedAdCommandRepository.add(classifiedAd)).thenReturn(Optional.of(expectedClassifiedAd));
+        Mockito.when(aggregateStoreRepository.add(classifiedAd)).thenReturn(Optional.of(expectedClassifiedAd));
 
         var updateClassifiedAd = ImmutableUpdateClassifiedAd.builder()
             .classifiedAdId(UUID.fromString(uuidString))
@@ -83,9 +82,9 @@ class ClassifiedAdServiceTest {
         expectedClassifiedAd.updateTitle(new ClassifiedAdTitle("test title"));
         expectedClassifiedAd.updatePrice(new Price(Money.fromDecimal(10.0, "USD")));
 
-        Mockito.when(classifiedAdCommandRepository.load(new ClassifiedAdId(UUID.fromString(uuidString))))
+        Mockito.when(aggregateStoreRepository.load(new ClassifiedAdId(UUID.fromString(uuidString))))
             .thenReturn(Optional.of(classifiedAd));
-        Mockito.when(classifiedAdCommandRepository.add(classifiedAd)).thenReturn(Optional.of(expectedClassifiedAd));
+        Mockito.when(aggregateStoreRepository.add(classifiedAd)).thenReturn(Optional.of(expectedClassifiedAd));
 
         var updateClassifiedAd = ImmutableUpdateClassifiedAd.builder()
             .classifiedAdId(UUID.fromString(uuidString))
@@ -111,9 +110,9 @@ class ClassifiedAdServiceTest {
         var expectedClassifiedAd = new ClassifiedAd(classifiedAdId, ownerId);
         expectedClassifiedAd.updateText(new ClassifiedAdText("test text"));
 
-        Mockito.when(classifiedAdCommandRepository.load(new ClassifiedAdId(UUID.fromString(uuidString))))
+        Mockito.when(aggregateStoreRepository.load(new ClassifiedAdId(UUID.fromString(uuidString))))
             .thenReturn(Optional.of(classifiedAd));
-        Mockito.when(classifiedAdCommandRepository.add(classifiedAd)).thenReturn(Optional.of(expectedClassifiedAd));
+        Mockito.when(aggregateStoreRepository.add(classifiedAd)).thenReturn(Optional.of(expectedClassifiedAd));
 
         var updateClassifiedAd = ImmutableUpdateClassifiedAd.builder()
             .classifiedAdId(UUID.fromString(uuidString))
@@ -136,10 +135,11 @@ class ClassifiedAdServiceTest {
         var classifiedAdId = new ClassifiedAdId(UUID.fromString(uuidString));
         var classifiedAd = new ClassifiedAd(classifiedAdId, ownerId);
 
-        Mockito.when(classifiedAdCommandRepository.load(new ClassifiedAdId(UUID.fromString(uuidString))))
+        Mockito.when(aggregateStoreRepository.load(new ClassifiedAdId(UUID.fromString(uuidString))))
             .thenReturn(Optional.of(classifiedAd));
 
-        var found = classifiedAdCommandRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)));
+        var found = aggregateStoreRepository.load(new ClassifiedAdId(UUID.fromString(uuidString)))
+            .map(it -> (ClassifiedAd) it);
 
         assertThat(found).isPresent();
 

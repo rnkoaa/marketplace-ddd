@@ -46,7 +46,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
     void testSaveMultipleEventsAtExpectedVersion() {
         List<VersionedEvent> aggregateEvents = TestEvents.aggregateEvents;
 
-        Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
+        Result<Integer> save = jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 3);
 
         assertThat(save.isPresent()).isTrue();
 
@@ -139,7 +139,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         List<VersionedEvent> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
-        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
+        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 3);
 
         List<VersionedEvent> events = jdbcEventStoreRepository.load(TestEvents.streamId);
 
@@ -152,7 +152,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         List<VersionedEvent> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
-        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
+        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 3);
 
         List<VersionedEvent> events = jdbcEventStoreRepository.load(TestEvents.aggregateName);
 
@@ -174,7 +174,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         List<VersionedEvent> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
-        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
+        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 3);
 
         List<VersionedEvent> events = jdbcEventStoreRepository.load(TestEvents.streamId, 2);
 
@@ -187,7 +187,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         List<VersionedEvent> aggregateEvents = TestEvents.aggregateEvents;
 
         // when
-        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 1);
+        jdbcEventStoreRepository.save(TestEvents.streamId, aggregateEvents, 3);
 
         List<VersionedEvent> events = jdbcEventStoreRepository.load(TestEvents.aggregateName, 2);
 

@@ -53,7 +53,7 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
     this.pictures = new ArrayList<>();
     ClassifiedAdId classifiedAdId = createClassifiedAd.getClassifiedAdId()
         .map(ClassifiedAdId::from)
-        .orElse(ClassifiedAdId.newClassifedAdId());
+        .orElse(ClassifiedAdId.newClassifiedAdId());
     apply(ImmutableClassifiedAdCreated.builder()
         .id(idGenerator.newUUID())
         .aggregateId(classifiedAdId.id())

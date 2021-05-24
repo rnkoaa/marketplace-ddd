@@ -1,8 +1,6 @@
 package com.marketplace.eventstore.framework.event;
 
 import com.marketplace.cqrs.event.Event;
-
-import com.marketplace.cqrs.event.VersionedEvent;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,25 +8,15 @@ import java.util.List;
 public class EventStreamImpl implements EventStream<Event> {
 
     private List<Event> events;
-    private List<Event> changes;
     private final String id;
     private final String name;
     private int version;
     private final Instant createdAt;
     private Instant updatedAt;
 
-    public EventStreamImpl(String id, String name, int version, Instant createdAt) {
-        this(id, name, version, createdAt, Instant.now());
-    }
-
-    public EventStreamImpl(String id) {
-        this(id, "", 0, Instant.now(), Instant.now());
-    }
-
     public EventStreamImpl(String id, String name, int version, List<Event> events) {
         this(id, name, version, Instant.now(), Instant.now());
         this.events = events;
-        this.changes = new ArrayList<>();
     }
 
     public EventStreamImpl(
@@ -39,7 +27,6 @@ public class EventStreamImpl implements EventStream<Event> {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.events = new ArrayList<>();
-        this.changes = new ArrayList<>();
     }
 
     @Override
@@ -73,15 +60,15 @@ public class EventStreamImpl implements EventStream<Event> {
     }
 
     @Override
-    public void append(Event event, int expectedVersion) {
-        this.version = expectedVersion;
-        this.updatedAt = Instant.now();
-        this.changes.add(event);
+    public boolean isEmpty() {
+        return events.isEmpty();
     }
 
     @Override
-    public List<Event> getChanges(){
-        return changes;
+    public void append(Event event, int expectedVersion) {
+        this.version = expectedVersion;
+        this.updatedAt = Instant.now();
+        this.events.add(event);
     }
 
     @Override

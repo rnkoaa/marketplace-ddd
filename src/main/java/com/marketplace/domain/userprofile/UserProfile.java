@@ -14,7 +14,6 @@ import com.marketplace.domain.userprofile.event.UserRegistered;
 import com.marketplace.cqrs.event.EventId;
 import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.cqrs.framework.AggregateRoot;
-import java.util.List;
 import java.util.Objects;
 
 public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
@@ -44,13 +43,6 @@ public class UserProfile extends AggregateRoot<EventId, VersionedEvent> {
 
     // for initializing aggregate
     public UserProfile() {
-    }
-
-    public UserProfile(List<VersionedEvent> events) {
-        events.forEach(event -> {
-            when(event);
-            incrementVersion();
-        });
     }
 
     public UserProfile(UserId id, FullName fullName, DisplayName displayName) {
