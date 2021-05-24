@@ -17,7 +17,6 @@ import org.testcontainers.utility.DockerImageName;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AbstractContainerInitializer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractContainerInitializer.class);
     protected ApplicationContext context;
     protected DSLContext dslContext;
 
@@ -30,8 +29,6 @@ public class AbstractContainerInitializer {
             .build();
 
         dslContext = context.getDSLContext();
-
-        String dbConnectionUrl = config.getDb().getUrl();
     }
 
     public ApplicationContext getApplicationContext() {

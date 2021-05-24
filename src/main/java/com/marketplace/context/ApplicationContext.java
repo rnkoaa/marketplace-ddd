@@ -6,6 +6,7 @@ import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
+import com.marketplace.domain.userprofile.UserProfileEventListener;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.server.SparkServer;
@@ -37,6 +38,8 @@ public interface ApplicationContext {
     ClassifiedAdQueryRepository getClassifiedAdQueryRepository();
 
     EventStore<VersionedEvent> getEventStore();
+
+    UserProfileEventListener getUserProfileEventListener();
 
     @Component.Builder
     interface Builder {
