@@ -1,20 +1,11 @@
 plugins {
-    id 'java'
+//    id 'java'
     id 'idea'
     id 'nu.studer.jooq' version '5.2.1'
     id "org.flywaydb.flyway" version "7.8.2"
 //    id 'jacoco' // HERE!
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
-
-    // has issues with preview-features
-//    toolchain {
-//        languageVersion = JavaLanguageVersion.of(15)
-//    }
-}
 
 group 'com.marketplace'
 version '1.0.0-SNAPSHOT'
@@ -24,116 +15,54 @@ repositories {
     mavenCentral()
 }
 
-sourceSets {
-    main {
-        java.srcDirs += "$buildDir/generated/sources/annotationProcessor/java"
-    }
-    intTest {
-        java.srcDir "$projectDir/src/intTest/groovy"
-        resources.srcDir "$projectDir/src/intTest/resources"
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
-    }
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
 
-}
+    java {
+        sourceCompatibility = JavaVersion.VERSION_16
+        targetCompatibility = JavaVersion.VERSION_16
 
-idea {
-    module {
-        testSourceDirs += sourceSets.intTest.java.srcDirs
-        testResourceDirs += sourceSets.intTest.resources.srcDirs
-    }
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-    intTestImplementation {
-        extendsFrom testImplementation
-    }
-    intTestRuntime {
-        extendsFrom testRuntimeClasspath
+        // has issues with preview-features
+//    toolchain {
+//        languageVersion = JavaLanguageVersion.of(15)
+//    }
     }
 
-    flywayMigration
-}
-
-
-dependencies {
-    implementation project(":libs:config")
-    implementation project(":libs:common")
-    implementation project(":libs:cqrs-domain")
-    implementation project(":eventstore")
-    implementation project(":eventstore-sqlite")
-
-    implementation "org.flywaydb:flyway-core:$flywayVersion"
-    flywayMigration "org.xerial:sqlite-jdbc:$sqliteVersion"
-
-    implementation "org.xerial:sqlite-jdbc:$sqliteVersion"
-
-    jooqGenerator "org.xerial:sqlite-jdbc:$sqliteVersion"
-    jooqGenerator "org.jooq:jooq-meta-extensions:$jooqVersion"
-
-    implementation("org.slf4j:slf4j-api:1.7.30")
-    implementation("org.slf4j:slf4j-log4j12:1.7.30")
-
-    implementation("com.sparkjava:spark-core:2.9.3")
-
-    compileOnly 'org.immutables:value:2.8.8'
-    annotationProcessor 'org.immutables:value:2.8.8'
-
-    // some functional implementations
-    implementation('io.vavr:vavr:1.0.0-alpha-3')
-
-    // Runtime reflections
-    implementation("org.reflections:reflections:0.9.12")
-
-    // 2.11.3
-    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion"
-    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
-
-    implementation("javax.inject:javax.inject:1")
-    implementation("javax.persistence:javax.persistence-api:2.2")
-
-    implementation("com.google.dagger:dagger:${daggerVersion}")
-    annotationProcessor("com.google.dagger:dagger-compiler:${daggerVersion}")
-
-    testImplementation(platform("org.junit:junit-bom:${junitVersion}"))
-    testImplementation('org.junit.jupiter:junit-jupiter')
-    testImplementation("org.assertj:assertj-core:${assertjVersion}")
-    testImplementation("org.mockito:mockito-core:${mockitoVersion}")
-    testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
-
-    testImplementation("org.testcontainers:junit-jupiter:1.15.3")
-    testImplementation("org.testcontainers:mongodb:1.15.3")
-
-    intTestImplementation("org.slf4j:slf4j-api:1.7.30")
-    intTestImplementation("org.slf4j:slf4j-log4j12:1.7.30")
-
-
-}
-
-test {
-    useJUnitPlatform()
-    testLogging {
-        events "passed", "skipped", "failed"
+    sourceSets {
+        main {
+            java.srcDirs += "$buildDir/generated/sources/annotationProcessor/java"
+        }
+        intTest {
+            java.srcDir "$projectDir/src/intTest/groovy"
+            resources.srcDir "$projectDir/src/intTest/resources"
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+        }
     }
-}
 
-tasks.withType(JavaCompile) {
-    options.compilerArgs += "--enable-preview"
-}
-tasks.withType(Test) {
-    jvmArgs += "--enable-preview"
-}
-tasks.withType(JavaExec) {
-    jvmArgs += "--enable-preview"
-}
+    idea {
+        module {
+            testSourceDirs += sourceSets.intTest.java.srcDirs
+            testResourceDirs += sourceSets.intTest.resources.srcDirs
+        }
+    }
 
-allprojects {
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+        intTestImplementation {
+            extendsFrom testImplementation
+        }
+        intTestRuntime {
+            extendsFrom testRuntimeClasspath
+        }
+
+        flywayMigration
+    }
+
+
     tasks.withType(JavaCompile) {
         options.compilerArgs += "--enable-preview"
     }
@@ -143,85 +72,38 @@ allprojects {
     tasks.withType(JavaExec) {
         jvmArgs += "--enable-preview"
     }
-}
 
-task intTest(type: Test) {
-//    testClassesDirs = sourceSets.integration.output.classesDirs
-//    classpath = sourceSets.integration.runtimeClasspath
-    description = 'Runs the functional tests.'
-    group = 'verification'
-    testClassesDirs = sourceSets.intTest.output.classesDirs
-    classpath = sourceSets.intTest.runtimeClasspath
-    outputs.upToDateWhen { false }
-    mustRunAfter test
-}
-
-intTest {
-    useJUnitPlatform()
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-}
-
-check.dependsOn intTest
-
-subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
     }
 
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+
+    task intTest(type: Test) {
+        description = 'Runs the functional tests.'
+        group = 'verification'
+        testClassesDirs = sourceSets.intTest.output.classesDirs
+        classpath = sourceSets.intTest.runtimeClasspath
+        outputs.upToDateWhen { false }
+        mustRunAfter test
+    }
+
+    intTest {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+
+    check.dependsOn intTest
+
     processIntTestResources {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 }
-processIntTestResources {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
-
-// https://flywaydb.org/documentation/usage/gradle/migrate
-flyway {
-    driver = 'org.sqlite.JDBC'
-    url = "jdbc:sqlite:${projectDir}/src/main/resources/db/marketplace.db"
-    locations = ["filesystem:${projectDir}/src/main/resources/db/migration"]
-}
-
-jooq {
-    version = '3.14.7'  // the default (can be omitted)
-    edition = nu.studer.gradle.jooq.JooqEdition.OSS  // the default (can be omitted)
-
-    configurations {
-        main {  // name of the jOOQ configuration
-            generateSchemaSourceOnCompilation = true  // default (can be omitted)
-
-            generationTool {
-                logging = org.jooq.meta.jaxb.Logging.WARN
-                jdbc {
-                    driver = 'org.sqlite.JDBC'
-                    url = 'jdbc:sqlite:src/main/resources/db/marketplace.db'
-                }
-                generator {
-                    name = 'org.jooq.codegen.DefaultGenerator'
-                    database {
-                        name = 'org.jooq.meta.sqlite.SQLiteDatabase'
-                    }
-                    generate {
-                        relations = true
-                        deprecated = false
-                        records = true
-                        javaTimeTypes = true
-                        immutablePojos = true
-                        fluentSetters = true
-                    }
-                    target {
-                        packageName = 'com.marketplace.evenstore.jooq'
-                        directory = 'src/main/jooq'  // default (can be omitted)
-                    }
-                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
-                }
-            }
-        }
-    }
-}
-
-generateJooq.dependsOn(flywayMigrate)

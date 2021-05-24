@@ -1,8 +1,0 @@
----
-server:
-  port: 8080
-
-mongo:
-  hosts: localhost
-  database: marketplace
-  port: 27017
