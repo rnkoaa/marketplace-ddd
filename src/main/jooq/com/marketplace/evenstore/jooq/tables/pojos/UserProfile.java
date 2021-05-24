@@ -16,20 +16,20 @@ public class UserProfile implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String id;
-    private final String firstname;
-    private final String lastname;
-    private final String middlename;
-    private final String displayname;
+    private final String firstName;
+    private final String lastName;
+    private final String middleName;
+    private final String displayName;
     private final String photos;
     private final String created;
     private final String updated;
 
     public UserProfile(UserProfile value) {
         this.id = value.id;
-        this.firstname = value.firstname;
-        this.lastname = value.lastname;
-        this.middlename = value.middlename;
-        this.displayname = value.displayname;
+        this.firstName = value.firstName;
+        this.lastName = value.lastName;
+        this.middleName = value.middleName;
+        this.displayName = value.displayName;
         this.photos = value.photos;
         this.created = value.created;
         this.updated = value.updated;
@@ -37,19 +37,19 @@ public class UserProfile implements Serializable {
 
     public UserProfile(
         String id,
-        String firstname,
-        String lastname,
-        String middlename,
-        String displayname,
+        String firstName,
+        String lastName,
+        String middleName,
+        String displayName,
         String photos,
         String created,
         String updated
     ) {
         this.id = id;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.middlename = middlename;
-        this.displayname = displayname;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+        this.displayName = displayName;
         this.photos = photos;
         this.created = created;
         this.updated = updated;
@@ -63,31 +63,31 @@ public class UserProfile implements Serializable {
     }
 
     /**
-     * Getter for <code>user_profile.firstName</code>.
+     * Getter for <code>user_profile.first_name</code>.
      */
-    public String getFirstname() {
-        return this.firstname;
+    public String getFirstName() {
+        return this.firstName;
     }
 
     /**
-     * Getter for <code>user_profile.lastName</code>.
+     * Getter for <code>user_profile.last_name</code>.
      */
-    public String getLastname() {
-        return this.lastname;
+    public String getLastName() {
+        return this.lastName;
     }
 
     /**
-     * Getter for <code>user_profile.middleName</code>.
+     * Getter for <code>user_profile.middle_name</code>.
      */
-    public String getMiddlename() {
-        return this.middlename;
+    public String getMiddleName() {
+        return this.middleName;
     }
 
     /**
-     * Getter for <code>user_profile.displayName</code>.
+     * Getter for <code>user_profile.display_name</code>.
      */
-    public String getDisplayname() {
-        return this.displayname;
+    public String getDisplayName() {
+        return this.displayName;
     }
 
     /**
@@ -116,10 +116,10 @@ public class UserProfile implements Serializable {
         StringBuilder sb = new StringBuilder("UserProfile (");
 
         sb.append(id);
-        sb.append(", ").append(firstname);
-        sb.append(", ").append(lastname);
-        sb.append(", ").append(middlename);
-        sb.append(", ").append(displayname);
+        sb.append(", ").append(firstName);
+        sb.append(", ").append(lastName);
+        sb.append(", ").append(middleName);
+        sb.append(", ").append(displayName);
         sb.append(", ").append(photos);
         sb.append(", ").append(created);
         sb.append(", ").append(updated);

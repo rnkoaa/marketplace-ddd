@@ -37,62 +37,62 @@ public class UserProfileRecord extends UpdatableRecordImpl<UserProfileRecord> im
     }
 
     /**
-     * Setter for <code>user_profile.firstName</code>.
+     * Setter for <code>user_profile.first_name</code>.
      */
-    public UserProfileRecord setFirstname(String value) {
+    public UserProfileRecord setFirstName(String value) {
         set(1, value);
         return this;
     }
 
     /**
-     * Getter for <code>user_profile.firstName</code>.
+     * Getter for <code>user_profile.first_name</code>.
      */
-    public String getFirstname() {
+    public String getFirstName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>user_profile.lastName</code>.
+     * Setter for <code>user_profile.last_name</code>.
      */
-    public UserProfileRecord setLastname(String value) {
+    public UserProfileRecord setLastName(String value) {
         set(2, value);
         return this;
     }
 
     /**
-     * Getter for <code>user_profile.lastName</code>.
+     * Getter for <code>user_profile.last_name</code>.
      */
-    public String getLastname() {
+    public String getLastName() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>user_profile.middleName</code>.
+     * Setter for <code>user_profile.middle_name</code>.
      */
-    public UserProfileRecord setMiddlename(String value) {
+    public UserProfileRecord setMiddleName(String value) {
         set(3, value);
         return this;
     }
 
     /**
-     * Getter for <code>user_profile.middleName</code>.
+     * Getter for <code>user_profile.middle_name</code>.
      */
-    public String getMiddlename() {
+    public String getMiddleName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>user_profile.displayName</code>.
+     * Setter for <code>user_profile.display_name</code>.
      */
-    public UserProfileRecord setDisplayname(String value) {
+    public UserProfileRecord setDisplayName(String value) {
         set(4, value);
         return this;
     }
 
     /**
-     * Getter for <code>user_profile.displayName</code>.
+     * Getter for <code>user_profile.display_name</code>.
      */
-    public String getDisplayname() {
+    public String getDisplayName() {
         return (String) get(4);
     }
 
@@ -171,22 +171,22 @@ public class UserProfileRecord extends UpdatableRecordImpl<UserProfileRecord> im
 
     @Override
     public Field<String> field2() {
-        return UserProfile.USER_PROFILE.FIRSTNAME;
+        return UserProfile.USER_PROFILE.FIRST_NAME;
     }
 
     @Override
     public Field<String> field3() {
-        return UserProfile.USER_PROFILE.LASTNAME;
+        return UserProfile.USER_PROFILE.LAST_NAME;
     }
 
     @Override
     public Field<String> field4() {
-        return UserProfile.USER_PROFILE.MIDDLENAME;
+        return UserProfile.USER_PROFILE.MIDDLE_NAME;
     }
 
     @Override
     public Field<String> field5() {
-        return UserProfile.USER_PROFILE.DISPLAYNAME;
+        return UserProfile.USER_PROFILE.DISPLAY_NAME;
     }
 
     @Override
@@ -211,22 +211,22 @@ public class UserProfileRecord extends UpdatableRecordImpl<UserProfileRecord> im
 
     @Override
     public String component2() {
-        return getFirstname();
+        return getFirstName();
     }
 
     @Override
     public String component3() {
-        return getLastname();
+        return getLastName();
     }
 
     @Override
     public String component4() {
-        return getMiddlename();
+        return getMiddleName();
     }
 
     @Override
     public String component5() {
-        return getDisplayname();
+        return getDisplayName();
     }
 
     @Override
@@ -251,22 +251,22 @@ public class UserProfileRecord extends UpdatableRecordImpl<UserProfileRecord> im
 
     @Override
     public String value2() {
-        return getFirstname();
+        return getFirstName();
     }
 
     @Override
     public String value3() {
-        return getLastname();
+        return getLastName();
     }
 
     @Override
     public String value4() {
-        return getMiddlename();
+        return getMiddleName();
     }
 
     @Override
     public String value5() {
-        return getDisplayname();
+        return getDisplayName();
     }
 
     @Override
@@ -292,25 +292,25 @@ public class UserProfileRecord extends UpdatableRecordImpl<UserProfileRecord> im
 
     @Override
     public UserProfileRecord value2(String value) {
-        setFirstname(value);
+        setFirstName(value);
         return this;
     }
 
     @Override
     public UserProfileRecord value3(String value) {
-        setLastname(value);
+        setLastName(value);
         return this;
     }
 
     @Override
     public UserProfileRecord value4(String value) {
-        setMiddlename(value);
+        setMiddleName(value);
         return this;
     }
 
     @Override
     public UserProfileRecord value5(String value) {
-        setDisplayname(value);
+        setDisplayName(value);
         return this;
     }
 
@@ -359,14 +359,14 @@ public class UserProfileRecord extends UpdatableRecordImpl<UserProfileRecord> im
     /**
      * Create a detached, initialised UserProfileRecord
      */
-    public UserProfileRecord(String id, String firstname, String lastname, String middlename, String displayname, String photos, String created, String updated) {
+    public UserProfileRecord(String id, String firstName, String lastName, String middleName, String displayName, String photos, String created, String updated) {
         super(UserProfile.USER_PROFILE);
 
         setId(id);
-        setFirstname(firstname);
-        setLastname(lastname);
-        setMiddlename(middlename);
-        setDisplayname(displayname);
+        setFirstName(firstName);
+        setLastName(lastName);
+        setMiddleName(middleName);
+        setDisplayName(displayName);
         setPhotos(photos);
         setCreated(created);
         setUpdated(updated);

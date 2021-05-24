@@ -155,50 +155,50 @@ processIntegrationResources {
 processFunctionalResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
-
-// https://flywaydb.org/documentation/usage/gradle/migrate
-flyway {
-    driver = 'org.sqlite.JDBC'
-    url = "jdbc:sqlite:${projectDir}/src/main/resources/db/marketplace.db"
-    locations = ["filesystem:${projectDir}/src/main/resources/db/migration"]
-}
-
-jooq {
-    version = '3.14.7'  // the default (can be omitted)
-    edition = nu.studer.gradle.jooq.JooqEdition.OSS  // the default (can be omitted)
-
-    configurations {
-        main {  // name of the jOOQ configuration
-            generateSchemaSourceOnCompilation = true  // default (can be omitted)
-
-            generationTool {
-                logging = org.jooq.meta.jaxb.Logging.WARN
-                jdbc {
-                    driver = 'org.sqlite.JDBC'
-                    url = 'jdbc:sqlite:src/main/resources/db/marketplace.db'
-                }
-                generator {
-                    name = 'org.jooq.codegen.DefaultGenerator'
-                    database {
-                        name = 'org.jooq.meta.sqlite.SQLiteDatabase'
-                    }
-                    generate {
-                        relations = true
-                        deprecated = false
-                        records = true
-                        javaTimeTypes = true
-                        immutablePojos = true
-                        fluentSetters = true
-                    }
-                    target {
-                        packageName = 'com.marketplace.evenstore.jooq'
-                        directory = 'src/main/jooq'  // default (can be omitted)
-                    }
-                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
-                }
-            }
-        }
-    }
-}
-
-generateJooq.dependsOn(flywayMigrate)
+//
+//// https://flywaydb.org/documentation/usage/gradle/migrate
+//flyway {
+//    driver = 'org.sqlite.JDBC'
+//    url = "jdbc:sqlite:${projectDir}/src/main/resources/db/marketplace.db"
+//    locations = ["filesystem:${projectDir}/src/main/resources/db/migration"]
+//}
+//
+//jooq {
+//    version = '3.14.7'  // the default (can be omitted)
+//    edition = nu.studer.gradle.jooq.JooqEdition.OSS  // the default (can be omitted)
+//
+//    configurations {
+//        main {  // name of the jOOQ configuration
+//            generateSchemaSourceOnCompilation = true  // default (can be omitted)
+//
+//            generationTool {
+//                logging = org.jooq.meta.jaxb.Logging.WARN
+//                jdbc {
+//                    driver = 'org.sqlite.JDBC'
+//                    url = 'jdbc:sqlite:src/main/resources/db/marketplace.db'
+//                }
+//                generator {
+//                    name = 'org.jooq.codegen.DefaultGenerator'
+//                    database {
+//                        name = 'org.jooq.meta.sqlite.SQLiteDatabase'
+//                    }
+//                    generate {
+//                        relations = true
+//                        deprecated = false
+//                        records = true
+//                        javaTimeTypes = true
+//                        immutablePojos = true
+//                        fluentSetters = true
+//                    }
+//                    target {
+//                        packageName = 'com.marketplace.evenstore.jooq'
+//                        directory = 'src/main/jooq'  // default (can be omitted)
+//                    }
+//                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//generateJooq.dependsOn(flywayMigrate)

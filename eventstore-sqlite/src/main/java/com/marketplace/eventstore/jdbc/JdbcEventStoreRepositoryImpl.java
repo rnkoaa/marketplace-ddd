@@ -104,14 +104,15 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     @Override
     public Result<Integer> save(String streamId, List<VersionedEvent> events, int expectedVersion) {
         int latestVersion = getVersion(streamId);
-        int nextVersion = latestVersion + 1;
+        int startSeries = latestVersion + 1;
+        int nextVersion = latestVersion + events.size();
         if ((expectedVersion == 0) || (nextVersion != expectedVersion)) {
             String errMessage = "invalid expected version, latest version is %d, expected version is %d";
             return Result.error(new InvalidVersionException(String.format(errMessage, latestVersion, expectedVersion)));
         }
 
         List<EventDataRecord> eventDataRecords = IntStream.range(0, events.size())
-            .mapToObj(index -> new EventDataVersion(nextVersion + index, events.get(index)))
+            .mapToObj(index -> new EventDataVersion(startSeries + index, events.get(index)))
             .peek(eventVersion -> eventClassCache.put(eventVersion.event.getClass()))
             .map(eventVersion -> {
                 Result<String> result = serializeJson(objectMapper, eventVersion.event);

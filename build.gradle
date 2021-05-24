@@ -16,7 +16,6 @@ java {
 //    }
 }
 
-
 group 'com.marketplace'
 version '1.0.0-SNAPSHOT'
 
@@ -29,18 +28,18 @@ sourceSets {
     main {
         java.srcDirs += "$buildDir/generated/sources/annotationProcessor/java"
     }
-    integration {
-        java.srcDir "$projectDir/src/integration/groovy"
-        resources.srcDir "$projectDir/src/integration/resources"
+    intTest {
+        java.srcDir "$projectDir/src/intTest/groovy"
+        resources.srcDir "$projectDir/src/intTest/resources"
         compileClasspath += main.output + test.output
         runtimeClasspath += main.output + test.output
     }
+}
 
-    functional {
-        java.srcDir "$projectDir/src/functional/groovy"
-        resources.srcDir "$projectDir/src/functional/resources"
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
+idea {
+    module {
+        testSourceDirs += sourceSets.intTest.java.srcDirs
+        testResourceDirs += sourceSets.intTest.resources.srcDirs
     }
 }
 
@@ -48,18 +47,13 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-    integrationImplementation {
+    intTestImplementation {
         extendsFrom testImplementation
     }
-    integrationRuntime {
+    intTestRuntime {
         extendsFrom testRuntimeClasspath
     }
-    functionalImplementation {
-        extendsFrom testImplementation
-    }
-    functionalRuntime {
-        extendsFrom testRuntimeClasspath
-    }
+
     flywayMigration
 }
 
@@ -81,9 +75,6 @@ dependencies {
 
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("org.slf4j:slf4j-log4j12:1.7.30")
-
-    integrationImplementation("org.slf4j:slf4j-api:1.7.30")
-    integrationImplementation("org.slf4j:slf4j-log4j12:1.7.30")
 
     implementation("com.sparkjava:spark-core:2.9.3")
 
@@ -115,8 +106,8 @@ dependencies {
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
     testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
 
-    functionalImplementation("org.spockframework:spock-core:1.3-groovy-2.5")
-
+    intTestImplementation("org.slf4j:slf4j-api:1.7.30")
+    intTestImplementation("org.slf4j:slf4j-log4j12:1.7.30")
 }
 
 test {
@@ -148,30 +139,23 @@ allprojects {
     }
 }
 
-task integrationTest(type: Test) {
-    testClassesDirs = sourceSets.integration.output.classesDirs
-    classpath = sourceSets.integration.runtimeClasspath
-}
-task functionalTest(type: Test) {
-    testClassesDirs = sourceSets.functional.output.classesDirs
-    classpath = sourceSets.functional.runtimeClasspath
+task intTest(type: Test) {
+    description = 'Runs the functional tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.intTest.output.classesDirs
+    classpath = sourceSets.intTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+    mustRunAfter test
 }
 
-integrationTest {
+intTest {
     useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"
     }
 }
 
-functionalTest {
-    useJUnitPlatform()
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-}
-
-check.dependsOn integrationTest
+check.dependsOn intTest
 
 subprojects {
     repositories {
@@ -179,17 +163,11 @@ subprojects {
         mavenCentral()
     }
 
-    processIntegrationResources {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    }
-    processFunctionalResources {
+    processIntTestResources {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 }
-processIntegrationResources {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
-processFunctionalResources {
+processIntTestResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 

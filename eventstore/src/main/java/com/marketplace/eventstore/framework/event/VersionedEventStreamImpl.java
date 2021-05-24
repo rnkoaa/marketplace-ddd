@@ -1,6 +1,5 @@
 package com.marketplace.eventstore.framework.event;
 
-import com.marketplace.cqrs.event.Event;
 import com.marketplace.cqrs.event.VersionedEvent;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -9,25 +8,17 @@ import java.util.List;
 public class VersionedEventStreamImpl implements EventStream<VersionedEvent> {
 
     private List<VersionedEvent> events;
-    private List<VersionedEvent> changes;
     private final String id;
     private final String name;
     private int version;
     private final Instant createdAt;
     private Instant updatedAt;
 
-    public VersionedEventStreamImpl(String id, String name, int version, Instant createdAt) {
-        this(id, name, version, createdAt, Instant.now());
-    }
-
-    public VersionedEventStreamImpl(String id) {
-        this(id, "", 0, Instant.now(), Instant.now());
-    }
-
     public VersionedEventStreamImpl(String id, String name, int version, List<VersionedEvent> events) {
         this(id, name, version, Instant.now(), Instant.now());
-        this.events = events;
-        this.changes = new ArrayList<>();
+        if (this.events != null) {
+            this.events = events;
+        }
     }
 
     public VersionedEventStreamImpl(
@@ -38,7 +29,6 @@ public class VersionedEventStreamImpl implements EventStream<VersionedEvent> {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.events = new ArrayList<>();
-        this.changes = new ArrayList<>();
     }
 
     @Override
@@ -72,15 +62,15 @@ public class VersionedEventStreamImpl implements EventStream<VersionedEvent> {
     }
 
     @Override
-    public void append(VersionedEvent event, int expectedVersion) {
-        this.version = expectedVersion;
-        this.updatedAt = Instant.now();
-        this.changes.add(event);
+    public boolean isEmpty() {
+        return this.events.isEmpty();
     }
 
     @Override
-    public List<VersionedEvent> getChanges(){
-        return changes;
+    public void append(VersionedEvent event, int expectedVersion) {
+        this.version = expectedVersion;
+        this.updatedAt = Instant.now();
+        this.events.add(event);
     }
 
     @Override

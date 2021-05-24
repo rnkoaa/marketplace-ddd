@@ -5,6 +5,7 @@ package com.marketplace.evenstore.jooq.tables;
 
 
 import com.marketplace.evenstore.jooq.DefaultSchema;
+import com.marketplace.evenstore.jooq.Indexes;
 import com.marketplace.evenstore.jooq.Keys;
 import com.marketplace.evenstore.jooq.tables.records.UserProfileRecord;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row8;
@@ -53,24 +55,24 @@ public class UserProfile extends TableImpl<UserProfileRecord> {
     public final TableField<UserProfileRecord, String> ID = createField(DSL.name("id"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>user_profile.firstName</code>.
+     * The column <code>user_profile.first_name</code>.
      */
-    public final TableField<UserProfileRecord, String> FIRSTNAME = createField(DSL.name("firstName"), SQLDataType.CLOB, this, "");
+    public final TableField<UserProfileRecord, String> FIRST_NAME = createField(DSL.name("first_name"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
-     * The column <code>user_profile.lastName</code>.
+     * The column <code>user_profile.last_name</code>.
      */
-    public final TableField<UserProfileRecord, String> LASTNAME = createField(DSL.name("lastName"), SQLDataType.CLOB, this, "");
+    public final TableField<UserProfileRecord, String> LAST_NAME = createField(DSL.name("last_name"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
-     * The column <code>user_profile.middleName</code>.
+     * The column <code>user_profile.middle_name</code>.
      */
-    public final TableField<UserProfileRecord, String> MIDDLENAME = createField(DSL.name("middleName"), SQLDataType.CLOB, this, "");
+    public final TableField<UserProfileRecord, String> MIDDLE_NAME = createField(DSL.name("middle_name"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>user_profile.displayName</code>.
+     * The column <code>user_profile.display_name</code>.
      */
-    public final TableField<UserProfileRecord, String> DISPLAYNAME = createField(DSL.name("displayName"), SQLDataType.CLOB, this, "");
+    public final TableField<UserProfileRecord, String> DISPLAY_NAME = createField(DSL.name("display_name"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>user_profile.photos</code>.
@@ -123,6 +125,11 @@ public class UserProfile extends TableImpl<UserProfileRecord> {
     @Override
     public Schema getSchema() {
         return DefaultSchema.DEFAULT_SCHEMA;
+    }
+
+    @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.IDX_USER_PROFILE_DISPLAYNAME);
     }
 
     @Override

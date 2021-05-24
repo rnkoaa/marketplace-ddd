@@ -1,14 +1,17 @@
 package com.marketplace.cqrs.framework;
 
+import com.marketplace.cqrs.event.EventId;
 import com.marketplace.cqrs.event.VersionedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AggregateRoot<T, U extends VersionedEvent> implements InternalEventHandler<U>, EventApplier {
+public abstract class AggregateRoot<T extends EventId, U extends VersionedEvent> implements InternalEventHandler<U>, EventApplier {
 
     private final List<VersionedEvent> changes;
     private int version;
+
+    public abstract T getId();
 
     public int getVersion() {
         return version;
@@ -32,7 +35,6 @@ public abstract class AggregateRoot<T, U extends VersionedEvent> implements Inte
             incrementVersion();
         });
     }
-
 
     public void incrementVersion() {
         version++;
@@ -58,4 +60,8 @@ public abstract class AggregateRoot<T, U extends VersionedEvent> implements Inte
     public void handle(VersionedEvent event) {
         when(event);
     }
+
+    public  String getStreamId() {
+        return getClass().getSimpleName() + ":" + getId().toString();
+    };
 }

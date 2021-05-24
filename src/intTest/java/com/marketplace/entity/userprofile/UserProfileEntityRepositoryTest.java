@@ -57,13 +57,13 @@ public class UserProfileEntityRepositoryTest extends BaseRepositoryTest {
 
     public static UserProfileRecord generateUserProfile() {
         return new UserProfileRecord()
-            .setFirstname("hello")
+            .setFirstName("hello")
             .setId("ede8048e-2155-40d8-b9bf-49f96166d274")
-            .setLastname("world")
-            .setDisplayname("helloworld")
+            .setLastName("world")
+            .setDisplayName("helloworld")
             .setCreated(Instant.now().toString())
             .setUpdated(Instant.now().toString())
-            .setMiddlename("h.");
+            .setMiddleName("h.");
     }
 
     public static void saveUserProfileRecord(DSLContext dslContext, UserProfileRecord userProfileRecord) {
