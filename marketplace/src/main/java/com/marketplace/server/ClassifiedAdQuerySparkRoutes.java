@@ -28,6 +28,7 @@ public class ClassifiedAdQuerySparkRoutes extends ClassifiedAdBaseRoutes {
   @Inject
   public ClassifiedAdQuerySparkRoutes(
       ObjectMapper objectMapper, ClassifiedAdQueryController classifiedAdQueryController) {
+    super(objectMapper);
     this.objectMapper = objectMapper;
     this.classifiedAdQueryController = classifiedAdQueryController;
   }

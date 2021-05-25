@@ -6,6 +6,7 @@ import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.UserProfile;
+import io.vavr.control.Try;
 import java.util.Optional;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -23,18 +24,14 @@ public class UserProfileCommandService {
         this.aggregateStoreRepository = aggregateStoreRepository;
     }
 
-    public CommandHandlerResult<CreateUserProfileResult> handle(CreateUserProfileCommand command) {
+    public Try<CreateUserProfileResult> handle(CreateUserProfileCommand command) {
         var userId = UserId.newId();
         var displayName = new DisplayName(command.getDisplayName());
         UserProfile userProfile = new UserProfile(userId, command.fullName(), displayName);
-        var saved = aggregateStoreRepository.add(userProfile);
-        return saved.map(user -> ImmutableCommandHandlerResult.<CreateUserProfileResult>builder()
-            .result(ImmutableCreateUserProfileResult.builder().id(user.getId().id()).build())
-            .isSuccessful(true)
-            .build())
-            .orElseGet(() -> ImmutableCommandHandlerResult.<CreateUserProfileResult>builder()
-                .isSuccessful(false)
-                .message("failed to create user, please try again")
+
+        return Try.of(() -> aggregateStoreRepository.add(userProfile))
+            .map(user -> ImmutableCreateUserProfileResult.builder()
+                .id(userId.id())
                 .build());
     }
 
