@@ -39,6 +39,11 @@ dependencies {
     compileOnly("org.immutables:value:${immutablesVersion}")
     annotationProcessor("org.immutables:value:${immutablesVersion}")
 
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
+
     implementation 'io.projectreactor:reactor-core:3.4.0'
     implementation("com.google.guava:guava:30.0-jre")
 
@@ -57,7 +62,7 @@ dependencies {
 
     testFixturesCompileOnly("org.immutables:value:${immutablesVersion}")
     testFixturesAnnotationProcessor("org.immutables:value:${immutablesVersion}")
-//    annotationProcessor("org.immutables:value:${immutablesVersion}")
+
     testFixturesApi "com.google.guava:guava:30.0-jre"
 
 }

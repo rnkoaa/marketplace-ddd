@@ -30,14 +30,16 @@ public class UserProfileCommandService {
         UserProfile userProfile = new UserProfile(userId, command.fullName(), displayName);
 
         return Try.of(() -> aggregateStoreRepository.add(userProfile))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
             .map(user -> ImmutableCreateUserProfileResult.builder()
-                .id(userId.id())
+                .id(user.getId().id())
                 .build());
     }
 
     public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserProfileCommand command) {
         return aggregateStoreRepository.load(UserId.from(command.getUserId()))
-            .map(it -> (UserProfile)it)
+            .map(it -> (UserProfile) it)
             .flatMap(userProfile -> {
                 userProfile.updatePhoto(command.getPhotoUrl());
                 return doUserProfileUpdate(command.getUserId(), userProfile);
@@ -53,8 +55,8 @@ public class UserProfileCommandService {
 
     public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserFullNameCommand command) {
         return aggregateStoreRepository.load(UserId.from(command.getUserId()))
-            .map(it -> (UserProfile)it)
-            .flatMap(userProfile -> updateUserFullName(command,  userProfile))
+            .map(it -> (UserProfile) it)
+            .flatMap(userProfile -> updateUserFullName(command, userProfile))
             .orElse(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
                 .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
                 .isSuccessful(false)
@@ -65,7 +67,7 @@ public class UserProfileCommandService {
     public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserDisplayNameCommand command) {
         return aggregateStoreRepository
             .load(UserId.from(command.getUserId()))
-            .map(it -> (UserProfile)it)
+            .map(it -> (UserProfile) it)
             .flatMap(userProfile -> updateUserDisplayName(command, userProfile))
             .orElse(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
                 .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())

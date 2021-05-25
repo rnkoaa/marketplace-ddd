@@ -1,16 +1,15 @@
 package com.marketplace.eventstore.test.data;
 
-import com.marketplace.cqrs.event.Event;
 import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.eventstore.test.events.ImmutableTestCreatedEvent;
 import com.marketplace.eventstore.test.events.ImmutableTestTextUpdatedEvent;
 import com.marketplace.eventstore.test.events.ImmutableTestTitleUpdatedEvent;
+import com.marketplace.eventstore.test.events.TestCreatedEvent;
 import com.marketplace.eventstore.test.events.TestTextUpdatedEvent;
 import com.marketplace.eventstore.test.events.TestTitleUpdatedEvent;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import com.marketplace.eventstore.test.events.TestCreatedEvent;
 
 public class TestEvents {
 
