@@ -16,16 +16,16 @@ import org.immutables.value.Value.Immutable;
 public abstract class UpdateUserFullNameCommand {
 
     @JsonProperty("user_id")
-    abstract UUID getUserId();
+    public abstract UUID getUserId();
 
     @JsonProperty("first_name")
-    abstract String getFirstName();
+    public abstract String getFirstName();
 
     @JsonProperty("last_name")
-    abstract String getLastName();
+    public abstract String getLastName();
 
     @JsonProperty("middle_name")
-    abstract Optional<String> getMiddleName();
+    public abstract Optional<String> getMiddleName();
 
     @JsonIgnore
     public FullName fullName() {

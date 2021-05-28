@@ -3,6 +3,7 @@ package com.marketplace.domain.userprofile;
 import com.marketplace.cqrs.framework.Strings;
 
 public record DisplayName(String value) {
+
     public DisplayName {
         if (Strings.isNullOrEmpty(value)) {
             throw new IllegalArgumentException("display name cannot be null or empty");

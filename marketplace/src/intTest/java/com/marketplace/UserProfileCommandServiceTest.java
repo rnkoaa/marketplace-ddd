@@ -10,15 +10,18 @@ import com.marketplace.config.ConfigLoader;
 import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
 import com.marketplace.domain.AggregateStoreRepository;
+import com.marketplace.domain.shared.UserId;
+import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.domain.userprofile.UserProfileEventListener;
 import com.marketplace.domain.userprofile.controller.CreateUserProfileResult;
 import com.marketplace.domain.userprofile.controller.DuplicateDisplayNameException;
+import com.marketplace.domain.userprofile.controller.UpdateUserDisplayNameCommand;
 import com.marketplace.domain.userprofile.controller.UpdateUserFullNameCommand;
 import com.marketplace.domain.userprofile.controller.UpdateUserProfileResult;
 import com.marketplace.domain.userprofile.controller.UserProfileCommandService;
 import com.marketplace.domain.userprofile.entity.UserProfileEntity;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
-import com.marketplace.fixtures.LoadUpdateUserFullName;
+import com.marketplace.fixtures.LoadUpdateUserCommands;
 import com.marketplace.fixtures.UserProfileFixture;
 import io.vavr.control.Try;
 import java.io.IOException;
@@ -91,7 +94,7 @@ public class UserProfileCommandServiceTest extends AbstractContainerInitializer 
         assertThat(createUserProfileResults.isSuccess()).isTrue();
 
         CreateUserProfileResult createUserProfileResult = createUserProfileResults.get();
-        UpdateUserFullNameCommand updateUserFullNameCommand = LoadUpdateUserFullName
+        UpdateUserFullNameCommand updateUserFullNameCommand = LoadUpdateUserCommands
             .load(createUserProfileResult.getId());
 
         Try<UpdateUserProfileResult> updateUserProfileResults = userProfileCommandService
@@ -106,6 +109,47 @@ public class UserProfileCommandServiceTest extends AbstractContainerInitializer 
         UserProfileEntity entity = mayBeUserProfileEntity.get();
         assertThat(entity.getFirstName()).isEqualTo(updateUserFullNameCommand.fullName().firstName());
         assertThat(entity.getLastName()).isEqualTo(updateUserFullNameCommand.fullName().lastName());
+
+        updateUserFullNameCommand.getUserId();
+        Optional<UserProfile> loadedUserProfile = aggregateStoreRepository
+            .load(new UserId(updateUserFullNameCommand.getUserId()))
+            .map(it -> (UserProfile) it);
+
+        assertThat(loadedUserProfile).isPresent();
+        UserProfile profile = loadedUserProfile.get();
+        assertThat(profile.getFullName().firstName()).isEqualTo(updateUserFullNameCommand.fullName().firstName());
+        assertThat(profile.getFullName().lastName()).isEqualTo(updateUserFullNameCommand.fullName().lastName());
+    }
+
+    @Test
+    void testUserDisplayNameCanBeUpdatedForExistingUser() throws IOException {
+        var userProfileCommand = UserProfileFixture.loadCreateUserProfileDto();
+        Try<CreateUserProfileResult> createUserProfileResults = userProfileCommandService.handle(userProfileCommand);
+        assertThat(createUserProfileResults.isSuccess()).isTrue();
+
+        CreateUserProfileResult createUserProfileResult = createUserProfileResults.get();
+        UpdateUserDisplayNameCommand updateUserFullNameCommand = LoadUpdateUserCommands
+            .loadDisplayUpdate(createUserProfileResult.getId());
+
+        Try<UpdateUserProfileResult> updateUserProfileResults = userProfileCommandService
+            .handle(updateUserFullNameCommand);
+        assertThat(updateUserProfileResults.isSuccess()).isTrue();
+
+        Optional<UserProfileEntity> mayBeUserProfileEntity = userProfileQueryRepository
+            .findById(createUserProfileResult.getId());
+
+        assertThat(mayBeUserProfileEntity).isPresent();
+
+        UserProfileEntity entity = mayBeUserProfileEntity.get();
+        assertThat(entity.getDisplayName()).isEqualTo(updateUserFullNameCommand.displayName().toString());
+
+        Optional<UserProfile> loadedUserProfile = aggregateStoreRepository
+            .load(new UserId(updateUserFullNameCommand.getUserId()))
+            .map(it -> (UserProfile) it);
+
+        assertThat(loadedUserProfile).isPresent();
+        UserProfile profile = loadedUserProfile.get();
+        assertThat(profile.getDisplayName()).isEqualTo(updateUserFullNameCommand.displayName());
     }
 
     @AfterEach

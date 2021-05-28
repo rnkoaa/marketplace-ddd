@@ -67,7 +67,7 @@ public class UserProfileEventListener {
             .flatMap(userProfileEntity -> {
                 UserProfileEntity modifiedUserProfileEntity = ImmutableUserProfileEntity.copyOf(userProfileEntity)
                     .withDisplayName(event.getDisplayName());
-                return userProfileQueryRepository.save(modifiedUserProfileEntity);
+                return userProfileQueryRepository.update(modifiedUserProfileEntity);
             });
         if (maybeUpdateUserProfile.isEmpty()) {
             LOGGER.info("error updating display name {}", event);
@@ -80,14 +80,13 @@ public class UserProfileEventListener {
             .flatMap(userProfileEntity -> {
                 UserProfileEntity modifiedUserProfileEntity = ImmutableUserProfileEntity.copyOf(userProfileEntity)
                     .withPhotoUrl(event.getPhotoUrl());
-                return userProfileQueryRepository.save(modifiedUserProfileEntity);
+                return userProfileQueryRepository.update(modifiedUserProfileEntity);
             });
         if (maybeUpdateUserProfile.isEmpty()) {
             LOGGER.info("error updating display name {}", event);
         }
     }
 
-    @Subscribe
     public static UserProfileEntity createFromEvent(UserRegistered event) {
         Builder builder = ImmutableUserProfileEntity.builder()
             .id(event.getUserId())
