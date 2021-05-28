@@ -9,7 +9,6 @@ public interface CommandHandlerResult<T> {
 
     Optional<T> getResult();
 
-    //  @JsonProperty("successful")
     boolean isSuccessful();
 
     Optional<String> getMessage();

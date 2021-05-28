@@ -1,6 +1,7 @@
 package com.marketplace.domain.userprofile.controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marketplace.domain.userprofile.FullName;
@@ -14,13 +15,17 @@ import org.immutables.value.Value.Immutable;
 @JsonSerialize(as = ImmutableUpdateUserFullNameCommand.class)
 public abstract class UpdateUserFullNameCommand {
 
-    abstract UUID getUserId();
+    @JsonProperty("user_id")
+    public abstract UUID getUserId();
 
-    abstract String getFirstName();
+    @JsonProperty("first_name")
+    public abstract String getFirstName();
 
-    abstract String getLastName();
+    @JsonProperty("last_name")
+    public abstract String getLastName();
 
-    abstract Optional<String> getMiddleName();
+    @JsonProperty("middle_name")
+    public abstract Optional<String> getMiddleName();
 
     @JsonIgnore
     public FullName fullName() {

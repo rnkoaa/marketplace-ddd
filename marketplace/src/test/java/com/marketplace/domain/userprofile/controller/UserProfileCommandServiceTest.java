@@ -2,7 +2,6 @@ package com.marketplace.domain.userprofile.controller;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-import com.marketplace.cqrs.command.CommandHandlerResult;
 import com.marketplace.cqrs.event.EventId;
 import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.cqrs.framework.AggregateRoot;
@@ -11,6 +10,8 @@ import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
+import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
+import io.vavr.control.Try;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,12 +26,13 @@ class UserProfileCommandServiceTest {
 
     @Mock
     AggregateStoreRepository aggregateStoreRepository;
-
+    @Mock
+    UserProfileQueryRepository userProfileQueryRepository;
     private UserProfileCommandService userProfileCommandService;
 
     @BeforeEach
     void setup() {
-        userProfileCommandService = new UserProfileCommandService(aggregateStoreRepository);
+        userProfileCommandService = new UserProfileCommandService(userProfileQueryRepository, aggregateStoreRepository);
     }
 
     @Test
@@ -42,23 +44,24 @@ class UserProfileCommandServiceTest {
             .middleName("Goka")
             .displayName("tucci")
             .build();
-
+//
         var expectedUserProfile = new UserProfile(UserId.from(expectedUserId), createCommand.fullName(),
             createCommand.displayName());
 
         Mockito.when(aggregateStoreRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.of(expectedUserProfile));
-        CommandHandlerResult<CreateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
+        Try<CreateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
         assertThat(handle).isNotNull();
 
-        assertThat(handle.isSuccessful()).isTrue();
-        Optional<CreateUserProfileResult> result = handle.getResult();
+        assertThat(handle.isSuccess()).isTrue();
+        Optional<CreateUserProfileResult> result = handle.toJavaOptional();
         assertThat(result).isPresent();
         CreateUserProfileResult createUserProfileResult = result.get();
 
         assertThat(createUserProfileResult.getId()).isEqualTo(expectedUserId);
     }
 
+    //
     @Test
     void testFailedCreateWillFailCreatingUser() {
         var createCommand = ImmutableCreateUserProfileCommand.builder()
@@ -70,14 +73,11 @@ class UserProfileCommandServiceTest {
 
         Mockito.when(aggregateStoreRepository.add(Mockito.any(UserProfile.class)))
             .thenReturn(Optional.empty());
-        CommandHandlerResult<CreateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
+        Try<CreateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
         assertThat(handle).isNotNull();
 
-        assertThat(handle.isSuccessful()).isFalse();
-        assertThat(handle.getResult()).isNotPresent();
-        assertThat(handle.getMessage()).isPresent()
-            .get()
-            .isEqualTo("failed to create user, please try again");
+        assertThat(handle.isSuccess()).isFalse();
+        assertThat(handle.toJavaOptional()).isNotPresent();
     }
 
     @Test
@@ -97,16 +97,9 @@ class UserProfileCommandServiceTest {
 
         Mockito.when(aggregateStoreRepository.load(expectedUserProfile.getId()))
             .thenReturn(Optional.of(expectedUserProfile));
+        Try<UpdateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(createCommand);
-        assertThat(handle).isNotNull();
-
-        assertThat(handle.isSuccessful()).isTrue();
-        Optional<UpdateUserProfileResult> result = handle.getResult();
-        assertThat(result).isPresent();
-        UpdateUserProfileResult updateUserProfileResult = result.get();
-
-        assertThat(updateUserProfileResult.getId()).isEqualTo(expectedUserId);
+        assertThat(handle.isSuccess()).isTrue();
     }
 
     @Test
@@ -120,16 +113,13 @@ class UserProfileCommandServiceTest {
         Mockito.when(aggregateStoreRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.empty());
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
+        Try<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
         assertThat(handle).isNotNull();
 
-        assertThat(handle.isSuccessful()).isFalse();
-        assertThat(handle.getMessage()).isNotEmpty()
-            .isEqualTo(Optional.of("user with id ddfa7983-e2ff-413c-937b-1e6aa800f6d8 was not found to be updated."));
-        Optional<UpdateUserProfileResult> result = handle.getResult();
-        assertThat(result).isPresent();
+        assertThat(handle.isSuccess()).isFalse();
     }
 
+    //
     @Test
     void testAnyFailureUpdatesWillReturnEmpty() {
         var expectedUserId = UUID.fromString("ddfa7983-e2ff-413c-937b-1e6aa800f6d8");
@@ -148,16 +138,13 @@ class UserProfileCommandServiceTest {
         Mockito.when(aggregateStoreRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.of(expectedUserProfile));
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
+        Try<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
         assertThat(handle).isNotNull();
 
-        assertThat(handle.isSuccessful()).isFalse();
-        assertThat(handle.getMessage()).isNotEmpty()
-            .isEqualTo(Optional.of("failed to update user, please try again"));
-        Optional<UpdateUserProfileResult> result = handle.getResult();
-        assertThat(result).isPresent();
+        assertThat(handle.isSuccess()).isFalse();
     }
 
+    //
     @Test
     void testUserProfileFullNameCanBeUpdated() {
         var expectedUserId = UUID.fromString("ddfa7983-e2ff-413c-937b-1e6aa800f6d8");
@@ -177,11 +164,11 @@ class UserProfileCommandServiceTest {
         Mockito.when(aggregateStoreRepository.load(expectedUserProfile.getId()))
             .thenReturn(Optional.of(expectedUserProfile));
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
+        Try<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
         assertThat(handle).isNotNull();
 
-        assertThat(handle.isSuccessful()).isTrue();
-        Optional<UpdateUserProfileResult> result = handle.getResult();
+        assertThat(handle.isSuccess()).isTrue();
+        Optional<UpdateUserProfileResult> result = handle.toJavaOptional();
         assertThat(result).isPresent();
         UpdateUserProfileResult updateUserProfileResult = result.get();
 
@@ -200,14 +187,10 @@ class UserProfileCommandServiceTest {
         Mockito.when(aggregateStoreRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.empty());
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
+        Try<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
         assertThat(handle).isNotNull();
 
-        assertThat(handle.isSuccessful()).isFalse();
-        assertThat(handle.getMessage()).isNotEmpty()
-            .isEqualTo(Optional.of("user with id ddfa7983-e2ff-413c-937b-1e6aa800f6d8 was not found to be updated."));
-        Optional<UpdateUserProfileResult> result = handle.getResult();
-        assertThat(result).isPresent();
+        assertThat(handle.isSuccess()).isFalse();
     }
 
     @Test
@@ -228,14 +211,10 @@ class UserProfileCommandServiceTest {
         Mockito.when(aggregateStoreRepository.load(UserId.from(expectedUserId)))
             .thenReturn(Optional.of(expectedUserProfile));
 
-        CommandHandlerResult<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
+        Try<UpdateUserProfileResult> handle = userProfileCommandService.handle(updateCommand);
         assertThat(handle).isNotNull();
 
-        assertThat(handle.isSuccessful()).isFalse();
-        assertThat(handle.getMessage()).isNotEmpty()
-            .isEqualTo(Optional.of("failed to update user, please try again"));
-        Optional<UpdateUserProfileResult> result = handle.getResult();
-        assertThat(result).isPresent();
+        assertThat(handle.isSuccess()).isFalse();
     }
 
 }

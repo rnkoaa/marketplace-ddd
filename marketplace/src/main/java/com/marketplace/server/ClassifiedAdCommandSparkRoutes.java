@@ -27,13 +27,12 @@ import spark.Route;
 public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ClassifiedAdCommandSparkRoutes.class);
-  public static final String HEADER_CONTENT_TYPE = "Content-Type";
-  public static final String NO_CONTENT = "";
   private final ObjectMapper objectMapper;
   private final ClassifiedAdController classifiedAdController;
 
   @Inject
   public ClassifiedAdCommandSparkRoutes(ObjectMapper objectMapper, ClassifiedAdController classifiedAdController) {
+      super(objectMapper);
     this.objectMapper = objectMapper;
     this.classifiedAdController = classifiedAdController;
   }
@@ -233,7 +232,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
 
   public String serializeResponse(Object object) {
     return Try.of(() -> objectMapper.writeValueAsString(object))
-        .onFailure(ex -> LOGGER.info("error while serialing object with message {}", ex.getMessage()))
+        .onFailure(ex -> LOGGER.info("error while serializing object with message {}", ex.getMessage()))
         .getOrElse("");
   }
 

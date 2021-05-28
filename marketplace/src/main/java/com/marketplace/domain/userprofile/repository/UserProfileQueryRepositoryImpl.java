@@ -32,6 +32,15 @@ public class UserProfileQueryRepositoryImpl implements UserProfileQueryRepositor
     }
 
     @Override
+    public Optional<UserProfileEntity> findByDisplayName(String displayName) {
+        return dslContext.select()
+            .from(Tables.USER_PROFILE)
+            .where(Tables.USER_PROFILE.DISPLAY_NAME.eq(displayName))
+            .fetchOptionalInto(UserProfileRecord.class)
+            .map(UserProfileMapper::convert);
+    }
+
+    @Override
     public List<UserProfileEntity> findAll() {
         return dslContext.select()
             .from(Tables.USER_PROFILE)
@@ -39,6 +48,17 @@ public class UserProfileQueryRepositoryImpl implements UserProfileQueryRepositor
             .stream()
             .map(UserProfileMapper::convert)
             .toList();
+    }
+
+    @Override
+    public Optional<UserProfileEntity> update(UserProfileEntity entity) {
+        UserProfileRecord userProfileRecord = UserProfileMapper.convert(entity);
+        userProfileRecord.setUpdated(Instant.now().toString());
+        return dslContext.update(Tables.USER_PROFILE)
+            .set(userProfileRecord)
+            .returning(Tables.USER_PROFILE.ID)
+            .fetchOptional()
+            .map(it -> entity);
     }
 
     @Override

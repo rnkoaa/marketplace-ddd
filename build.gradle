@@ -28,25 +28,15 @@ subprojects {
 //        languageVersion = JavaLanguageVersion.of(15)
 //    }
     }
+//
 
-    sourceSets {
-        main {
-            java.srcDirs += "$buildDir/generated/sources/annotationProcessor/java"
-        }
-        intTest {
-            java.srcDir "$projectDir/src/intTest/groovy"
-            resources.srcDir "$projectDir/src/intTest/resources"
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-        }
-    }
-
-    idea {
-        module {
-            testSourceDirs += sourceSets.intTest.java.srcDirs
-            testResourceDirs += sourceSets.intTest.resources.srcDirs
-        }
-    }
+//
+//    idea {
+//        module {
+//            testSourceDirs += sourceSets.intTest.java.srcDirs
+//            testResourceDirs += sourceSets.intTest.resources.srcDirs
+//        }
+//    }
 
     configurations {
         compileOnly {
@@ -77,33 +67,33 @@ subprojects {
         mavenLocal()
         mavenCentral()
     }
-
-    test {
-        useJUnitPlatform()
-        testLogging {
-            events "passed", "skipped", "failed"
-        }
-    }
-
-    task intTest(type: Test) {
-        description = 'Runs the functional tests.'
-        group = 'verification'
-        testClassesDirs = sourceSets.intTest.output.classesDirs
-        classpath = sourceSets.intTest.runtimeClasspath
-        outputs.upToDateWhen { false }
-        mustRunAfter test
-    }
-
-    intTest {
-        useJUnitPlatform()
-        testLogging {
-            events "passed", "skipped", "failed"
-        }
-    }
-
-    check.dependsOn intTest
-
-    processIntTestResources {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    }
+//
+//    test {
+//        useJUnitPlatform()
+//        testLogging {
+//            events "passed", "skipped", "failed"
+//        }
+//    }
+//
+//    task intTest(type: Test) {
+//        description = 'Runs the functional tests.'
+//        group = 'verification'
+//        testClassesDirs = sourceSets.intTest.output.classesDirs
+//        classpath = sourceSets.intTest.runtimeClasspath
+//        outputs.upToDateWhen { false }
+//        mustRunAfter test
+//    }
+//
+//    intTest {
+//        useJUnitPlatform()
+//        testLogging {
+//            events "passed", "skipped", "failed"
+//        }
+//    }
+//
+//    check.dependsOn intTest
+//
+//    processIntTestResources {
+//        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+//    }
 }

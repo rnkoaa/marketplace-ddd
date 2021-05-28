@@ -25,6 +25,13 @@ sourceSets {
     }
 }
 
+idea {
+    module {
+        testSourceDirs += sourceSets.intTest.java.srcDirs
+        testResourceDirs += sourceSets.intTest.resources.srcDirs
+    }
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -65,6 +72,8 @@ dependencies {
 
     compileOnly 'org.immutables:value:2.8.8'
     annotationProcessor 'org.immutables:value:2.8.8'
+
+    implementation("com.google.guava:guava:30.0-jre")
 
     // some functional implementations
     implementation('io.vavr:vavr:1.0.0-alpha-3')
