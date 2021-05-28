@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.sqlite.SQLiteConfig;
 
 @Module
 public abstract class JooqModule {
@@ -19,10 +20,15 @@ public abstract class JooqModule {
     public static DSLContext provideDSLContext(ApplicationConfig applicationConfig) {
         Connection conn = null;
         try {
+            SQLiteConfig config = new SQLiteConfig();
+            config.setSharedCache(true);
+            config.enableLoadExtension(true);
+            config.enforceForeignKeys(true);
+            //displayName
             conn = DriverManager.getConnection(applicationConfig.getDb().getUrl());
 
             // we always need a foreign key support
-            enableForeignKeySupport(conn);
+//            enableForeignKeySupport(conn);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }

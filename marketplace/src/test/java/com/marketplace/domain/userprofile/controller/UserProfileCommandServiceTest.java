@@ -10,6 +10,7 @@ import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
+import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
 import io.vavr.control.Try;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,11 +26,13 @@ class UserProfileCommandServiceTest {
 
     @Mock
     AggregateStoreRepository aggregateStoreRepository;
+    @Mock
+    UserProfileQueryRepository userProfileQueryRepository;
     private UserProfileCommandService userProfileCommandService;
 
     @BeforeEach
     void setup() {
-        userProfileCommandService = new UserProfileCommandService(aggregateStoreRepository);
+        userProfileCommandService = new UserProfileCommandService(userProfileQueryRepository, aggregateStoreRepository);
     }
 
     @Test

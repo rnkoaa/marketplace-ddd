@@ -8,13 +8,12 @@ import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryRepository;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
 import com.marketplace.domain.userprofile.UserProfileEventListener;
+import com.marketplace.domain.userprofile.controller.UserProfileCommandService;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
-import com.marketplace.eventstore.framework.event.EventListener;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.server.SparkServer;
 import dagger.BindsInstance;
 import dagger.Component;
-import java.util.List;
 import javax.inject.Singleton;
 import org.jooq.DSLContext;
 
@@ -46,6 +45,8 @@ public interface ApplicationContext {
     EventBus getEventBus();
 
     UserProfileEventListener getUserProfileEventListener();
+
+    UserProfileCommandService getUsProfileCommandService();
 
     @Component.Builder
     interface Builder {

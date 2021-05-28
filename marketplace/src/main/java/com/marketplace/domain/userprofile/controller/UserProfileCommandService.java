@@ -9,6 +9,8 @@ import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.UserProfile;
+import com.marketplace.domain.userprofile.entity.UserProfileEntity;
+import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
 import io.vavr.control.Try;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,17 +23,28 @@ import javax.inject.Singleton;
 public class UserProfileCommandService {
 
     private final AggregateStoreRepository aggregateStoreRepository;
+    private final UserProfileQueryRepository userProfileQueryRepository;
 
     @Inject
-    public UserProfileCommandService(AggregateStoreRepository aggregateStoreRepository) {
+    public UserProfileCommandService(UserProfileQueryRepository userProfileQueryRepository,
+        AggregateStoreRepository aggregateStoreRepository
+    ) {
+        this.userProfileQueryRepository = userProfileQueryRepository;
         this.aggregateStoreRepository = aggregateStoreRepository;
     }
 
     public Try<CreateUserProfileResult> handle(CreateUserProfileCommand command) {
         var userId = UserId.newId();
+
+        Optional<UserProfileEntity> existingUserProfile = userProfileQueryRepository
+            .findByDisplayName(command.getDisplayName());
+        
+        if (existingUserProfile.isPresent()) {
+            return Try.failure(new DuplicateDisplayNameException(command.getDisplayName() + " already exists"));
+        }
+
         var displayName = new DisplayName(command.getDisplayName());
         UserProfile userProfile = new UserProfile(userId, command.fullName(), displayName);
-
         return Try.of(() -> aggregateStoreRepository.add(userProfile))
             .filter(Optional::isPresent)
             .map(Optional::get)

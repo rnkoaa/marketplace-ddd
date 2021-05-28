@@ -60,7 +60,6 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void userProfileCanBeCreatedAndLoaded() throws IOException {
         CreateUserProfileCommand command = UserProfileFixture.loadCreateUserProfileDto();
         assertThat(command).isNotNull();
@@ -90,7 +89,6 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void userProfileCanBeUpdated() throws IOException {
         CreateUserProfileCommand createUserProfileCmd = UserProfileFixture.loadCreateUserProfileDto();
         UpdateUserProfileCommand updateUserProfileCommand =
@@ -147,7 +145,6 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testUserProfileCanBeLoadedAndUpdated() throws IOException {
         CreateUserProfileCommand createUserProfileCmd = UserProfileFixture.loadCreateUserProfileDto();
         UpdateUserProfileCommand updateUserProfileCommand =
