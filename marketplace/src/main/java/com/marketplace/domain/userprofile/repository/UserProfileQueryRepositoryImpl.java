@@ -51,6 +51,17 @@ public class UserProfileQueryRepositoryImpl implements UserProfileQueryRepositor
     }
 
     @Override
+    public Optional<UserProfileEntity> update(UserProfileEntity entity) {
+        UserProfileRecord userProfileRecord = UserProfileMapper.convert(entity);
+        userProfileRecord.setUpdated(Instant.now().toString());
+        return dslContext.update(Tables.USER_PROFILE)
+            .set(userProfileRecord)
+            .returning(Tables.USER_PROFILE.ID)
+            .fetchOptional()
+            .map(it -> entity);
+    }
+
+    @Override
     public Optional<UserProfileEntity> save(UserProfileEntity entity) {
         var userExists = fetchRecord(entity.getId().toString());
 

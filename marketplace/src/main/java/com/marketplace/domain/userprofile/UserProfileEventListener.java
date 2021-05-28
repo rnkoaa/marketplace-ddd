@@ -48,10 +48,13 @@ public class UserProfileEventListener {
                 }
                 UserProfileEntity modifiedUserProfileEntity = ImmutableUserProfileEntity.copyOf(userProfileEntity)
                     .withFirstName(event.getFirstName())
-                    .withLastName(event.getLastName())
-                    .withMiddleName(middleName);
+                    .withLastName(event.getLastName());
+                if (!middleName.equals("")) {
+                    modifiedUserProfileEntity = ImmutableUserProfileEntity.copyOf(modifiedUserProfileEntity)
+                        .withMiddleName(middleName);
+                }
 
-                return userProfileQueryRepository.save(modifiedUserProfileEntity);
+                return userProfileQueryRepository.update(modifiedUserProfileEntity);
             });
         if (maybeUpdateUserProfile.isEmpty()) {
             LOGGER.info("error updating userprofile {}", event);

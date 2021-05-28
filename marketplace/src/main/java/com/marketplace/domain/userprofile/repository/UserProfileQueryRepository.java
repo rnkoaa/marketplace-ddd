@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface UserProfileQueryRepository extends QueryRepository<UserProfileEntity, UUID> {
 
     Optional<UserProfileEntity> findByDisplayName(String displayName);
+
+    Optional<UserProfileEntity> update(UserProfileEntity value);
 }

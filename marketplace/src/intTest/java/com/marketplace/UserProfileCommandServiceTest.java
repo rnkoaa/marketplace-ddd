@@ -13,10 +13,16 @@ import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.userprofile.UserProfileEventListener;
 import com.marketplace.domain.userprofile.controller.CreateUserProfileResult;
 import com.marketplace.domain.userprofile.controller.DuplicateDisplayNameException;
+import com.marketplace.domain.userprofile.controller.UpdateUserFullNameCommand;
+import com.marketplace.domain.userprofile.controller.UpdateUserProfileResult;
 import com.marketplace.domain.userprofile.controller.UserProfileCommandService;
+import com.marketplace.domain.userprofile.entity.UserProfileEntity;
+import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
+import com.marketplace.fixtures.LoadUpdateUserFullName;
 import com.marketplace.fixtures.UserProfileFixture;
 import io.vavr.control.Try;
 import java.io.IOException;
+import java.util.Optional;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +40,8 @@ public class UserProfileCommandServiceTest extends AbstractContainerInitializer 
 
     private UserProfileEventListener userProfileEventListener;
 
+    private UserProfileQueryRepository userProfileQueryRepository;
+
     EventBus eventBus;
 
     @BeforeEach
@@ -47,6 +55,8 @@ public class UserProfileCommandServiceTest extends AbstractContainerInitializer 
         userProfileCommandService = context.getUsProfileCommandService();
         userProfileEventListener = context.getUserProfileEventListener();
         eventBus = context.getEventBus();
+
+        userProfileQueryRepository = context.getUserProfileQueryRepository();
 
         eventBus.register(userProfileEventListener);
         cleanup();
@@ -72,6 +82,30 @@ public class UserProfileCommandServiceTest extends AbstractContainerInitializer 
         Try<CreateUserProfileResult> secondTry = userProfileCommandService.handle(userProfileCommand);
         assertThat(secondTry.isSuccess()).isFalse();
         assertThat(secondTry.getCause()).isInstanceOf(DuplicateDisplayNameException.class);
+    }
+
+    @Test
+    void testUserFullNameCanBeUpdatedForExisingUser() throws IOException {
+        var userProfileCommand = UserProfileFixture.loadCreateUserProfileDto();
+        Try<CreateUserProfileResult> createUserProfileResults = userProfileCommandService.handle(userProfileCommand);
+        assertThat(createUserProfileResults.isSuccess()).isTrue();
+
+        CreateUserProfileResult createUserProfileResult = createUserProfileResults.get();
+        UpdateUserFullNameCommand updateUserFullNameCommand = LoadUpdateUserFullName
+            .load(createUserProfileResult.getId());
+
+        Try<UpdateUserProfileResult> updateUserProfileResults = userProfileCommandService
+            .handle(updateUserFullNameCommand);
+        assertThat(updateUserProfileResults.isSuccess()).isTrue();
+
+        Optional<UserProfileEntity> mayBeUserProfileEntity = userProfileQueryRepository
+            .findById(createUserProfileResult.getId());
+
+        assertThat(mayBeUserProfileEntity).isPresent();
+
+        UserProfileEntity entity = mayBeUserProfileEntity.get();
+        assertThat(entity.getFirstName()).isEqualTo(updateUserFullNameCommand.fullName().firstName());
+        assertThat(entity.getLastName()).isEqualTo(updateUserFullNameCommand.fullName().lastName());
     }
 
     @AfterEach

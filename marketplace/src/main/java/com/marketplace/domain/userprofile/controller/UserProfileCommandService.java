@@ -8,6 +8,7 @@ import com.marketplace.cqrs.framework.AggregateRoot;
 import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
+import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.domain.userprofile.entity.UserProfileEntity;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
@@ -38,7 +39,7 @@ public class UserProfileCommandService {
 
         Optional<UserProfileEntity> existingUserProfile = userProfileQueryRepository
             .findByDisplayName(command.getDisplayName());
-        
+
         if (existingUserProfile.isPresent()) {
             return Try.failure(new DuplicateDisplayNameException(command.getDisplayName() + " already exists"));
         }
@@ -70,7 +71,11 @@ public class UserProfileCommandService {
             .map(it -> (UserProfile) it);
         return Try.ofSupplier(load::get)
             .flatMap(userProfile -> {
-                updateUserFullName(command, userProfile);
+                userProfile.updateUserFullName(
+                    new FullName(command.getFirstName(),
+                        command.getMiddleName().orElse(""),
+                        command.getLastName())
+                );
                 return doTryUpdates(userProfile);
             });
     }
