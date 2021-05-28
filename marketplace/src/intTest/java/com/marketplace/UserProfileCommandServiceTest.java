@@ -17,6 +17,7 @@ import com.marketplace.domain.userprofile.controller.CreateUserProfileResult;
 import com.marketplace.domain.userprofile.controller.DuplicateDisplayNameException;
 import com.marketplace.domain.userprofile.controller.UpdateUserDisplayNameCommand;
 import com.marketplace.domain.userprofile.controller.UpdateUserFullNameCommand;
+import com.marketplace.domain.userprofile.controller.UpdateUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.UpdateUserProfileResult;
 import com.marketplace.domain.userprofile.controller.UserProfileCommandService;
 import com.marketplace.domain.userprofile.entity.UserProfileEntity;
@@ -122,17 +123,17 @@ public class UserProfileCommandServiceTest extends AbstractContainerInitializer 
     }
 
     @Test
-    void testUserDisplayNameCanBeUpdatedForExistingUser() throws IOException {
+    void testUserProfileUrlCanBeUpdatedForExistingUser() throws IOException {
         var userProfileCommand = UserProfileFixture.loadCreateUserProfileDto();
         Try<CreateUserProfileResult> createUserProfileResults = userProfileCommandService.handle(userProfileCommand);
         assertThat(createUserProfileResults.isSuccess()).isTrue();
 
         CreateUserProfileResult createUserProfileResult = createUserProfileResults.get();
-        UpdateUserDisplayNameCommand updateUserFullNameCommand = LoadUpdateUserCommands
-            .loadDisplayUpdate(createUserProfileResult.getId());
+        UpdateUserProfileCommand updateUserProfileCommand = LoadUpdateUserCommands
+            .loadUpdateUserProfile(createUserProfileResult.getId());
 
         Try<UpdateUserProfileResult> updateUserProfileResults = userProfileCommandService
-            .handle(updateUserFullNameCommand);
+            .handle(updateUserProfileCommand);
         assertThat(updateUserProfileResults.isSuccess()).isTrue();
 
         Optional<UserProfileEntity> mayBeUserProfileEntity = userProfileQueryRepository
@@ -141,15 +142,16 @@ public class UserProfileCommandServiceTest extends AbstractContainerInitializer 
         assertThat(mayBeUserProfileEntity).isPresent();
 
         UserProfileEntity entity = mayBeUserProfileEntity.get();
-        assertThat(entity.getDisplayName()).isEqualTo(updateUserFullNameCommand.displayName().toString());
+        assertThat(entity.getPhotoUrl()).isPresent();
+        assertThat(entity.getPhotoUrl().get()).isEqualTo(updateUserProfileCommand.getPhotoUrl());
 
         Optional<UserProfile> loadedUserProfile = aggregateStoreRepository
-            .load(new UserId(updateUserFullNameCommand.getUserId()))
+            .load(new UserId(updateUserProfileCommand.getUserId()))
             .map(it -> (UserProfile) it);
 
         assertThat(loadedUserProfile).isPresent();
         UserProfile profile = loadedUserProfile.get();
-        assertThat(profile.getDisplayName()).isEqualTo(updateUserFullNameCommand.displayName());
+        assertThat(profile.getPhotoUrl()).isEqualTo(updateUserProfileCommand.getPhotoUrl());
     }
 
     @AfterEach
