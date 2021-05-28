@@ -2,6 +2,9 @@ package com.marketplace.domain.userprofile.controller;
 
 import com.marketplace.cqrs.command.CommandHandlerResult;
 import com.marketplace.cqrs.command.ImmutableCommandHandlerResult;
+import com.marketplace.cqrs.event.EventId;
+import com.marketplace.cqrs.event.VersionedEvent;
+import com.marketplace.cqrs.framework.AggregateRoot;
 import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
@@ -37,31 +40,26 @@ public class UserProfileCommandService {
                 .build());
     }
 
-    public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserProfileCommand command) {
-        return aggregateStoreRepository.load(UserId.from(command.getUserId()))
-            .map(it -> (UserProfile) it)
+    public Try<UpdateUserProfileResult> handle(UpdateUserProfileCommand command) {
+        Optional<UserProfile> load = aggregateStoreRepository
+            .load(UserId.from(command.getUserId()))
+            .map(it -> (UserProfile) it);
+        return Try.ofSupplier(load::get)
             .flatMap(userProfile -> {
                 userProfile.updatePhoto(command.getPhotoUrl());
-                return doUserProfileUpdate(command.getUserId(), userProfile);
-            })
-            .orElse(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
-                .result(ImmutableUpdateUserProfileResult.builder()
-                    .id(command.getUserId())
-                    .build())
-                .isSuccessful(false)
-                .message("user with id " + command.getUserId().toString() + " was not found to be updated.")
-                .build());
+                return doTryUpdates(userProfile);
+            });
     }
 
-    public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserFullNameCommand command) {
-        return aggregateStoreRepository.load(UserId.from(command.getUserId()))
-            .map(it -> (UserProfile) it)
-            .flatMap(userProfile -> updateUserFullName(command, userProfile))
-            .orElse(ImmutableCommandHandlerResult.<UpdateUserProfileResult>builder()
-                .result(ImmutableUpdateUserProfileResult.builder().id(command.getUserId()).build())
-                .isSuccessful(false)
-                .message("user with id " + command.getUserId().toString() + " was not found to be updated.")
-                .build());
+    public Try<UpdateUserProfileResult> handle(UpdateUserFullNameCommand command) {
+        Optional<UserProfile> load = aggregateStoreRepository
+            .load(UserId.from(command.getUserId()))
+            .map(it -> (UserProfile) it);
+        return Try.ofSupplier(load::get)
+            .flatMap(userProfile -> {
+                updateUserFullName(command, userProfile);
+                return doTryUpdates(userProfile);
+            });
     }
 
     public CommandHandlerResult<UpdateUserProfileResult> handle(UpdateUserDisplayNameCommand command) {
@@ -87,6 +85,16 @@ public class UserProfileCommandService {
         var displayName = new DisplayName(command.getDisplayName());
         userProfile.updateDisplayName(displayName);
         return doUserProfileUpdate(command.getUserId(), userProfile);
+    }
+
+    private Try<UpdateUserProfileResult> doTryUpdates(UserProfile userProfile) {
+
+        return Try.of(() -> aggregateStoreRepository.add(userProfile))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(user -> ImmutableUpdateUserProfileResult.builder()
+                .id(userProfile.getId().id())
+                .build());
     }
 
     private Optional<ImmutableCommandHandlerResult<UpdateUserProfileResult>> doUserProfileUpdate(
