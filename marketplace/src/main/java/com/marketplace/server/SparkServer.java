@@ -86,6 +86,22 @@ public class SparkServer {
             "/user",
             MEDIA_APPLICATION_JSON,
             userProfileCommandSparkRoutes.createUserProfile());
+        Spark.put(
+            "/user/:userId",
+            MEDIA_APPLICATION_JSON,
+            userProfileCommandSparkRoutes.updateUserProfile());
+        Spark.put(
+            "/user/:userId/name",
+            MEDIA_APPLICATION_JSON,
+            userProfileCommandSparkRoutes.updateUserFullName());
+        Spark.put(
+            "/user/:userId/photo",
+            MEDIA_APPLICATION_JSON,
+            userProfileCommandSparkRoutes.updateUserProfilePhoto());
+        Spark.put(
+            "/user/:userId/display_name",
+            MEDIA_APPLICATION_JSON,
+            userProfileCommandSparkRoutes.updateUserDisplayName());
 
         System.out.println("Spark Server is running on port :" + Spark.port());
     }

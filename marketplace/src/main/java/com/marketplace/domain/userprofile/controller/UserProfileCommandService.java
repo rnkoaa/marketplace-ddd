@@ -35,7 +35,7 @@ public class UserProfileCommandService {
             .findByDisplayName(command.getDisplayName());
 
         if (existingUserProfile.isPresent()) {
-            return Try.failure(new DuplicateDisplayNameException(command.getDisplayName() + " already exists"));
+            return Try.failure(new DuplicateDisplayNameException("display_name '" + command.getDisplayName() + "' already exists"));
         }
 
         var displayName = new DisplayName(command.getDisplayName());

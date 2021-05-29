@@ -4,6 +4,7 @@
 package com.marketplace.evenstore.jooq;
 
 
+import com.marketplace.evenstore.jooq.tables.ClassCache;
 import com.marketplace.evenstore.jooq.tables.ClassifiedAd;
 import com.marketplace.evenstore.jooq.tables.EventData;
 import com.marketplace.evenstore.jooq.tables.FlywaySchemaHistory;
@@ -29,6 +30,11 @@ public class DefaultSchema extends SchemaImpl {
      * The reference instance of <code>DEFAULT_SCHEMA</code>
      */
     public static final DefaultSchema DEFAULT_SCHEMA = new DefaultSchema();
+
+    /**
+     * The table <code>class_cache</code>.
+     */
+    public final ClassCache CLASS_CACHE = ClassCache.CLASS_CACHE;
 
     /**
      * The table <code>classified_ad</code>.
@@ -66,6 +72,7 @@ public class DefaultSchema extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.<Table<?>>asList(
+            ClassCache.CLASS_CACHE,
             ClassifiedAd.CLASSIFIED_AD,
             EventData.EVENT_DATA,
             FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,

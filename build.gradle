@@ -22,21 +22,8 @@ subprojects {
     java {
         sourceCompatibility = JavaVersion.VERSION_16
         targetCompatibility = JavaVersion.VERSION_16
-
-        // has issues with preview-features
-//    toolchain {
-//        languageVersion = JavaLanguageVersion.of(15)
-//    }
     }
-//
 
-//
-//    idea {
-//        module {
-//            testSourceDirs += sourceSets.intTest.java.srcDirs
-//            testResourceDirs += sourceSets.intTest.resources.srcDirs
-//        }
-//    }
 
     configurations {
         compileOnly {
@@ -52,7 +39,6 @@ subprojects {
         flywayMigration
     }
 
-
     tasks.withType(JavaCompile) {
         options.compilerArgs += "--enable-preview"
     }
@@ -67,33 +53,4 @@ subprojects {
         mavenLocal()
         mavenCentral()
     }
-//
-//    test {
-//        useJUnitPlatform()
-//        testLogging {
-//            events "passed", "skipped", "failed"
-//        }
-//    }
-//
-//    task intTest(type: Test) {
-//        description = 'Runs the functional tests.'
-//        group = 'verification'
-//        testClassesDirs = sourceSets.intTest.output.classesDirs
-//        classpath = sourceSets.intTest.runtimeClasspath
-//        outputs.upToDateWhen { false }
-//        mustRunAfter test
-//    }
-//
-//    intTest {
-//        useJUnitPlatform()
-//        testLogging {
-//            events "passed", "skipped", "failed"
-//        }
-//    }
-//
-//    check.dependsOn intTest
-//
-//    processIntTestResources {
-//        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-//    }
 }

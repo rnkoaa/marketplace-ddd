@@ -1,5 +1,6 @@
 package com.marketplace.eventstore.jdbc;
 
+import static com.marketplace.eventstore.jdbc.Tables.CLASS_CACHE;
 import static com.marketplace.eventstore.jdbc.Tables.EVENT_DATA;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.times;
@@ -48,7 +49,8 @@ class JdbcEventStoreFuncTest extends AbstractJdbcFuncTest {
     @AfterEach
     void cleanup() {
         eventPublisher.close();
-        dslContext.delete(EVENT_DATA).execute();
+        dslContext.truncate(EVENT_DATA).execute();
+        dslContext.truncate(CLASS_CACHE).execute();
     }
 
     @Test

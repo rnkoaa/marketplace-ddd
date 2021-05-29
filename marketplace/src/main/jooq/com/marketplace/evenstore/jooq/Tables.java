@@ -4,6 +4,7 @@
 package com.marketplace.evenstore.jooq;
 
 
+import com.marketplace.evenstore.jooq.tables.ClassCache;
 import com.marketplace.evenstore.jooq.tables.ClassifiedAd;
 import com.marketplace.evenstore.jooq.tables.EventData;
 import com.marketplace.evenstore.jooq.tables.FlywaySchemaHistory;
@@ -15,6 +16,11 @@ import com.marketplace.evenstore.jooq.tables.UserProfile;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
+
+    /**
+     * The table <code>class_cache</code>.
+     */
+    public static final ClassCache CLASS_CACHE = ClassCache.CLASS_CACHE;
 
     /**
      * The table <code>classified_ad</code>.

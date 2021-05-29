@@ -9,8 +9,10 @@ import org.immutables.value.Value.Default;
 @JsonSerialize(as = ImmutableDbConfig.class)
 @JsonDeserialize(as = ImmutableDbConfig.class)
 public interface DbConfig {
+
     @Default
     default String getUrl() {
-        return "jdbc:sqlite:src/main/resources/db/marketplace.db";
+//        return "jdbc:sqlite:src/main/resources/db/marketplace.db";
+        return "jdbc:sqlite:/Users/rnkoaa/workspace/marketplace-ddd/db/marketplace.db";
     }
 }

@@ -4,10 +4,12 @@
 package com.marketplace.evenstore.jooq;
 
 
+import com.marketplace.evenstore.jooq.tables.ClassCache;
 import com.marketplace.evenstore.jooq.tables.ClassifiedAd;
 import com.marketplace.evenstore.jooq.tables.EventData;
 import com.marketplace.evenstore.jooq.tables.FlywaySchemaHistory;
 import com.marketplace.evenstore.jooq.tables.UserProfile;
+import com.marketplace.evenstore.jooq.tables.records.ClassCacheRecord;
 import com.marketplace.evenstore.jooq.tables.records.ClassifiedAdRecord;
 import com.marketplace.evenstore.jooq.tables.records.EventDataRecord;
 import com.marketplace.evenstore.jooq.tables.records.FlywaySchemaHistoryRecord;
@@ -31,6 +33,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<ClassCacheRecord> PK_CLASS_CACHE = Internal.createUniqueKey(ClassCache.CLASS_CACHE, DSL.name("pk_class_cache"), new TableField[] { ClassCache.CLASS_CACHE.ID }, true);
     public static final UniqueKey<ClassifiedAdRecord> PK_CLASSIFIED_AD = Internal.createUniqueKey(ClassifiedAd.CLASSIFIED_AD, DSL.name("pk_classified_ad"), new TableField[] { ClassifiedAd.CLASSIFIED_AD.ID }, true);
     public static final UniqueKey<EventDataRecord> PK_EVENT_DATA = Internal.createUniqueKey(EventData.EVENT_DATA, DSL.name("pk_event_data"), new TableField[] { EventData.EVENT_DATA.ID }, true);
     public static final UniqueKey<FlywaySchemaHistoryRecord> PK_FLYWAY_SCHEMA_HISTORY = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, DSL.name("pk_flyway_schema_history"), new TableField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK }, true);

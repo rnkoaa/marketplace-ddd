@@ -4,6 +4,7 @@
 package com.marketplace.eventstore.jdbc;
 
 
+import com.marketplace.eventstore.jdbc.tables.ClassCache;
 import com.marketplace.eventstore.jdbc.tables.EventData;
 import com.marketplace.eventstore.jdbc.tables.FlywaySchemaHistory;
 
@@ -13,6 +14,11 @@ import com.marketplace.eventstore.jdbc.tables.FlywaySchemaHistory;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
+
+    /**
+     * The table <code>class_cache</code>.
+     */
+    public static final ClassCache CLASS_CACHE = ClassCache.CLASS_CACHE;
 
     /**
      * The table <code>event_data</code>.

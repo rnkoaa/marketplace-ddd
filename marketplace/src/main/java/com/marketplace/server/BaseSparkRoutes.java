@@ -1,9 +1,11 @@
 package com.marketplace.server;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.Request;
 
 public abstract class BaseSparkRoutes {
 
@@ -20,6 +22,14 @@ public abstract class BaseSparkRoutes {
 
     public <T> Try<T> deserialize(byte[] body, Class<T> clzz) {
         return Try.of(() -> objectMapper.readValue(body, clzz));
+    }
+
+    public <T> Try<T> deserialize(byte[] body, TypeReference<T> clzz) {
+        return Try.of(() -> objectMapper.readValue(body, clzz));
+    }
+
+    public String getRequestParam(Request req, String param) {
+        return req.params(":" + param);
     }
 
     public String serializeResponse(Object object) {
