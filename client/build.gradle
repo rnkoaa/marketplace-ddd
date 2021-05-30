@@ -1,20 +1,53 @@
 plugins {
     id 'java'
+    id 'idea'
 }
 
 group 'com.marketplace'
 version '1.0.0-SNAPSHOT'
 
 repositories {
+    mavenLocal()
     mavenCentral()
+}
+
+sourceSets {
+    main {
+        java.srcDirs += "$buildDir/generated/sources/annotationProcessor/java"
+    }
+    funcTest {
+        java.srcDir "$projectDir/src/funcTest/groovy"
+        resources.srcDir "$projectDir/src/funcTest/resources"
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.funcTest.java.srcDirs
+        testResourceDirs += sourceSets.funcTest.resources.srcDirs
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    funcTestImplementation {
+        extendsFrom testImplementation
+    }
+    funcTestRuntime {
+        extendsFrom testRuntimeClasspath
+    }
 }
 
 dependencies {
     implementation project(":libs:config")
     implementation project(":libs:common")
 
-    compileOnly("org.projectlombok:lombok:${lombokVersion}")
-    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+    compileOnly 'org.immutables:value:2.8.8'
+    annotationProcessor 'org.immutables:value:2.8.8'
 
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -26,6 +59,12 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+    funcTestImplementation(platform("org.junit:junit-bom:${junitVersion}"))
+    funcTestImplementation('org.junit.jupiter:junit-jupiter')
+    funcTestImplementation("org.assertj:assertj-core:${assertjVersion}")
+    funcTestImplementation("org.mockito:mockito-core:${mockitoVersion}")
+    funcTestImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
 }
 
 test {
@@ -33,6 +72,25 @@ test {
     testLogging {
         events "passed", "skipped", "failed"
     }
+}
+
+
+task functionalTest(type: Test) {
+    testClassesDirs = sourceSets.funcTest.output.classesDirs
+    classpath = sourceSets.funcTest.runtimeClasspath
+}
+
+functionalTest {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+check.dependsOn functionalTest
+
+processFuncTestResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 tasks.withType(JavaCompile) {

@@ -1,5 +1,6 @@
 package com.marketplace.eventstore.jdbc;
 
+import static com.marketplace.eventstore.jdbc.Tables.CLASS_CACHE;
 import static com.marketplace.eventstore.jdbc.Tables.EVENT_DATA;
 import static org.jooq.impl.DSL.countDistinct;
 import static org.jooq.impl.DSL.max;
@@ -19,7 +20,9 @@ import org.jooq.Record1;
 
 public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
-    record EventDataVersion(int version, VersionedEvent event) { }
+    record EventDataVersion(int version, VersionedEvent event) {
+
+    }
 
     private final EventClassCache eventClassCache;
     private final ObjectMapper objectMapper;
@@ -194,6 +197,13 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     @Override
     public int nextVersion(String streamId) {
         return 0;
+    }
+
+    @Override
+    public void deleteAll() {
+        dslContext.truncate(EVENT_DATA).execute();
+        dslContext.truncate(CLASS_CACHE).execute();
+        dslContext.delete(EVENT_DATA).execute();
     }
 
     private Try<VersionedEvent> convertFromEventDataRecord(ObjectMapper objectMapper,

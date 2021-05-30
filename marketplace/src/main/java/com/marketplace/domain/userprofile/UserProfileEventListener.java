@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.marketplace.domain.userprofile.entity.ImmutableUserProfileEntity;
 import com.marketplace.domain.userprofile.entity.ImmutableUserProfileEntity.Builder;
 import com.marketplace.domain.userprofile.entity.UserProfileEntity;
+import com.marketplace.domain.userprofile.event.DeleteAllUsersEvent;
 import com.marketplace.domain.userprofile.event.ProfilePhotoUploaded;
 import com.marketplace.domain.userprofile.event.UserDisplayNameUpdated;
 import com.marketplace.domain.userprofile.event.UserFullNameUpdated;
@@ -85,6 +86,11 @@ public class UserProfileEventListener {
         if (maybeUpdateUserProfile.isEmpty()) {
             LOGGER.info("error updating display name {}", event);
         }
+    }
+
+    @Subscribe
+    public void onDeleteUsers(DeleteAllUsersEvent event) {
+        userProfileQueryRepository.deleteAll();
     }
 
     public static UserProfileEntity createFromEvent(UserRegistered event) {

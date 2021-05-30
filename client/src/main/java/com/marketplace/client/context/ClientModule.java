@@ -2,6 +2,7 @@ package com.marketplace.client.context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.client.ClassifiedAdRestService;
+import com.marketplace.client.UserProfileRestService;
 import com.marketplace.client.config.ClientConfig;
 import com.marketplace.common.ObjectMapperBuilder;
 import dagger.Module;
@@ -14,31 +15,37 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 @Module
 public abstract class ClientModule {
 
-  @Provides
-  @Singleton
-  static OkHttpClient okHttpClient() {
-    return new OkHttpClient();
-  }
+    @Provides
+    @Singleton
+    static OkHttpClient okHttpClient() {
+        return new OkHttpClient();
+    }
 
-  @Provides
-  @Singleton
-  static ObjectMapper provideObjectMapper() {
-    return new ObjectMapperBuilder().build();
-  }
+    @Provides
+    @Singleton
+    static ObjectMapper provideObjectMapper() {
+        return new ObjectMapperBuilder().build();
+    }
 
-  @Provides
-  @Singleton
-  static Retrofit provideRetrofit(ClientConfig config, ObjectMapper objectMapper, OkHttpClient okHttpClient) {
-    return new Retrofit.Builder()
-        .baseUrl(config.getApplicationUrl())
-        .client(okHttpClient)
-        .addConverterFactory(JacksonConverterFactory.create(objectMapper))
-        .build();
-  }
+    @Provides
+    @Singleton
+    static Retrofit provideRetrofit(ClientConfig config, ObjectMapper objectMapper, OkHttpClient okHttpClient) {
+        return new Retrofit.Builder()
+            .baseUrl(config.getApplicationURL())
+            .client(okHttpClient)
+            .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+            .build();
+    }
 
-  @Provides
-  @Singleton
-  static ClassifiedAdRestService provideClassifiedAdRestService(Retrofit retrofit) {
-    return retrofit.create(ClassifiedAdRestService.class);
-  }
+    @Provides
+    @Singleton
+    static UserProfileRestService provideUserProfileRestService(Retrofit retrofit) {
+        return retrofit.create(UserProfileRestService.class);
+    }
+
+    @Provides
+    @Singleton
+    static ClassifiedAdRestService provideClassifiedAdRestService(Retrofit retrofit) {
+        return retrofit.create(ClassifiedAdRestService.class);
+    }
 }

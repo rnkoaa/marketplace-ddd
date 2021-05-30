@@ -155,4 +155,9 @@ public class InMemoryEventStore implements EventStore<Event> {
             return Result.error("unable to publish event.");
         });
     }
+
+    @Override
+    public void deleteAll() {
+        entityStore.clear();
+    }
 }

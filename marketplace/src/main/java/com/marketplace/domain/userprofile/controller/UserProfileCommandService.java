@@ -1,12 +1,16 @@
 package com.marketplace.domain.userprofile.controller;
 
+import com.marketplace.cqrs.event.Event;
+import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.domain.userprofile.entity.UserProfileEntity;
+import com.marketplace.domain.userprofile.event.ImmutableDeleteAllUsersEvent;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
+import com.marketplace.eventstore.framework.event.EventPublisher;
 import io.vavr.control.Try;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -19,11 +23,15 @@ public class UserProfileCommandService {
 
     private final AggregateStoreRepository aggregateStoreRepository;
     private final UserProfileQueryRepository userProfileQueryRepository;
+    private final EventPublisher<Event> eventPublisher;
 
     @Inject
-    public UserProfileCommandService(UserProfileQueryRepository userProfileQueryRepository,
+    public UserProfileCommandService(
+        EventPublisher<Event> eventPublisher,
+        UserProfileQueryRepository userProfileQueryRepository,
         AggregateStoreRepository aggregateStoreRepository
     ) {
+        this.eventPublisher = eventPublisher;
         this.userProfileQueryRepository = userProfileQueryRepository;
         this.aggregateStoreRepository = aggregateStoreRepository;
     }
@@ -129,6 +137,13 @@ public class UserProfileCommandService {
             aggregateStoreRepository.load(userId)
                 .map(it -> (UserProfile) it)
                 .orElseThrow(() -> new NotFoundException("user with profile '" + userId + "' not found")));
+    }
+
+    public Try<Void> handle(DeleteAllUsersCommand command) {
+        return Try.of(() -> {
+            aggregateStoreRepository.deleteAll();
+            return null;
+        });
     }
 }
 

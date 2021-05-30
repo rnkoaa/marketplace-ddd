@@ -11,7 +11,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.domain.userprofile.controller.CreateUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.CreateUserProfileResult;
+import com.marketplace.domain.userprofile.controller.DeleteAllUsersCommand;
 import com.marketplace.domain.userprofile.controller.DuplicateDisplayNameException;
+import com.marketplace.domain.userprofile.controller.ImmutableDeleteAllUsersCommand;
 import com.marketplace.domain.userprofile.controller.ImmutableLoadUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.ImmutableUpdateUserFullNameCommand;
 import com.marketplace.domain.userprofile.controller.ImmutableUpdateUserProfileCommand;
@@ -144,6 +146,30 @@ public class UserProfileCommandRoutes extends BaseSparkRoutes {
                 Case($Success($()), value -> {
                     res.status(200);
                     return serializeResponse(value);
+                }),
+                Case($Failure($()), x -> {
+                    res.status(404);
+                    Map<String, Object> resMessage = Map.of(
+                        "message", x.getMessage()
+                    );
+                    return serializeResponse(resMessage);
+                })
+            );
+        });
+    }
+
+    public Route deleteUsers() {
+        return ((req, res) -> {
+            DeleteAllUsersCommand command = ImmutableDeleteAllUsersCommand.builder()
+                .build();
+
+            Try<Void> tryResponse = commandService.handle(command);
+//
+            setJsonHeaders(res);
+            return API.Match(tryResponse).of(
+                Case($Success($()), value -> {
+                    res.status(200);
+                    return null;
                 }),
                 Case($Failure($()), x -> {
                     res.status(404);

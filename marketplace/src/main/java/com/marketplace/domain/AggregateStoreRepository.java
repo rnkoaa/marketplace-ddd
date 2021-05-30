@@ -69,4 +69,9 @@ public class AggregateStoreRepository
                 return aggregateRoot;
             });
     }
+
+    public void deleteAll() {
+        System.out.println("Deleting all events");
+        eventEventStore.deleteAll();
+    }
 }

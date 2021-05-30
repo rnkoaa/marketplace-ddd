@@ -104,4 +104,9 @@ public interface EventStore<T extends Event> {
      * operation failed.
      */
     Result<Boolean> publish(String streamId, int expectedVersion, T event);
+
+    /**
+     *
+     */
+    void deleteAll();
 }

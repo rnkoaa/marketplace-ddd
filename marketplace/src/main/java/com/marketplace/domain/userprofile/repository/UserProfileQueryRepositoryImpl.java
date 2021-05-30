@@ -84,6 +84,12 @@ public class UserProfileQueryRepositoryImpl implements UserProfileQueryRepositor
             .map(it -> entity);
     }
 
+    @Override
+    public void deleteAll() {
+        dslContext.truncate(Tables.USER_PROFILE).execute();
+        dslContext.delete(Tables.USER_PROFILE).execute();
+    }
+
     private Optional<UserProfileRecord> fetchRecord(String id) {
         return dslContext.select()
             .from(Tables.USER_PROFILE)
