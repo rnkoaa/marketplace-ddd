@@ -12,17 +12,20 @@ public class SparkServer {
     private final ClassifiedAdCommandSparkRoutes classifiedAdCommandSparkRoutes;
     private final ClassifiedAdQuerySparkRoutes classifiedAdQuerySparkRoutes;
     private final UserProfileCommandRoutes userProfileCommandSparkRoutes;
+    private final EventSparkRoutes eventSparkRoutes;
 
     @Inject
     public SparkServer(
         @Named("server.port") int port,
         ClassifiedAdCommandSparkRoutes classifiedAdCommandSparkRoutes,
         UserProfileCommandRoutes userProfileCommandSparkRoutes,
+        EventSparkRoutes eventSparkRoutes,
         ClassifiedAdQuerySparkRoutes classifiedAdQuerySparkRoutes) {
         Spark.port(port);
         this.classifiedAdCommandSparkRoutes = classifiedAdCommandSparkRoutes;
         this.classifiedAdQuerySparkRoutes = classifiedAdQuerySparkRoutes;
         this.userProfileCommandSparkRoutes = userProfileCommandSparkRoutes;
+        this.eventSparkRoutes = eventSparkRoutes;
     }
 
     public void run() {
@@ -106,6 +109,8 @@ public class SparkServer {
             "/user/:userId/display_name",
             MEDIA_APPLICATION_JSON,
             userProfileCommandSparkRoutes.updateUserDisplayName());
+
+        eventSparkRoutes.register("/event");
 
         System.out.println("Spark Server is running on port :" + Spark.port());
     }

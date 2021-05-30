@@ -1,11 +1,14 @@
 package com.marketplace.server;
 
+import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
+import spark.Response;
 
 public abstract class BaseSparkRoutes {
 
@@ -18,6 +21,11 @@ public abstract class BaseSparkRoutes {
 
     public BaseSparkRoutes(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+    }
+
+    protected void setJsonHeaders(Response response) {
+        response.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
+        response.type(MEDIA_APPLICATION_JSON);
     }
 
     public <T> Try<T> deserialize(byte[] body, Class<T> clzz) {

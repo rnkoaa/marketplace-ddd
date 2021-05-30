@@ -50,10 +50,7 @@ public class UserProfileCommandService {
     }
 
     public Try<UpdateUserProfileResult> handle(UpdateUserProfileCommand command) {
-        Optional<UserProfile> load = aggregateStoreRepository
-            .load(UserId.from(command.getUserId()))
-            .map(it -> (UserProfile) it);
-        return Try.ofSupplier(load::get)
+        return loadUserProfile(UserId.from(command.getUserId()))
             .flatMap(userProfile -> {
                 command.getDisplayName()
                     .filter(it -> !it.isEmpty())
@@ -86,10 +83,7 @@ public class UserProfileCommandService {
     }
 
     public Try<UpdateUserProfileResult> handle(UpdateUserFullNameCommand command) {
-        Optional<UserProfile> load = aggregateStoreRepository
-            .load(UserId.from(command.getUserId()))
-            .map(it -> (UserProfile) it);
-        return Try.ofSupplier(load::get)
+        return loadUserProfile(UserId.from(command.getUserId()))
             .flatMap(userProfile -> {
                 userProfile.updateUserFullName(
                     new FullName(command.getFirstName(),
@@ -101,16 +95,11 @@ public class UserProfileCommandService {
     }
 
     public Try<UpdateUserProfileResult> handle(UpdateUserDisplayNameCommand command) {
-        Optional<UserProfile> loadedUserProfile = aggregateStoreRepository
-            .load(UserId.from(command.getUserId()))
-            .map(it -> (UserProfile) it);
-
-        return Try.ofSupplier(loadedUserProfile::get)
+        return loadUserProfile(UserId.from(command.getUserId()))
             .flatMap(userProfile -> {
                 userProfile.updateDisplayName(new DisplayName(command.getDisplayName()));
                 return doTryUpdates(userProfile);
-            })
-            ;
+            });
     }
 
     private Try<UpdateUserProfileResult> doTryUpdates(UserProfile userProfile) {
@@ -123,21 +112,23 @@ public class UserProfileCommandService {
     }
 
     public Try<LoadUserProfileResponse> handle(LoadUserProfileCommand command) {
-        Optional<LoadUserProfileResponse> loadedUserProfile = aggregateStoreRepository
-            .load(UserId.from(command.getUserId()))
-            .map(it -> (UserProfile) it)
+        return loadUserProfile(UserId.from(command.getUserId()))
             .map(userProfile -> ImmutableLoadUserProfileResponse.builder()
                 .userId(userProfile.getId().id())
                 .firstName(userProfile.getFullName().firstName())
                 .lastName(userProfile.getFullName().lastName())
-                .middleName(userProfile.getFullName().middleName() != null ? userProfile.getFullName().middleName() : "")
+                .middleName(
+                    userProfile.getFullName().middleName() != null ? userProfile.getFullName().middleName() : "")
                 .photoUrl(userProfile.getPhotoUrl() != null ? userProfile.getPhotoUrl() : "")
                 .displayName(userProfile.getDisplayName().toString())
                 .build());
+    }
 
-        return Try.of(() -> loadedUserProfile
-            .orElseThrow(() -> new NotFoundException("user with id '" + command.getUserId() + "' not found"))
-        );
+    private Try<UserProfile> loadUserProfile(UserId userId) {
+        return Try.of(() ->
+            aggregateStoreRepository.load(userId)
+                .map(it -> (UserProfile) it)
+                .orElseThrow(() -> new NotFoundException("user with profile '" + userId + "' not found")));
     }
 }
 
