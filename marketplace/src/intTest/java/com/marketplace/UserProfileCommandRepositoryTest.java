@@ -110,7 +110,7 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
 
         var profile = (UserProfile) addedUserProfile.get();
 
-        profile.updatePhoto(updateUserProfileCommand.getPhotoUrl());
+        profile.updatePhoto(updateUserProfileCommand.getPhotoUrl().orElse(""));
         var secondSaved = aggregateStoreRepository.add(profile);
         assertThat(secondSaved).isPresent();
 
@@ -165,7 +165,7 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         assertThat(loadedUserProfile).isPresent();
 
         UserProfile profile = loadedUserProfile.get();
-        profile.updatePhoto(updateUserProfileCommand.getPhotoUrl());
+        profile.updatePhoto(updateUserProfileCommand.getPhotoUrl().orElse(""));
         var secondSaved = aggregateStoreRepository.add(profile);
         assertThat(secondSaved).isPresent();
 

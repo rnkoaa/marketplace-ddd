@@ -90,6 +90,10 @@ public class SparkServer {
             "/user/:userId",
             MEDIA_APPLICATION_JSON,
             userProfileCommandSparkRoutes.updateUserProfile());
+        Spark.get(
+            "/user/:userId",
+            MEDIA_APPLICATION_JSON,
+            userProfileCommandSparkRoutes.getUserProfile());
         Spark.put(
             "/user/:userId/name",
             MEDIA_APPLICATION_JSON,

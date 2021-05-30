@@ -46,7 +46,6 @@ configurations {
     flywayMigration
 }
 
-
 dependencies {
     implementation project(":libs:config")
     implementation project(":libs:common")
@@ -101,7 +100,6 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
 }
 
-
 test {
     useJUnitPlatform()
     testLogging {
@@ -143,11 +141,6 @@ flyway {
     url = "jdbc:sqlite:${projectDir}/src/main/resources/db/marketplace.db"
     locations = ["filesystem:${projectDir}/src/main/resources/db/migration"]
 }
-
-//task copyDb(type: Copy) {
-//    from "${projectDir}/src/main/resources/db"
-//    to "${rootProject.rootDir}/db"
-//}
 
 task copyDb(type: Copy) {
     from "${projectDir}/src/main/resources/db/marketplace.db"

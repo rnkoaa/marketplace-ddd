@@ -19,9 +19,7 @@ import org.jooq.Record1;
 
 public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
-    record EventDataVersion(int version, VersionedEvent event) {
-
-    }
+    record EventDataVersion(int version, VersionedEvent event) { }
 
     private final EventClassCache eventClassCache;
     private final ObjectMapper objectMapper;
@@ -57,12 +55,6 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
         return fetch.stream()
             .map(eventDataRecord -> convertFromEventDataRecord(objectMapper, eventDataRecord))
-//            .peek(it -> it.isSuccess())
-            .peek(it -> {
-                if(!it.isSuccess()) {
-                    System.out.println(it.getCause().getMessage());
-                }
-            })
             .filter(Try::isSuccess)
             .map(Try::get)
             .toList();
@@ -231,7 +223,7 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
     }
 
     private Result<EventDataRecord> createFromEvent(Event event, int expectedVersion, Result<String> eventDataResult) {
-        Result<EventDataRecord> result = eventDataResult
+        return eventDataResult
             .map(eventData -> new EventDataRecord()
                 .setId(event.getId().toString())
                 .setStreamId(event.getStreamId())
@@ -241,12 +233,6 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
                 .setEventType(event.getClass().getSimpleName())
                 .setData(eventData)
                 .setCreated(event.getCreatedAt().toString()));
-
-        if (result.isError()) {
-            System.out.println(result.getError().getMessage());
-        }
-
-        return result;
     }
 
 }

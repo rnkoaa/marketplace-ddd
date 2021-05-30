@@ -4,6 +4,7 @@ import com.marketplace.config.ApplicationConfig;
 import com.marketplace.config.ConfigLoader;
 import com.marketplace.context.ApplicationContext;
 import com.marketplace.context.DaggerApplicationContext;
+import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.eventstore.framework.event.EventListener;
 import com.marketplace.server.SparkServer;
 import java.io.IOException;

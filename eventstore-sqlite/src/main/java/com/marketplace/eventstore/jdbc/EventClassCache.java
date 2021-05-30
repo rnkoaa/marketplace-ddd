@@ -48,7 +48,13 @@ public class EventClassCache {
                 .fetchOptionalInto(ClassCacheRecord.class);
             return classCacheRecord
                 .map(clzz -> Try.of(() -> Class.forName(clzz.getClassName())))
-                .orElseGet(() -> Try.failure(new RuntimeException("Class '" + className + "' not found")));
+                .filter(Try::isSuccess)
+                .map(it -> {
+                    Class<?> aClass = it.get();
+                    eventCache.put(aClass.getSimpleName(), aClass);
+                    return it;
+                })
+                .orElseThrow(() -> new RuntimeException("Class '" + className + "' not found"));
         }
         return Try.of(() -> eventClass);
     }

@@ -28,6 +28,12 @@ CREATE
     INDEX idx_event_data_stream_id_version
     ON event_data (stream_id, event_version);
 
+create table IF NOT EXISTS class_cache
+(
+    id             TEXT PRIMARY KEY,
+    class_name      TEXT NOT NULL
+);
+
 create table user_profile
 (
     id              TEXT PRIMARY KEY,

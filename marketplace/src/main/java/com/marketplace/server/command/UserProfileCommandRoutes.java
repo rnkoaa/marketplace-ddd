@@ -12,7 +12,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.domain.userprofile.controller.CreateUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.CreateUserProfileResult;
 import com.marketplace.domain.userprofile.controller.DuplicateDisplayNameException;
+import com.marketplace.domain.userprofile.controller.ImmutableLoadUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.ImmutableUpdateUserFullNameCommand;
+import com.marketplace.domain.userprofile.controller.ImmutableUpdateUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.LoadUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.LoadUserProfileResponse;
 import com.marketplace.domain.userprofile.controller.UpdateUserProfileResult;
 import com.marketplace.domain.userprofile.controller.UserProfileCommandService;
 import com.marketplace.server.BaseSparkRoutes;
@@ -90,8 +94,12 @@ public class UserProfileCommandRoutes extends BaseSparkRoutes {
                 Case($Success($()), value -> {
                     response.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
                     response.type(MEDIA_APPLICATION_JSON);
-                    response.status(202);
-                    return value;
+                    response.status(200);
+                    Map<String, Object> resMessage = Map.of(
+                        "status", "Successfully updated user",
+                        "user_id", value.getId()
+                    );
+                    return serializeResponse(resMessage);
                 }),
                 Case($Failure($()), x -> {
                     response.status(404);
@@ -107,14 +115,113 @@ public class UserProfileCommandRoutes extends BaseSparkRoutes {
     }
 
     public Route updateUserProfile() {
-        return null;
+        return ((req, response) -> {
+            String userId = getRequestParam(req, "userId");
+            TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {
+            };
+            Try<Map<String, Object>> deserialize = deserialize(req.bodyAsBytes(), typeRef);
+            Try<UpdateUserProfileResult> updateUserProfileResults = deserialize
+                .map(res -> ImmutableUpdateUserProfileCommand.builder()
+                    .firstName((String) res.getOrDefault("first_name", ""))
+                    .lastName((String) res.getOrDefault("last_name", ""))
+                    .middleName((String) res.getOrDefault("middle_name", ""))
+                    .photoUrl((String) res.getOrDefault("photo_url", ""))
+                    .displayName((String) res.getOrDefault("display_name", ""))
+                    .userId(UUID.fromString(userId))
+                    .build())
+                .flatMap(commandService::handle);
+
+            return API.Match(updateUserProfileResults).of(
+                Case($Success($()), value -> {
+                    response.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
+                    response.type(MEDIA_APPLICATION_JSON);
+                    response.status(200);
+                    Map<String, Object> resMessage = Map.of(
+                        "status", "Successfully updated user",
+                        "user_id", value.getId()
+                    );
+                    return serializeResponse(resMessage);
+                }),
+                Case($Failure($()), x -> {
+                    response.status(404);
+                    response.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
+                    response.type(MEDIA_APPLICATION_JSON);
+                    Map<String, Object> resMessage = Map.of(
+                        "message", x.getMessage()
+                    );
+                    return serializeResponse(resMessage);
+                })
+            );
+        });
     }
 
     public Route updateUserProfilePhoto() {
-        return null;
+        return ((req, response) -> {
+            String userId = getRequestParam(req, "userId");
+            TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {
+            };
+            Try<Map<String, Object>> deserialize = deserialize(req.bodyAsBytes(), typeRef);
+            Try<UpdateUserProfileResult> updateUserProfileResults = deserialize
+                .map(res -> ImmutableUpdateUserProfileCommand.builder()
+                    .photoUrl((String) res.getOrDefault("photo_url", ""))
+                    .userId(UUID.fromString(userId))
+                    .build())
+                .flatMap(commandService::handle);
+
+            return API.Match(updateUserProfileResults).of(
+                Case($Success($()), value -> {
+                    response.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
+                    response.type(MEDIA_APPLICATION_JSON);
+                    response.status(200);
+                    Map<String, Object> resMessage = Map.of(
+                        "status", "Successfully updated user",
+                        "user_id", value.getId()
+                    );
+                    return serializeResponse(resMessage);
+                }),
+                Case($Failure($()), x -> {
+                    response.status(404);
+                    response.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
+                    response.type(MEDIA_APPLICATION_JSON);
+                    Map<String, Object> resMessage = Map.of(
+                        "message", x.getMessage()
+                    );
+                    return serializeResponse(resMessage);
+                })
+            );
+        });
     }
 
     public Route updateUserDisplayName() {
         return null;
+    }
+
+    public Route getUserProfile() {
+       return ((req, res) -> {
+           String userId = getRequestParam(req, "userId");
+           LoadUserProfileCommand command = ImmutableLoadUserProfileCommand.builder()
+               .userId(UUID.fromString(userId))
+               .build();
+
+           Try<LoadUserProfileResponse> tryResponse = commandService.handle(command);
+
+           return API.Match(tryResponse).of(
+               Case($Success($()), value -> {
+                   res.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
+                   res.type(MEDIA_APPLICATION_JSON);
+                   res.status(200);
+                   return serializeResponse(value);
+               }),
+               Case($Failure($()), x -> {
+                   res.status(404);
+                   res.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
+                   res.type(MEDIA_APPLICATION_JSON);
+                   Map<String, Object> resMessage = Map.of(
+                       "message", x.getMessage()
+                   );
+                   return serializeResponse(resMessage);
+               })
+           );
+       }) ;
     }
 }

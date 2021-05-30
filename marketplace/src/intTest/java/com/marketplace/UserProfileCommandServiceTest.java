@@ -143,7 +143,9 @@ public class UserProfileCommandServiceTest extends AbstractContainerInitializer 
 
         UserProfileEntity entity = mayBeUserProfileEntity.get();
         assertThat(entity.getPhotoUrl()).isPresent();
-        assertThat(entity.getPhotoUrl().get()).isEqualTo(updateUserProfileCommand.getPhotoUrl());
+        Optional<String> photoUrl = updateUserProfileCommand.getPhotoUrl();
+        assertThat(photoUrl).isPresent();
+        assertThat(entity.getPhotoUrl()).isEqualTo(photoUrl);
 
         Optional<UserProfile> loadedUserProfile = aggregateStoreRepository
             .load(new UserId(updateUserProfileCommand.getUserId()))
@@ -151,7 +153,7 @@ public class UserProfileCommandServiceTest extends AbstractContainerInitializer 
 
         assertThat(loadedUserProfile).isPresent();
         UserProfile profile = loadedUserProfile.get();
-        assertThat(profile.getPhotoUrl()).isEqualTo(updateUserProfileCommand.getPhotoUrl());
+        assertThat(profile.getPhotoUrl()).isEqualTo(photoUrl.get());
     }
 
     @AfterEach
