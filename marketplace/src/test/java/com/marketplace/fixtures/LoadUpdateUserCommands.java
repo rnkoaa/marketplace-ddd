@@ -1,12 +1,12 @@
 package com.marketplace.fixtures;
 
 import com.marketplace.context.ObjectMapperModule;
-import com.marketplace.domain.userprofile.controller.ImmutableUpdateUserDisplayNameCommand;
-import com.marketplace.domain.userprofile.controller.ImmutableUpdateUserFullNameCommand;
-import com.marketplace.domain.userprofile.controller.ImmutableUpdateUserProfileCommand;
-import com.marketplace.domain.userprofile.controller.UpdateUserDisplayNameCommand;
-import com.marketplace.domain.userprofile.controller.UpdateUserFullNameCommand;
-import com.marketplace.domain.userprofile.controller.UpdateUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.command.ImmutableUpdateUserDisplayNameCommand;
+import com.marketplace.domain.userprofile.controller.command.ImmutableUpdateUserFullNameCommand;
+import com.marketplace.domain.userprofile.controller.command.ImmutableUpdateUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.command.UpdateUserDisplayNameCommand;
+import com.marketplace.domain.userprofile.controller.command.UpdateUserFullNameCommand;
+import com.marketplace.domain.userprofile.controller.command.UpdateUserProfileCommand;
 import java.io.IOException;
 import java.util.UUID;
 

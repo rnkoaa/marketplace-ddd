@@ -1,5 +1,6 @@
 package com.marketplace.client;
 
+import com.marketplace.client.classifiedad.ClassifiedAdRestService;
 import com.marketplace.client.config.ClientConfig;
 import com.marketplace.client.context.ClientContext;
 import com.marketplace.client.context.DaggerClientContext;

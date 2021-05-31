@@ -1,14 +1,14 @@
 package com.marketplace.client.context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.client.ClassifiedAdRestService;
-import com.marketplace.client.UserProfileRestService;
+import com.marketplace.client.classifiedad.ClassifiedAdRestService;
+import com.marketplace.client.userprofile.UserProfileRestService;
 import com.marketplace.client.config.ClientConfig;
 import com.marketplace.common.ObjectMapperBuilder;
 import dagger.Module;
 import dagger.Provides;
 import java.io.IOException;
-import java.util.Objects;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -26,44 +26,47 @@ public abstract class ClientModule {
     @Provides
     @Singleton
     static OkHttpClient okHttpClient() {
-//        return new OkHttpClient();
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(new Interceptor() {
-            @NotNull
-            @Override
-            public Response intercept(@NotNull Interceptor.Chain chain) throws IOException {
-                Request original = chain.request();
-                String requestBody = bodyToString(original);
-
-//                RequestBody body = original.body();
-                System.out.println(requestBody);
-//                body.
-
-//                // Request customization: add request headers
-//                Request.Builder requestBuilder = original.newBuilder()
-//                    .header("Authorization", "auth-value"); // <-- this is the important line
-
-//                Request request = requestBuilder.build();
-                return chain.proceed(original);
-            }
-        });
-
+        httpClient.addInterceptor(new RequestBodyLoggingInterceptor());
         return httpClient.build();
     }
 
-    private static String bodyToString(final Request request) {
+    static class RequestBodyLoggingInterceptor implements Interceptor {
 
-        try {
-            final Request copy = request.newBuilder().build();
-            final Buffer buffer = new Buffer();
-            RequestBody body = copy.body();
-            if (body != null) {
-                body.writeTo(buffer);
-            }
-            return buffer.readUtf8();
-        } catch (final IOException e) {
-            return "did not work";
+        @NotNull
+        @Override
+        public Response intercept(@NotNull Chain chain) throws IOException {
+            Request original = chain.request();
+            String requestBody = bodyToString(original);
+            System.out.println(requestBody);
+            return chain.proceed(original);
         }
+
+        private static String bodyToString(final Request request) {
+
+            try {
+                final Request copy = request.newBuilder().build();
+                String s = copy.url().encodedPath();
+                final Buffer buffer = new Buffer();
+                RequestBody body = copy.body();
+                if (body != null) {
+                    body.writeTo(buffer);
+                }
+                System.out.println(s);
+                String requestBody = buffer.readUtf8();
+
+                return String.format("[Path: %s, Body: (%s)]", s, requestBody);
+            } catch (final IOException e) {
+                return "did not work";
+            }
+        }
+    }
+
+    @Provides
+    @Singleton
+    @Named("yamlObjectMapper")
+    static ObjectMapper provideYamlObjectMapper() {
+        return new ObjectMapperBuilder().build();
     }
 
     @Provides

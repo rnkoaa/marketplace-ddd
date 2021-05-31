@@ -1,7 +1,6 @@
 package com.marketplace.server.command;
 
 import static com.google.common.base.Predicates.instanceOf;
-import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.Patterns.$Failure;
@@ -9,20 +8,18 @@ import static io.vavr.Patterns.$Success;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.domain.userprofile.controller.CreateUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.CreateUserProfileResult;
-import com.marketplace.domain.userprofile.controller.DeleteAllUsersCommand;
 import com.marketplace.domain.userprofile.controller.DuplicateDisplayNameException;
-import com.marketplace.domain.userprofile.controller.ImmutableDeleteAllUsersCommand;
-import com.marketplace.domain.userprofile.controller.ImmutableLoadUserProfileCommand;
-import com.marketplace.domain.userprofile.controller.ImmutableUpdateUserFullNameCommand;
-import com.marketplace.domain.userprofile.controller.ImmutableUpdateUserProfileCommand;
-import com.marketplace.domain.userprofile.controller.LoadUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.LoadUserProfileResponse;
-import com.marketplace.domain.userprofile.controller.UpdateUserFullNameCommand;
-import com.marketplace.domain.userprofile.controller.UpdateUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.UpdateUserProfileResult;
 import com.marketplace.domain.userprofile.controller.UserProfileCommandService;
+import com.marketplace.domain.userprofile.controller.command.CreateUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.command.ImmutableLoadUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.command.ImmutableUpdateUserFullNameCommand;
+import com.marketplace.domain.userprofile.controller.command.ImmutableUpdateUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.command.LoadUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.command.UpdateUserFullNameCommand;
+import com.marketplace.domain.userprofile.controller.command.UpdateUserProfileCommand;
 import com.marketplace.server.BaseSparkRoutes;
 import io.vavr.API;
 import io.vavr.control.Try;

@@ -11,6 +11,9 @@ import com.marketplace.domain.shared.UserId;
 import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
+import com.marketplace.domain.userprofile.controller.command.ImmutableCreateUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.command.ImmutableUpdateUserFullNameCommand;
+import com.marketplace.domain.userprofile.controller.command.ImmutableUpdateUserProfileCommand;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
 import com.marketplace.eventstore.framework.event.EventPublisher;
 import io.vavr.control.Try;
@@ -38,8 +41,7 @@ class UserProfileCommandServiceTest {
 
     @BeforeEach
     void setup() {
-        userProfileCommandService = new UserProfileCommandService(eventPublisher, userProfileQueryRepository,
-            aggregateStoreRepository);
+        userProfileCommandService = new UserProfileCommandService(userProfileQueryRepository, aggregateStoreRepository);
     }
 
     @Test
