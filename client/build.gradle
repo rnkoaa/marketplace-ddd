@@ -87,7 +87,8 @@ functionalTest {
     }
 }
 
-check.dependsOn functionalTest
+// don't want to run funcTests in CI
+//check.dependsOn functionalTest
 
 processFuncTestResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE

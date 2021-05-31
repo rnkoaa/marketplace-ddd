@@ -6,7 +6,6 @@ import com.marketplace.client.model.userprofile.CreateUserProfileRequest;
 import com.marketplace.client.model.userprofile.GetUserProfileResponse;
 import com.marketplace.client.model.userprofile.ImmutableCreateUserProfileRequest;
 import com.marketplace.client.model.userprofile.ImmutableUpdateUserProfileRequest;
-import com.marketplace.client.model.userprofile.UpdateUserProfileRequest;
 import com.marketplace.client.model.userprofile.UpdateUserProfileResponse;
 import java.io.IOException;
 import java.util.UUID;
