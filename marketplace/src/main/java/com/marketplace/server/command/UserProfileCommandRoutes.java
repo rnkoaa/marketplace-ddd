@@ -158,30 +158,6 @@ public class UserProfileCommandRoutes extends BaseSparkRoutes {
         });
     }
 
-    public Route deleteUsers() {
-        return ((req, res) -> {
-            DeleteAllUsersCommand command = ImmutableDeleteAllUsersCommand.builder()
-                .build();
-
-            Try<Void> tryResponse = commandService.handle(command);
-//
-            setJsonHeaders(res);
-            return API.Match(tryResponse).of(
-                Case($Success($()), value -> {
-                    res.status(200);
-                    return null;
-                }),
-                Case($Failure($()), x -> {
-                    res.status(404);
-                    Map<String, Object> resMessage = Map.of(
-                        "message", x.getMessage()
-                    );
-                    return serializeResponse(resMessage);
-                })
-            );
-        });
-    }
-
     private Object generateResponse(Response res, Try<UpdateUserProfileResult> updateUserProfileResults) {
         setJsonHeaders(res);
         return API.Match(updateUserProfileResults).of(
