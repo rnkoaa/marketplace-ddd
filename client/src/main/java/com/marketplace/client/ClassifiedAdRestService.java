@@ -1,11 +1,11 @@
 package com.marketplace.client;
 
-import com.marketplace.client.model.ApproveClassifiedAdRequest;
-import com.marketplace.client.model.ClassifiedAdRequest;
-import com.marketplace.client.model.ClassifiedAdResponse;
-import com.marketplace.client.model.UpdateClassifiedAdPriceRequest;
-import com.marketplace.client.model.UpdateClassifiedAdTextRequest;
-import com.marketplace.client.model.UpdateClassifiedAdTitleRequest;
+import com.marketplace.client.model.classifiedad.ApproveClassifiedAdRequest;
+import com.marketplace.client.model.classifiedad.ClassifiedAdRequest;
+import com.marketplace.client.model.classifiedad.ClassifiedAdResponse;
+import com.marketplace.client.model.classifiedad.UpdateClassifiedAdPriceRequest;
+import com.marketplace.client.model.classifiedad.UpdateClassifiedAdTextRequest;
+import com.marketplace.client.model.classifiedad.UpdateClassifiedAdTitleRequest;
 import java.util.UUID;
 import retrofit2.Call;
 import retrofit2.http.Body;

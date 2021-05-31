@@ -71,6 +71,9 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
 
     implementation "org.flywaydb:flyway-core:$flywayVersion"
+    // some functional implementations
+    implementation("io.vavr:vavr:${vavrVersion}")
+
 
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("org.slf4j:slf4j-log4j12:1.7.30")

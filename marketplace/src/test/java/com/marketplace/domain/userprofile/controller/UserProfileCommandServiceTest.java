@@ -2,6 +2,7 @@ package com.marketplace.domain.userprofile.controller;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+import com.marketplace.cqrs.event.Event;
 import com.marketplace.cqrs.event.EventId;
 import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.cqrs.framework.AggregateRoot;
@@ -11,6 +12,7 @@ import com.marketplace.domain.userprofile.DisplayName;
 import com.marketplace.domain.userprofile.FullName;
 import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
+import com.marketplace.eventstore.framework.event.EventPublisher;
 import io.vavr.control.Try;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,11 +30,16 @@ class UserProfileCommandServiceTest {
     AggregateStoreRepository aggregateStoreRepository;
     @Mock
     UserProfileQueryRepository userProfileQueryRepository;
+
+    @Mock
+    EventPublisher<Event> eventPublisher;
+
     private UserProfileCommandService userProfileCommandService;
 
     @BeforeEach
     void setup() {
-        userProfileCommandService = new UserProfileCommandService(userProfileQueryRepository, aggregateStoreRepository);
+        userProfileCommandService = new UserProfileCommandService(eventPublisher, userProfileQueryRepository,
+            aggregateStoreRepository);
     }
 
     @Test

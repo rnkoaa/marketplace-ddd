@@ -51,6 +51,10 @@ public class ClassifiedAdQueryRepositoryImpl implements ClassifiedAdQueryReposit
             .map(ClassifiedAdQueryEntityMapper::convert);
     }
 
+    @Override
+    public void deleteAll() {
+
+    }
 
     @Override
     public List<ClassifiedAdQueryEntity> findByOwner(UUID ownerId) {

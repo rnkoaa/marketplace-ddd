@@ -7,26 +7,30 @@ import com.marketplace.domain.repository.Repository;
 import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.eventstore.framework.event.EventStream;
+import com.marketplace.eventstore.jdbc.EventClassCache;
 import io.vavr.control.Try;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import org.jooq.DSLContext;
 
 @Named
 @Singleton
 public class AggregateStoreRepository
-   /* Repository<AggregateRoot<EventId, VersionedEvent>, EventId>*/ {
+    /* Repository<AggregateRoot<EventId, VersionedEvent>, EventId>*/ {
 
-    private final AggregateTypeMapper aggregateTypeMapper = AggregateTypeMapper.getInstance();
+    private final EventClassCache aggregateTypeMapper;
 
     private final EventStore<VersionedEvent> eventEventStore;
 
     @Inject
     public AggregateStoreRepository(
+        DSLContext dslContext,
         EventStore<VersionedEvent> eventEventStore) {
         this.eventEventStore = eventEventStore;
+        this.aggregateTypeMapper = EventClassCache.getInstance(dslContext);
     }
 
     public boolean exists(EventId id) {
@@ -41,7 +45,7 @@ public class AggregateStoreRepository
         }
 
         String aggregateName = id.getAggregateName();
-        return aggregateTypeMapper.getClassInfo(aggregateName)
+        return aggregateTypeMapper.get(aggregateName)
             .flatMap(clzz -> Try.of(clzz::getDeclaredConstructor))
             .flatMap(constructor -> Try.of(constructor::newInstance))
             .map(instance -> {
@@ -54,7 +58,7 @@ public class AggregateStoreRepository
     }
 
     public Optional<AggregateRoot<EventId, VersionedEvent>> add(AggregateRoot<EventId, VersionedEvent> aggregateRoot) {
-        aggregateTypeMapper.put(aggregateRoot);
+        aggregateTypeMapper.put(aggregateRoot.getClass());
         List<VersionedEvent> changes = aggregateRoot.getChanges();
         Result<Boolean> publishResult = eventEventStore
             .publish(aggregateRoot.getStreamId(), aggregateRoot.getVersion(), changes);
@@ -64,5 +68,10 @@ public class AggregateStoreRepository
                 aggregateRoot.clearChanges();
                 return aggregateRoot;
             });
+    }
+
+    public void deleteAll() {
+        System.out.println("Deleting all events");
+        eventEventStore.deleteAll();
     }
 }

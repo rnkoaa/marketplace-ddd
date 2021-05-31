@@ -3,11 +3,13 @@ package com.marketplace.domain.classifiedad.query;
 import java.util.List;
 import java.util.Optional;
 
-public interface QueryRepository<T, U>{
+public interface QueryRepository<T, U> {
 
-  Optional<T> findById(U id);
+    Optional<T> findById(U id);
 
-  List<T> findAll();
+    List<T> findAll();
 
-  Optional<T> save(T value);
+    Optional<T> save(T value);
+
+    void deleteAll();
 }

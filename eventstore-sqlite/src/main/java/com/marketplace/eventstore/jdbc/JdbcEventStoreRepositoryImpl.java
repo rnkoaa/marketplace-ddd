@@ -1,5 +1,6 @@
 package com.marketplace.eventstore.jdbc;
 
+import static com.marketplace.eventstore.jdbc.Tables.CLASS_CACHE;
 import static com.marketplace.eventstore.jdbc.Tables.EVENT_DATA;
 import static org.jooq.impl.DSL.countDistinct;
 import static org.jooq.impl.DSL.max;
@@ -11,6 +12,7 @@ import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.InvalidVersionException;
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
+import io.vavr.control.Try;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.jooq.DSLContext;
@@ -22,13 +24,14 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
     }
 
-    private static final EventClassCache eventClassCache = EventClassCache.getInstance();
+    private final EventClassCache eventClassCache;
     private final ObjectMapper objectMapper;
     private final DSLContext dslContext;
 
     public JdbcEventStoreRepositoryImpl(ObjectMapper objectMapper, DSLContext dslContext) {
         this.objectMapper = objectMapper;
         this.dslContext = dslContext;
+        eventClassCache = EventClassCache.getInstance(dslContext);
     }
 
     @Override
@@ -41,8 +44,8 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
         return fetch.stream()
             .map(eventDataRecord -> convertFromEventDataRecord(objectMapper, eventDataRecord))
-            .filter(Result::isPresent)
-            .map(Result::get)
+            .filter(Try::isSuccess)
+            .map(Try::get)
             .toList();
     }
 
@@ -55,8 +58,8 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
         return fetch.stream()
             .map(eventDataRecord -> convertFromEventDataRecord(objectMapper, eventDataRecord))
-            .filter(Result::isPresent)
-            .map(Result::get)
+            .filter(Try::isSuccess)
+            .map(Try::get)
             .toList();
     }
 
@@ -196,17 +199,24 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         return 0;
     }
 
-    private static Result<VersionedEvent> convertFromEventDataRecord(ObjectMapper objectMapper,
+    @Override
+    public void deleteAll() {
+        dslContext.truncate(EVENT_DATA).execute();
+        dslContext.truncate(CLASS_CACHE).execute();
+        dslContext.delete(EVENT_DATA).execute();
+    }
+
+    private Try<VersionedEvent> convertFromEventDataRecord(ObjectMapper objectMapper,
         EventDataRecord eventDataRecord) {
         String data = eventDataRecord.getData();
         String eventType = eventDataRecord.getEventType();
 
         if (eventType == null || eventType.isEmpty()) {
-            return Result.error("unable to determine event type");
+            return Try.failure(new RuntimeException("unable to determine event type"));
         }
 
-        Result<Class<?>> classResult = eventClassCache.get(eventType);
-        return classResult.flatmap(clzz -> deserializeJSON(objectMapper, data, clzz))
+        Try<? extends Class<?>> classResult = eventClassCache.get(eventType);
+        return classResult.flatMap(clzz -> tryDeserialize(objectMapper, data, clzz))
             .map(e -> (VersionedEvent) e);
     }
 
@@ -218,16 +228,12 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
         }
     }
 
-    public static <T> Result<T> deserializeJSON(ObjectMapper objectMapper, String json, Class<T> clzz) {
-        try {
-            return Result.of(objectMapper.readValue(json, clzz));
-        } catch (JsonProcessingException e) {
-            return Result.error(e);
-        }
+    public static <T> Try<T> tryDeserialize(ObjectMapper objectMapper, String json, Class<T> clzz) {
+        return Try.of(() -> objectMapper.readValue(json, clzz));
     }
 
     private Result<EventDataRecord> createFromEvent(Event event, int expectedVersion, Result<String> eventDataResult) {
-        Result<EventDataRecord> result = eventDataResult
+        return eventDataResult
             .map(eventData -> new EventDataRecord()
                 .setId(event.getId().toString())
                 .setStreamId(event.getStreamId())
@@ -237,12 +243,6 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
                 .setEventType(event.getClass().getSimpleName())
                 .setData(eventData)
                 .setCreated(event.getCreatedAt().toString()));
-
-        if (result.isError()) {
-            System.out.println(result.getError().getMessage());
-        }
-
-        return result;
     }
 
 }

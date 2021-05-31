@@ -3,12 +3,8 @@ package com.marketplace.client;
 import com.marketplace.client.config.ClientConfig;
 import com.marketplace.client.context.ClientContext;
 import com.marketplace.client.context.DaggerClientContext;
-import com.marketplace.client.model.ClassifiedAdResponse;
 import com.marketplace.config.ConfigLoader;
 import java.io.IOException;
-import java.util.UUID;
-import retrofit2.Call;
-import retrofit2.Response;
 
 public class ClientApplication {
 
@@ -40,18 +36,18 @@ public class ClientApplication {
 //      }
 //    }
 
-    Call<ClassifiedAdResponse> call = classifiedAdRestService.findById(UUID.fromString("da31260e-b943-425f-8563-ddb6a911662d"));
-    Response<ClassifiedAdResponse> execute = call.execute();
-    if(execute.isSuccessful()){
-      ClassifiedAdResponse body = execute.body();
-      if(body != null) {
-        System.out.println(body.toString());
-      }
-    }else{
-      if (execute.errorBody() != null) {
-        System.out.println(execute.errorBody().string());
-      }
-    }
+//    Call<ClassifiedAdResponse> call = classifiedAdRestService.findById(UUID.fromString("da31260e-b943-425f-8563-ddb6a911662d"));
+//    Response<ClassifiedAdResponse> execute = call.execute();
+//    if(execute.isSuccessful()){
+//      ClassifiedAdResponse body = execute.body();
+//      if(body != null) {
+//        System.out.println(body.toString());
+//      }
+//    }else{
+//      if (execute.errorBody() != null) {
+//        System.out.println(execute.errorBody().string());
+//      }
+//    }
 //    ClientContext context = DaggerClientContext.
 //        builder()
 ////        .config(config)

@@ -29,7 +29,7 @@ public interface EventStoreRepository {
      * Save an event for an aggregate
      *
      * @param streamId the id of the aggregate to save
-     * @param event       The event being saved for the aggregate
+     * @param event    The event being saved for the aggregate
      * @return the number of rows affected.
      */
     Result<Boolean> save(String streamId, VersionedEvent event);
@@ -37,8 +37,7 @@ public interface EventStoreRepository {
     /**
      * persist multiple events for an aggregate
      *
-     * @param event           list of events being persisted for an aggregate.
-     *                        event.aggregateName} is not null
+     * @param event list of events being persisted for an aggregate. event.aggregateName} is not null
      * @return internal id of the row persisted.
      */
     Result<Boolean> save(VersionedEvent event);
@@ -46,9 +45,8 @@ public interface EventStoreRepository {
     /**
      * persist multiple events for an aggregate
      *
-     * @param streamId     the id of the aggregate
-     * @param events           list of events being persisted for an aggregate.
-     *                        event.aggregateName} is not null
+     * @param streamId        the id of the aggregate
+     * @param events          list of events being persisted for an aggregate. event.aggregateName} is not null
      * @param expectedVersion the expected current version of the aggregate
      * @return internal id of the row persisted.
      */
@@ -57,7 +55,7 @@ public interface EventStoreRepository {
     /**
      * save an event for
      *
-     * @param streamId     the id of the aggregate
+     * @param streamId        the id of the aggregate
      * @param event           being persisted. Ensure that the {@param event.aggregateId} is not null as well as {@param
      *                        event.aggregateName} is not null
      * @param expectedVersion the expected current version of the aggregate
@@ -92,9 +90,10 @@ public interface EventStoreRepository {
     long countEvents(String streamId);
 
     /**
-     *
      * @param streamId
      * @return
      */
     int nextVersion(String streamId);
+
+    void deleteAll();
 }

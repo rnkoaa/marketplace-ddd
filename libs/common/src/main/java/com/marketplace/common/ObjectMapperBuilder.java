@@ -1,6 +1,7 @@
 package com.marketplace.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -15,7 +16,7 @@ public class ObjectMapperBuilder {
     objectMapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
 
     // Ignore null values when writing json.
-    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    objectMapper.setSerializationInclusion(Include.NON_DEFAULT);
 
     // Write times as a String instead of a Long so its human readable.
     objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);

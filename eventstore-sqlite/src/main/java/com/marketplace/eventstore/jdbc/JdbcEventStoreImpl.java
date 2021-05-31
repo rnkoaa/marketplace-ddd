@@ -102,4 +102,10 @@ public class JdbcEventStoreImpl implements EventStore<VersionedEvent> {
             return true;
         });
     }
+
+    @Override
+    public void deleteAll() {
+        System.out.println("Deleting all events");
+        eventStoreRepository.deleteAll();
+    }
 }

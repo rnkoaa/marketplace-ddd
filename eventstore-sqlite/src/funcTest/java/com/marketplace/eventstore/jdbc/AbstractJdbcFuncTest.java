@@ -1,5 +1,6 @@
 package com.marketplace.eventstore.jdbc;
 
+import static com.marketplace.eventstore.jdbc.Tables.CLASS_CACHE;
 import static com.marketplace.eventstore.jdbc.Tables.EVENT_DATA;
 
 import com.marketplace.eventstore.jdbc.flyway.FlywayMigration;
@@ -33,13 +34,15 @@ public abstract class AbstractJdbcFuncTest {
     @BeforeEach
     void setup() throws SQLException {
         int count = dslContext.delete(EVENT_DATA).execute();
+        dslContext.truncate(EVENT_DATA).execute();
+        dslContext.truncate(CLASS_CACHE).execute();
         LOGGER.info("cleaning event data {}", count);
     }
 
     @AfterEach
     void cleanup() throws SQLException {
-        dslContext.delete(EVENT_DATA).execute();
-        closeConnection(connection);
+        dslContext.truncate(EVENT_DATA).execute();
+        dslContext.truncate(CLASS_CACHE).execute();
     }
 
     @BeforeAll
@@ -50,10 +53,10 @@ public abstract class AbstractJdbcFuncTest {
     @AfterAll
     static void cleanupAll() {
 // delete db file
-        File dbFile = new File("src/funcTest/resources/db/eventstore.db");
-        if (!dbFile.delete()) {
-            LOGGER.info("unable to delete db file");
-        }
+//        File dbFile = new File("src/funcTest/resources/db/eventstore.db");
+//        if (!dbFile.delete()) {
+//            LOGGER.info("unable to delete db file");
+//        }
     }
 
     private static Connection createConnection(final String connectionString) throws SQLException {

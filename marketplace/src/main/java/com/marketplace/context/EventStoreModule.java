@@ -6,6 +6,7 @@ import com.marketplace.cqrs.event.Event;
 import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.eventstore.framework.event.EventPublisher;
 import com.marketplace.eventstore.framework.event.EventStore;
+import com.marketplace.eventstore.framework.event.EventStoreRepository;
 import com.marketplace.eventstore.impl.InMemoryEventPublisher;
 import com.marketplace.eventstore.jdbc.JdbcEventStoreImpl;
 import com.marketplace.eventstore.jdbc.JdbcEventStoreRepository;

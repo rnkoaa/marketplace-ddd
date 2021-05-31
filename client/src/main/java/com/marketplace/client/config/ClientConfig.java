@@ -1,9 +1,15 @@
 package com.marketplace.client.config;
 
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-@Data
-public class ClientConfig {
-  private String applicationUrl = "http://localhost:8080/";
+@Value.Immutable
+@JsonDeserialize(as = ImmutableClientConfig.class)
+public interface ClientConfig {
+
+    @Value.Default
+    default String getApplicationURL() {
+        return "http://localhost:8080/";
+    }
 
 }

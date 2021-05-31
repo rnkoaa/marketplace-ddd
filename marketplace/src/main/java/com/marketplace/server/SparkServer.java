@@ -12,17 +12,23 @@ public class SparkServer {
     private final ClassifiedAdCommandSparkRoutes classifiedAdCommandSparkRoutes;
     private final ClassifiedAdQuerySparkRoutes classifiedAdQuerySparkRoutes;
     private final UserProfileCommandRoutes userProfileCommandSparkRoutes;
+    private final EventSparkRoutes eventSparkRoutes;
+    private final AdminService adminService;
 
     @Inject
     public SparkServer(
         @Named("server.port") int port,
         ClassifiedAdCommandSparkRoutes classifiedAdCommandSparkRoutes,
         UserProfileCommandRoutes userProfileCommandSparkRoutes,
-        ClassifiedAdQuerySparkRoutes classifiedAdQuerySparkRoutes) {
+        EventSparkRoutes eventSparkRoutes,
+        ClassifiedAdQuerySparkRoutes classifiedAdQuerySparkRoutes,
+        AdminService adminService) {
         Spark.port(port);
         this.classifiedAdCommandSparkRoutes = classifiedAdCommandSparkRoutes;
         this.classifiedAdQuerySparkRoutes = classifiedAdQuerySparkRoutes;
         this.userProfileCommandSparkRoutes = userProfileCommandSparkRoutes;
+        this.eventSparkRoutes = eventSparkRoutes;
+        this.adminService = adminService;
     }
 
     public void run() {
@@ -86,6 +92,29 @@ public class SparkServer {
             "/user",
             MEDIA_APPLICATION_JSON,
             userProfileCommandSparkRoutes.createUserProfile());
+        Spark.put(
+            "/user/:userId",
+            MEDIA_APPLICATION_JSON,
+            userProfileCommandSparkRoutes.updateUserProfile());
+        Spark.get(
+            "/user/:userId",
+            MEDIA_APPLICATION_JSON,
+            userProfileCommandSparkRoutes.getUserProfile());
+        Spark.put(
+            "/user/:userId/name",
+            MEDIA_APPLICATION_JSON,
+            userProfileCommandSparkRoutes.updateUserFullName());
+        Spark.put(
+            "/user/:userId/photo",
+            MEDIA_APPLICATION_JSON,
+            userProfileCommandSparkRoutes.updateUserProfilePhoto());
+        Spark.put(
+            "/user/:userId/display_name",
+            MEDIA_APPLICATION_JSON,
+            userProfileCommandSparkRoutes.updateUserDisplayName());
+
+        adminService.register("/admin");
+        eventSparkRoutes.register("/event");
 
         System.out.println("Spark Server is running on port :" + Spark.port());
     }

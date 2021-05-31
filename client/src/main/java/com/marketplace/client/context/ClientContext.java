@@ -2,6 +2,7 @@ package com.marketplace.client.context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.client.ClassifiedAdRestService;
+import com.marketplace.client.UserProfileRestService;
 import com.marketplace.client.config.ClientConfig;
 import dagger.BindsInstance;
 import dagger.Component;
@@ -15,16 +16,18 @@ import javax.inject.Singleton;
 @Singleton
 public interface ClientContext {
 
-  ClassifiedAdRestService classifiedAdRestService();
+    ClassifiedAdRestService classifiedAdRestService();
 
-  ObjectMapper objectMapper();
+    UserProfileRestService getUserProfileRestService();
 
-  @Component.Builder
-  interface Builder {
+    ObjectMapper objectMapper();
 
-    ClientContext build();
+    @Component.Builder
+    interface Builder {
 
-    @BindsInstance
-    Builder config(ClientConfig config);
-  }
+        ClientContext build();
+
+        @BindsInstance
+        Builder config(ClientConfig config);
+    }
 }

@@ -11,11 +11,6 @@ public interface VersionedEvent extends Event {
     }
 
     @Value.Default
-    default boolean isNew() {
-        return false;
-    }
-
-    @Value.Default
     @Override
     default String getAggregateName() {
         return "ClassifiedAd";

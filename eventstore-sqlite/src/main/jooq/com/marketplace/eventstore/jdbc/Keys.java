@@ -4,8 +4,10 @@
 package com.marketplace.eventstore.jdbc;
 
 
+import com.marketplace.eventstore.jdbc.tables.ClassCache;
 import com.marketplace.eventstore.jdbc.tables.EventData;
 import com.marketplace.eventstore.jdbc.tables.FlywaySchemaHistory;
+import com.marketplace.eventstore.jdbc.tables.records.ClassCacheRecord;
 import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
 import com.marketplace.eventstore.jdbc.tables.records.FlywaySchemaHistoryRecord;
 
@@ -26,6 +28,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<ClassCacheRecord> PK_CLASS_CACHE = Internal.createUniqueKey(ClassCache.CLASS_CACHE, DSL.name("pk_class_cache"), new TableField[] { ClassCache.CLASS_CACHE.ID }, true);
     public static final UniqueKey<EventDataRecord> PK_EVENT_DATA = Internal.createUniqueKey(EventData.EVENT_DATA, DSL.name("pk_event_data"), new TableField[] { EventData.EVENT_DATA.ID }, true);
     public static final UniqueKey<FlywaySchemaHistoryRecord> PK_FLYWAY_SCHEMA_HISTORY = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, DSL.name("pk_flyway_schema_history"), new TableField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK }, true);
 }

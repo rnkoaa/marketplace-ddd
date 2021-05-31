@@ -14,6 +14,7 @@ import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
 import com.marketplace.eventstore.test.data.TestEvents;
 import com.marketplace.eventstore.test.events.ImmutableTestCreatedEvent;
 import com.marketplace.eventstore.test.events.TestCreatedEvent;
+import io.vavr.control.Try;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
 
-    EventClassCache eventClassCache = EventClassCache.getInstance();
+    EventClassCache eventClassCache;
     private final JdbcEventStoreRepository jdbcEventStoreRepository;
 
     final ObjectMapper objectMapper = new ObjectMapperBuilder().build();
@@ -31,6 +32,7 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
     public JdbcEventStoreRepositoryFuncTest() throws SQLException {
         super();
         jdbcEventStoreRepository = new JdbcEventStoreRepositoryImpl(objectMapper, dslContext);
+        eventClassCache = EventClassCache.getInstance(dslContext);
     }
 
     @Test
@@ -83,14 +85,14 @@ class JdbcEventStoreRepositoryFuncTest extends AbstractJdbcFuncTest {
         String eventData = eventDataRecord.get(EVENT_DATA.DATA, String.class);
         String eventType = eventDataRecord.get(EVENT_DATA.EVENT_TYPE, String.class);
 
-        Result<Class<?>> classResult = eventClassCache.get(eventType);
-        assertThat(classResult.isPresent()).isTrue();
+        Try<? extends Class<?>> classResult = eventClassCache.get(eventType);
+        assertThat(classResult.isSuccess()).isTrue();
 
-        Result<Event> eventResult = classResult
-            .flatmap(clzz -> deserializeJSON(objectMapper, eventData, clzz)
+        Try<Event> eventResult = classResult
+            .flatMap(clzz ->  Try.of(() -> objectMapper.readValue(eventData, clzz))
                 .map(res -> (Event) res));
 
-        assertThat(eventResult.isPresent()).isTrue();
+        assertThat(eventResult.isSuccess()).isTrue();
 
         Event event = eventResult.get();
         assertThat(event.getAggregateId()).isEqualByComparingTo(TestEvents.testCreatedEvent.getAggregateId());

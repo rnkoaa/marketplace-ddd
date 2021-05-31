@@ -46,7 +46,6 @@ configurations {
     flywayMigration
 }
 
-
 dependencies {
     implementation project(":libs:config")
     implementation project(":libs:common")
@@ -76,7 +75,7 @@ dependencies {
     implementation("com.google.guava:guava:30.0-jre")
 
     // some functional implementations
-    implementation('io.vavr:vavr:1.0.0-alpha-3')
+    implementation("io.vavr:vavr:${vavrVersion}")
 
     // Runtime reflections
     implementation("org.reflections:reflections:0.9.12")
@@ -100,7 +99,6 @@ dependencies {
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
     testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
 }
-
 
 test {
     useJUnitPlatform()
@@ -144,6 +142,11 @@ flyway {
     locations = ["filesystem:${projectDir}/src/main/resources/db/migration"]
 }
 
+task copyDb(type: Copy) {
+    from "${projectDir}/src/main/resources/db/marketplace.db"
+    into "${rootProject.rootDir}/db"
+}
+
 jooq {
     version = '3.14.7'  // the default (can be omitted)
     edition = nu.studer.gradle.jooq.JooqEdition.OSS  // the default (can be omitted)
@@ -183,3 +186,5 @@ jooq {
 }
 
 generateJooq.dependsOn(flywayMigrate)
+
+copyDb.dependsOn(generateJooq)

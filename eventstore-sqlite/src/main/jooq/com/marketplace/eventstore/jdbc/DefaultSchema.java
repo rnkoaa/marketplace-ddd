@@ -4,6 +4,7 @@
 package com.marketplace.eventstore.jdbc;
 
 
+import com.marketplace.eventstore.jdbc.tables.ClassCache;
 import com.marketplace.eventstore.jdbc.tables.EventData;
 import com.marketplace.eventstore.jdbc.tables.FlywaySchemaHistory;
 
@@ -27,6 +28,11 @@ public class DefaultSchema extends SchemaImpl {
      * The reference instance of <code>DEFAULT_SCHEMA</code>
      */
     public static final DefaultSchema DEFAULT_SCHEMA = new DefaultSchema();
+
+    /**
+     * The table <code>class_cache</code>.
+     */
+    public final ClassCache CLASS_CACHE = ClassCache.CLASS_CACHE;
 
     /**
      * The table <code>event_data</code>.
@@ -54,6 +60,7 @@ public class DefaultSchema extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.<Table<?>>asList(
+            ClassCache.CLASS_CACHE,
             EventData.EVENT_DATA,
             FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY);
     }
