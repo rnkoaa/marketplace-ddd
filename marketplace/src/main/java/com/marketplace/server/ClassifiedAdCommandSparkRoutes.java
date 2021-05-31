@@ -1,15 +1,13 @@
 package com.marketplace.server;
 
-import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.cqrs.command.CommandHandlerResult;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
-import com.marketplace.domain.classifiedad.controller.ClassifiedAdController;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.controller.UpdateClassifiedAdResponse;
+import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
 import io.vavr.control.Try;
 import java.util.Map;
 import java.util.UUID;
@@ -26,227 +24,238 @@ import spark.Route;
 @Named
 public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ClassifiedAdCommandSparkRoutes.class);
-  private final ObjectMapper objectMapper;
-  private final ClassifiedAdController classifiedAdController;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassifiedAdCommandSparkRoutes.class);
+    private final ObjectMapper objectMapper;
+    private final ClassifiedAdService classifiedAdService;
 
-  @Inject
-  public ClassifiedAdCommandSparkRoutes(ObjectMapper objectMapper, ClassifiedAdController classifiedAdController) {
-      super(objectMapper);
-    this.objectMapper = objectMapper;
-    this.classifiedAdController = classifiedAdController;
-  }
+    @Inject
+    public ClassifiedAdCommandSparkRoutes(ObjectMapper objectMapper, ClassifiedAdService classifiedAdService) {
+        super(objectMapper);
+        this.objectMapper = objectMapper;
+        this.classifiedAdService = classifiedAdService;
+    }
 
-  public Route createClassifiedAdRoute() {
-    return (request, response) -> {
+    public Route createClassifiedAdRoute() {
+        return (request, response) -> {
       byte[] body = request.bodyAsBytes();
       CreateClassifiedAd createAdDto = objectMapper.readValue(body, CreateClassifiedAd.class);
-      CommandHandlerResult<CreateAdResponse> ad = classifiedAdController.createAd(createAdDto);
-      if (ad.isSuccessful() && ad.getResult().isPresent()) {
-        var createAdResponse = ad.getResult();
-        response.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
-        response.type(MEDIA_APPLICATION_JSON);
-        response.status(201);
-        response.header("Location", String.format("/classified_ad/%s", createAdResponse.get()));
-        return NO_CONTENT;
-      } else {
-        Map<String, Object> resMessage = Map.of(
-            "status", ad.isSuccessful(),
-            "message", ad.getMessage()
-        );
-        response.status(404);
-        return serializeResponse(resMessage);
-      }
-    };
-  }
+            Try<CreateAdResponse> handle = classifiedAdService.handle(createAdDto);
 
-  public Route updateClassifiedAd() {
-    return (request, response) -> {
-      String classifiedAdId = getClassifiedIdFromRequest(request);
-      response.type("application/json");
-      var updateDto = read(classifiedAdId, request);
-      updateDto = ImmutableUpdateClassifiedAd.copyOf(updateDto).withClassifiedAdId(UUID.fromString(classifiedAdId));
-      var commandResult = classifiedAdController.updateClassifiedAd(updateDto);
-      return processResponse(response, commandResult);
-    };
-  }
-
-  public Route updateClassifiedAdTitle() {
-    return (req, res) -> {
-      String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(classifiedAdId, req);
-      return updateClassifiedAd.getTitle().map(title -> {
-        var commandResult = classifiedAdController
-            .updateClassifiedTitle(UUID.fromString(classifiedAdId), title);
-        return processUpdateResponse(res, commandResult);
-      }).orElseGet(() -> {
-        Map<String, Object> resMessage = Map.of(
-            "status", false,
-            "message", "title is required to change ownership of ad"
-        );
-        res.status(404);
-        return serializeResponse(resMessage);
-      });
-    };
-  }
-
-  public Route updateClassifiedAdOwner() {
-    return (req, res) -> {
-      String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(classifiedAdId, req);
-      return updateClassifiedAd.getOwnerId().map(ownerId -> {
-        var commandResult = classifiedAdController
-            .updateClassifiedAdOwner(UUID.fromString(classifiedAdId), ownerId);
-        return processUpdateResponse(res, commandResult);
-      }).orElseGet(() -> {
-        Map<String, Object> resMessage = Map.of(
-            "status", false,
-            "message", "ownerId is required to change ownership of ad"
-        );
-        res.status(404);
-        return serializeResponse(resMessage);
-      });
-    };
-  }
-
-  public Route updateClassifiedAdPrice() {
-    return (req, res) -> {
-      String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(classifiedAdId, req);
-      return updateClassifiedAd.getPrice()
-          .map(priceDto -> {
-            var commandResult = classifiedAdController
-                .updateClassifiedAdPrice(UUID.fromString(classifiedAdId),
-                    priceDto.getAmount(),
-                    priceDto.getCurrencyCode());
-            return processUpdateResponse(res, commandResult);
-          }).orElseGet(() -> {
-            Map<String, Object> resMessage = Map.of(
-                "status", false,
-                "message", "price is required to change price of ad"
-            );
-            res.status(404);
-            return serializeResponse(resMessage);
-          });
-    };
-  }
-
-  public Route updateClassifiedAdText() {
-    return (req, res) -> {
-      String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(classifiedAdId, req);
-      return updateClassifiedAd.getText()
-          .map(text -> {
-            var commandResult = classifiedAdController
-                .updateClassifiedText(UUID.fromString(classifiedAdId), text);
-            return processUpdateResponse(res, commandResult);
-          })
-          .orElseGet(() -> {
-            Map<String, Object> resMessage = Map.of(
-                "status", false,
-                "message", "text is required to change text of ad"
-            );
-            res.status(404);
-            return serializeResponse(resMessage);
-          });
-    };
-  }
-
-  public Route approveClassifiedAd() {
-    return (req, res) -> {
-      String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(classifiedAdId, req);
-      return updateClassifiedAd.getApprovedBy()
-          .map(approvedBy -> {
-            var commandResult = classifiedAdController
-                .approveClassifiedAd(UUID.fromString(classifiedAdId), approvedBy);
-            return processUpdateResponse(res, commandResult);
-          }).orElseGet(() -> {
-
-            Map<String, Object> resMessage = Map.of(
-                "status", false,
-                "message", "approver is required "
-            );
-            res.status(404);
-            return Try.of(() -> objectMapper.writeValueAsString(resMessage))
-                .get();
-          });
-    };
-  }
-
-  private String processUpdateResponse(Response res, CommandHandlerResult<UpdateClassifiedAdResponse> commandResult) {
-    if (commandResult.isSuccessful()) {
-      res.status(204);
-      return NO_CONTENT;
-    } else {
-      Map<String, Object> resMessage = Map.of(
-          "status", commandResult.isSuccessful(),
-          "message", commandResult.getMessage()
-      );
-      res.status(404);
-      return serializeResponse(resMessage);
+//      CommandHandlerResult<CreateAdResponse> ad = classifiedAdController.createAd(createAdDto);
+//      if (ad.isSuccessful() && ad.getResult().isPresent()) {
+//        var createAdResponse = ad.getResult();
+//        response.header(HEADER_CONTENT_TYPE, MEDIA_APPLICATION_JSON);
+//        response.type(MEDIA_APPLICATION_JSON);
+//        response.status(201);
+//        response.header("Location", String.format("/classified_ad/%s", createAdResponse.get()));
+//        return NO_CONTENT;
+//      } else {
+//        Map<String, Object> resMessage = Map.of(
+//            "status", ad.isSuccessful(),
+//            "message", ad.getMessage()
+//        );
+//        response.status(404);
+//        return serializeResponse(resMessage);
+//      }
+            return null;
+        };
     }
-  }
 
-  public Route publishClassifiedAd() {
-    return (req, res) -> {
-      String classifiedAdId = getClassifiedIdFromRequest(req);
-      var commandResult = classifiedAdController
-          .publishClassifiedAd(UUID.fromString(classifiedAdId));
-      return processResponse(res, commandResult);
-    };
-  }
-
-  private Object processResponse(Response res, CommandHandlerResult<UpdateClassifiedAdResponse> commandResult) {
-    if (commandResult.isSuccessful()) {
-      res.status(204);
-      return NO_CONTENT;
-    } else {
-      Map<String, Object> resMessage = Map.of(
-          "status", commandResult.isSuccessful(),
-          "message", commandResult.getMessage()
-      );
-      res.status(404);
-      return serializeResponse(resMessage);
+    public Route updateClassifiedAd() {
+        return (request, response) -> {
+//      String classifiedAdId = getClassifiedIdFromRequest(request);
+//      response.type("application/json");
+//      var updateDto = read(classifiedAdId, request);
+//      updateDto = ImmutableUpdateClassifiedAd.copyOf(updateDto).withClassifiedAdId(UUID.fromString(classifiedAdId));
+//      var commandResult = classifiedAdController.updateClassifiedAd(updateDto);
+//      return processResponse(response, commandResult);
+            return null;
+        };
     }
-  }
 
-  public Route addPictureToClassifiedAd() {
-    return (req, res) -> {
-      String classifiedAdId = getClassifiedIdFromRequest(req);
-      var updateClassifiedAd = read(classifiedAdId, req);
-      return updateClassifiedAd.getPictures()
-          .map(pictureDtos -> {
-            var commandResult = classifiedAdController.addPictures(UUID.fromString(classifiedAdId), pictureDtos);
-            return processResponse(res, commandResult);
-          }).orElseGet(() -> {
+    public Route updateClassifiedAdTitle() {
+        return (req, res) -> {
+//      String classifiedAdId = getClassifiedIdFromRequest(req);
+//      var updateClassifiedAd = read(classifiedAdId, req);
+//      return updateClassifiedAd.getTitle().map(title -> {
+//        var commandResult = classifiedAdController
+//            .updateClassifiedTitle(UUID.fromString(classifiedAdId), title);
+//        return processUpdateResponse(res, commandResult);
+//      }).orElseGet(() -> {
+//        Map<String, Object> resMessage = Map.of(
+//            "status", false,
+//            "message", "title is required to change ownership of ad"
+//        );
+//        res.status(404);
+//        return serializeResponse(resMessage);
+//      });
+            return null;
+        };
+    }
+
+    public Route updateClassifiedAdOwner() {
+        return (req, res) -> {
+//      String classifiedAdId = getClassifiedIdFromRequest(req);
+//      var updateClassifiedAd = read(classifiedAdId, req);
+//      return updateClassifiedAd.getOwnerId().map(ownerId -> {
+//        var commandResult = classifiedAdController
+//            .updateClassifiedAdOwner(UUID.fromString(classifiedAdId), ownerId);
+//        return processUpdateResponse(res, commandResult);
+//      }).orElseGet(() -> {
+//        Map<String, Object> resMessage = Map.of(
+//            "status", false,
+//            "message", "ownerId is required to change ownership of ad"
+//        );
+//        res.status(404);
+//        return serializeResponse(resMessage);
+//      });
+            return null;
+        };
+    }
+
+    public Route updateClassifiedAdPrice() {
+        return (req, res) -> {
+//      String classifiedAdId = getClassifiedIdFromRequest(req);
+//      var updateClassifiedAd = read(classifiedAdId, req);
+//      return updateClassifiedAd.getPrice()
+//          .map(priceDto -> {
+//            var commandResult = classifiedAdController
+//                .updateClassifiedAdPrice(UUID.fromString(classifiedAdId),
+//                    priceDto.getAmount(),
+//                    priceDto.getCurrencyCode());
+//            return processUpdateResponse(res, commandResult);
+//          }).orElseGet(() -> {
+//            Map<String, Object> resMessage = Map.of(
+//                "status", false,
+//                "message", "price is required to change price of ad"
+//            );
+//            res.status(404);
+//            return serializeResponse(resMessage);
+//          });
+            return null;
+        };
+    }
+
+    public Route updateClassifiedAdText() {
+        return (req, res) -> {
+//      String classifiedAdId = getClassifiedIdFromRequest(req);
+//      var updateClassifiedAd = read(classifiedAdId, req);
+//      return updateClassifiedAd.getText()
+//          .map(text -> {
+//            var commandResult = classifiedAdController
+//                .updateClassifiedText(UUID.fromString(classifiedAdId), text);
+//            return processUpdateResponse(res, commandResult);
+//          })
+//          .orElseGet(() -> {
+//            Map<String, Object> resMessage = Map.of(
+//                "status", false,
+//                "message", "text is required to change text of ad"
+//            );
+//            res.status(404);
+//            return serializeResponse(resMessage);
+//          });
+            return null;
+        };
+    }
+
+    public Route approveClassifiedAd() {
+        return (req, res) -> {
+//      String classifiedAdId = getClassifiedIdFromRequest(req);
+//      var updateClassifiedAd = read(classifiedAdId, req);
+//      return updateClassifiedAd.getApprovedBy()
+//          .map(approvedBy -> {
+//            var commandResult = classifiedAdController
+//                .approveClassifiedAd(UUID.fromString(classifiedAdId), approvedBy);
+//            return processUpdateResponse(res, commandResult);
+//          }).orElseGet(() -> {
+//
+//            Map<String, Object> resMessage = Map.of(
+//                "status", false,
+//                "message", "approver is required "
+//            );
+//            res.status(404);
+//            return Try.of(() -> objectMapper.writeValueAsString(resMessage))
+//                .get();
+//          });
+            return null;
+        };
+    }
+
+    private String processUpdateResponse(Response res, CommandHandlerResult<UpdateClassifiedAdResponse> commandResult) {
+        if (commandResult.isSuccessful()) {
+            res.status(204);
+            return NO_CONTENT;
+        } else {
             Map<String, Object> resMessage = Map.of(
-                "status", false,
-                "message", "at least add a picture to be added to classifiedAd"
+                "status", commandResult.isSuccessful(),
+                "message", commandResult.getMessage()
             );
             res.status(404);
             return serializeResponse(resMessage);
-          });
-    };
-  }
+        }
+    }
 
-  public String serializeResponse(Object object) {
-    return Try.of(() -> objectMapper.writeValueAsString(object))
-        .onFailure(ex -> LOGGER.info("error while serializing object with message {}", ex.getMessage()))
-        .getOrElse("");
-  }
+    public Route publishClassifiedAd() {
+        return (req, res) -> {
+//      String classifiedAdId = getClassifiedIdFromRequest(req);
+//      var commandResult = classifiedAdController
+//          .publishClassifiedAd(UUID.fromString(classifiedAdId));
+//      return processResponse(res, commandResult);
+            return null;
+        };
+    }
 
-  private UpdateClassifiedAd read(String classifiedAdId, Request req) {
-    byte[] bytes = req.bodyAsBytes();
-    UpdateClassifiedAd updateClassifiedAd = Try.of(() -> objectMapper.readValue(bytes, UpdateClassifiedAd.class))
-        .onFailure(ex -> {
-          System.out.println("error deserializing update request object with error ");
-          System.out.println(ex.getMessage());
-          LOGGER.info("error deserializing update request object with error {}", ex.getMessage());
-        })
-        .getOrElseThrow(() -> new IllegalArgumentException("failed to deserialize request body"));
-    return ImmutableUpdateClassifiedAd.copyOf(updateClassifiedAd)
-        .withClassifiedAdId(UUID.fromString(classifiedAdId));
-  }
+    private Object processResponse(Response res, CommandHandlerResult<UpdateClassifiedAdResponse> commandResult) {
+        if (commandResult.isSuccessful()) {
+            res.status(204);
+            return NO_CONTENT;
+        } else {
+            Map<String, Object> resMessage = Map.of(
+                "status", commandResult.isSuccessful(),
+                "message", commandResult.getMessage()
+            );
+            res.status(404);
+            return serializeResponse(resMessage);
+        }
+    }
+
+    public Route addPictureToClassifiedAd() {
+        return (req, res) -> {
+//      String classifiedAdId = getClassifiedIdFromRequest(req);
+//      var updateClassifiedAd = read(classifiedAdId, req);
+//      return updateClassifiedAd.getPictures()
+//          .map(pictureDtos -> {
+//            var commandResult = classifiedAdController.addPictures(UUID.fromString(classifiedAdId), pictureDtos);
+//            return processResponse(res, commandResult);
+//          }).orElseGet(() -> {
+//            Map<String, Object> resMessage = Map.of(
+//                "status", false,
+//                "message", "at least add a picture to be added to classifiedAd"
+//            );
+//            res.status(404);
+//            return serializeResponse(resMessage);
+//          });
+            return null;
+        };
+    }
+
+    public String serializeResponse(Object object) {
+        return Try.of(() -> objectMapper.writeValueAsString(object))
+            .onFailure(ex -> LOGGER.info("error while serializing object with message {}", ex.getMessage()))
+            .getOrElse("");
+    }
+
+    private UpdateClassifiedAd read(String classifiedAdId, Request req) {
+        byte[] bytes = req.bodyAsBytes();
+        UpdateClassifiedAd updateClassifiedAd = Try.of(() -> objectMapper.readValue(bytes, UpdateClassifiedAd.class))
+            .onFailure(ex -> {
+                System.out.println("error deserializing update request object with error ");
+                System.out.println(ex.getMessage());
+                LOGGER.info("error deserializing update request object with error {}", ex.getMessage());
+            })
+            .getOrElseThrow(() -> new IllegalArgumentException("failed to deserialize request body"));
+        return ImmutableUpdateClassifiedAd.copyOf(updateClassifiedAd)
+            .withClassifiedAdId(UUID.fromString(classifiedAdId));
+    }
 
 }

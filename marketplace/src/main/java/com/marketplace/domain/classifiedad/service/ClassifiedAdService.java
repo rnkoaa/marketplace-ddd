@@ -12,11 +12,17 @@ import com.marketplace.domain.classifiedad.controller.*;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.cqrs.framework.Strings;
 
+import com.marketplace.domain.userprofile.controller.ImmutableCreateUserProfileResult;
+import io.vavr.control.Try;
 import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
 import java.util.Optional;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
+@Named
+@Singleton
 public class ClassifiedAdService {
 
     private final AggregateStoreRepository aggregateStoreRepository;
@@ -26,7 +32,7 @@ public class ClassifiedAdService {
         this.aggregateStoreRepository = aggregateStoreRepository;
     }
 
-    public CommandHandlerResult<CreateAdResponse> handle(CreateClassifiedAd command) {
+    public Try<CreateAdResponse> handle(CreateClassifiedAd command) {
         ClassifiedAdId classifiedAdId = command.getClassifiedAdId()
             .map(ClassifiedAdId::from)
             .orElseGet(ClassifiedAdId::new);
@@ -38,22 +44,13 @@ public class ClassifiedAdService {
         command.getText()
             .ifPresent(text -> classifiedAd.updateText(new ClassifiedAdText(text)));
 
-        var saved = aggregateStoreRepository.add(classifiedAd);
-        if (saved.isEmpty()) {
-            return ImmutableCommandHandlerResult.<CreateAdResponse>builder()
-                .isSuccessful(false)
-                .message("failed to save classifiedAd")
-                .build();
-        }
-        var classifiedAdResponse = ImmutableCreateAdResponse.builder()
-            .ownerId(command.getOwnerId())
-            .classifiedAdId(classifiedAdId.id())
-            .build();
-
-        return ImmutableCommandHandlerResult.<CreateAdResponse>builder()
-            .result(classifiedAdResponse)
-            .isSuccessful(true)
-            .build();
+        return Try.of(() -> aggregateStoreRepository.add(classifiedAd))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(user -> ImmutableCreateAdResponse.builder()
+                .ownerId(command.getOwnerId())
+                .classifiedAdId(classifiedAdId.id())
+                .build());
     }
 
     public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAd command) {

@@ -7,6 +7,7 @@ import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryEntity;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryService;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
 
+import io.vavr.control.Try;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,7 +30,7 @@ public class ClassifiedAdController {
     this.classifiedAdQueryService = classifiedAdQueryService;
   }
 
-  public CommandHandlerResult<CreateAdResponse> createAd(CreateClassifiedAd createClassifiedAd) {
+  public Try<CreateAdResponse> createAd(CreateClassifiedAd createClassifiedAd) {
     return classifiedAdService.handle(createClassifiedAd);
   }
 
