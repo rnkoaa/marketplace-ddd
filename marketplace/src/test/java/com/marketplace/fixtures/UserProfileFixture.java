@@ -1,8 +1,8 @@
 package com.marketplace.fixtures;
 
 import com.marketplace.context.ObjectMapperModule;
-import com.marketplace.domain.userprofile.controller.CreateUserProfileCommand;
-import com.marketplace.domain.userprofile.controller.UpdateUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.command.CreateUserProfileCommand;
+import com.marketplace.domain.userprofile.controller.command.UpdateUserProfileCommand;
 
 import java.io.IOException;
 

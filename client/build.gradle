@@ -74,7 +74,6 @@ test {
     }
 }
 
-
 task functionalTest(type: Test) {
     testClassesDirs = sourceSets.funcTest.output.classesDirs
     classpath = sourceSets.funcTest.runtimeClasspath

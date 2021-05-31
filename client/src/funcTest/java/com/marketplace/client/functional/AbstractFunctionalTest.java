@@ -1,6 +1,6 @@
 package com.marketplace.client.functional;
 
-import com.marketplace.client.UserProfileRestService;
+import com.marketplace.client.userprofile.UserProfileRestService;
 import com.marketplace.client.config.ClientConfig;
 import com.marketplace.client.config.ImmutableClientConfig;
 import com.marketplace.client.context.ClientContext;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.TestInstance;
 public class AbstractFunctionalTest {
 
     ClientContext clientContext;
-    UserProfileRestService userProfileRestService;
+    protected UserProfileRestService userProfileRestService;
 
     @BeforeAll
     void setupAll() throws IOException {

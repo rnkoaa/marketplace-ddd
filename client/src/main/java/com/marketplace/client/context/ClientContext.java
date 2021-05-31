@@ -1,8 +1,8 @@
 package com.marketplace.client.context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.client.ClassifiedAdRestService;
-import com.marketplace.client.UserProfileRestService;
+import com.marketplace.client.classifiedad.ClassifiedAdRestService;
+import com.marketplace.client.userprofile.UserProfileRestService;
 import com.marketplace.client.config.ClientConfig;
 import dagger.BindsInstance;
 import dagger.Component;
@@ -21,6 +21,8 @@ public interface ClientContext {
     UserProfileRestService getUserProfileRestService();
 
     ObjectMapper objectMapper();
+
+    ObjectMapper yamlObjectMapper();
 
     @Component.Builder
     interface Builder {

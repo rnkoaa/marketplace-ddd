@@ -3,8 +3,8 @@ package com.marketplace.server;
 import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketplace.domain.userprofile.controller.ImmutableDeleteAllUsersCommand;
 import com.marketplace.domain.userprofile.controller.UserProfileCommandService;
+import com.marketplace.domain.userprofile.controller.command.ImmutableDeleteAllUsersCommand;
 import com.marketplace.domain.userprofile.repository.UserProfileQueryRepository;
 import javax.inject.Inject;
 import javax.inject.Named;

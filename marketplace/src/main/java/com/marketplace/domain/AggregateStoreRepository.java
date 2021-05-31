@@ -18,17 +18,14 @@ import org.jooq.DSLContext;
 
 @Named
 @Singleton
-public class AggregateStoreRepository
-    /* Repository<AggregateRoot<EventId, VersionedEvent>, EventId>*/ {
+public class AggregateStoreRepository {
 
     private final EventClassCache aggregateTypeMapper;
 
     private final EventStore<VersionedEvent> eventEventStore;
 
     @Inject
-    public AggregateStoreRepository(
-        DSLContext dslContext,
-        EventStore<VersionedEvent> eventEventStore) {
+    public AggregateStoreRepository(DSLContext dslContext, EventStore<VersionedEvent> eventEventStore) {
         this.eventEventStore = eventEventStore;
         this.aggregateTypeMapper = EventClassCache.getInstance(dslContext);
     }
@@ -71,7 +68,6 @@ public class AggregateStoreRepository
     }
 
     public void deleteAll() {
-        System.out.println("Deleting all events");
         eventEventStore.deleteAll();
     }
 }
