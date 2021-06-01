@@ -1,19 +1,24 @@
 package com.marketplace.domain.classifiedad.controller;
 
-import com.marketplace.domain.classifiedad.command.*;
+import com.marketplace.domain.classifiedad.command.ImmutableApproveClassifiedAd;
+import com.marketplace.domain.classifiedad.command.ImmutablePublishClassifiedAd;
+import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAdOwner;
+import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAdPrice;
+import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAdText;
+import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAdTitle;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryEntity;
 import com.marketplace.domain.classifiedad.query.ClassifiedAdQueryService;
 import com.marketplace.domain.classifiedad.service.ClassifiedAdService;
-
 import io.vavr.control.Try;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 @Named
 @Singleton
@@ -34,11 +39,11 @@ public class ClassifiedAdController {
     return classifiedAdService.handle(updateClassifiedAd);
   }
 
-  public Try<AddPictureResponse> addPicture(AddPictureToClassifiedAd addPictureToClassifiedAd) {
+  public Try<UpdateClassifiedAdResponse> addPicture(AddPictureToClassifiedAd addPictureToClassifiedAd) {
     return classifiedAdService.handle(addPictureToClassifiedAd);
   }
 
-  public Try<ResizePictureResponse> resizePicture(ResizeClassifiedAdPicture resizeClassifiedAdPicture) {
+  public Try<UpdateClassifiedAdResponse> resizePicture(ResizeClassifiedAdPicture resizeClassifiedAdPicture) {
     return classifiedAdService.handle(resizeClassifiedAdPicture);
   }
 
@@ -50,7 +55,7 @@ public class ClassifiedAdController {
   public Try<UpdateClassifiedAdResponse> updateClassifiedAdOwner(UUID classifiedAdId, UUID ownerId) {
     return classifiedAdService.handle(ImmutableUpdateClassifiedAdOwner.builder()
         .ownerId(ownerId)
-        .id(classifiedAdId)
+        .classifiedAdId(classifiedAdId)
         .build());
   }
 

@@ -13,6 +13,7 @@ import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.controller.ImmutableAddPictureToClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.ImmutableResizeClassifiedAdPicture;
 import com.marketplace.domain.classifiedad.controller.ResizeClassifiedAdPicture;
+import com.marketplace.domain.classifiedad.controller.UpdateClassifiedAdResponse;
 import com.marketplace.fixtures.LoadAddPicture;
 import com.marketplace.fixtures.LoadCreateAdEvent;
 import com.marketplace.fixtures.LoadResizePicture;
@@ -46,13 +47,13 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
             .copyOf(LoadAddPicture.load())
             .withClassifiedAdId(adResponse.getClassifiedAdId());
 
-        Try<AddPictureResponse> maybeAddPicture = classifiedAdService.handle(addPictureToClassifiedAd);
+        Try<UpdateClassifiedAdResponse> maybeAddPicture = classifiedAdService.handle(addPictureToClassifiedAd);
         assertThat(maybeAddPicture.isSuccess()).isTrue();
 
-        AddPictureResponse addPictureResponse = maybeAddPicture.get();
+        UpdateClassifiedAdResponse addPictureResponse = maybeAddPicture.get();
 
-        assertThat(addPictureResponse.getClassifiedAdId()).isPresent();
-        assertThat(addPictureResponse.getClassifiedAdId().get()).isEqualByComparingTo(adResponse.getClassifiedAdId());
+        assertThat(addPictureResponse.getId()).isNotNull();
+        assertThat(addPictureResponse.getId()).isEqualByComparingTo(adResponse.getClassifiedAdId());
 //        controller.addPicture(addPictureToClassifiedAd);
 //
 //        assert repository != null;
@@ -137,18 +138,17 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
         AddPictureToClassifiedAd addPictureToClassifiedAd = ImmutableAddPictureToClassifiedAd
             .copyOf(LoadAddPicture.load())
             .withClassifiedAdId(adResponse.getClassifiedAdId());
-        Try<AddPictureResponse> maybeAddResponse = classifiedAdService.handle(addPictureToClassifiedAd);
+        Try<UpdateClassifiedAdResponse> maybeAddResponse = classifiedAdService.handle(addPictureToClassifiedAd);
         assertThat(maybeAddResponse.isSuccess()).isTrue();
 
-        AddPictureResponse addPictureResponse = maybeAddResponse.get();
+        UpdateClassifiedAdResponse addPictureResponse = maybeAddResponse.get();
 
-        assertThat(addPictureResponse.getClassifiedAdId()).isPresent();
-        assertThat(addPictureResponse.getId()).isPresent();
+        assertThat(addPictureResponse.getId()).isNotNull();
 
         ResizeClassifiedAdPicture resizePictureCommand = ImmutableResizeClassifiedAdPicture
             .copyOf(LoadResizePicture.load())
             .withClassifiedAdId(adResponse.getClassifiedAdId())
-            .withId(addPictureResponse.getId().get());
+            .withId(addPictureResponse.getId());
         classifiedAdService.handle(resizePictureCommand);
 
         Optional<ClassifiedAd> load = classifiedAdService.findById(new ClassifiedAdId(adResponse.getClassifiedAdId()));

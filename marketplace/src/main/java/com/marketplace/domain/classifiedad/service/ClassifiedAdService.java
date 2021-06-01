@@ -186,6 +186,7 @@ public class ClassifiedAdService {
             .map(Optional::get)
             .map(user -> ImmutableUpdateClassifiedAdResponse.builder()
                 .id(classifiedAd.getId().id())
+                .ownerId(classifiedAd.getOwnerId().id())
                 .build());
     }
 
