@@ -1,23 +1,40 @@
 package com.marketplace.domain.classifiedad.service;
 
-import com.marketplace.cqrs.command.CommandHandlerResult;
-import com.marketplace.cqrs.command.ImmutableCommandHandlerResult;
+import com.marketplace.cqrs.framework.Strings;
 import com.marketplace.domain.AggregateStoreRepository;
 import com.marketplace.domain.PictureId;
 import com.marketplace.domain.PictureSize;
-import com.marketplace.domain.classifiedad.*;
-import com.marketplace.domain.classifiedad.command.*;
+import com.marketplace.domain.classifiedad.ClassifiedAd;
+import com.marketplace.domain.classifiedad.ClassifiedAdId;
+import com.marketplace.domain.classifiedad.ClassifiedAdText;
+import com.marketplace.domain.classifiedad.ClassifiedAdTitle;
+import com.marketplace.domain.classifiedad.DefaultCurrencyLookup;
+import com.marketplace.domain.classifiedad.Money;
+import com.marketplace.domain.classifiedad.Price;
+import com.marketplace.domain.classifiedad.command.ApproveClassifiedAd;
+import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
+import com.marketplace.domain.classifiedad.command.PublishClassifiedAd;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
-import com.marketplace.domain.classifiedad.controller.*;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdOwner;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdPrice;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdText;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdTitle;
+import com.marketplace.domain.classifiedad.controller.AddPictureToClassifiedAd;
+import com.marketplace.domain.classifiedad.controller.AddPicturesToClassifiedAd;
+import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
+import com.marketplace.domain.classifiedad.controller.ImmutableCreateAdResponse;
+import com.marketplace.domain.classifiedad.controller.ImmutableUpdateClassifiedAdResponse;
+import com.marketplace.domain.classifiedad.controller.ResizeClassifiedAdPicture;
+import com.marketplace.domain.classifiedad.controller.UpdateClassifiedAdResponse;
 import com.marketplace.domain.shared.UserId;
-import com.marketplace.cqrs.framework.Strings;
-
-import com.marketplace.domain.userprofile.controller.ImmutableCreateUserProfileResult;
+import com.marketplace.domain.userprofile.controller.NotFoundException;
 import io.vavr.control.Try;
 import java.util.List;
-import java.util.UUID;
-import javax.inject.Inject;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -53,74 +70,39 @@ public class ClassifiedAdService {
                 .build());
     }
 
-    public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAd command) {
-        Optional<UUID> mayBeClassifiedAdId = command.getClassifiedAdId();
-        return mayBeClassifiedAdId
-            .flatMap(classifiedAdId -> findById(new ClassifiedAdId(classifiedAdId)))
-            .flatMap(classifiedAd -> {
-                command.getOwnerId().ifPresent(ownerId -> classifiedAd.updateOwner(new UserId(ownerId)));
-                command.getTitle().ifPresent(title -> classifiedAd.updateTitle(new ClassifiedAdTitle(title)));
-                command.getText().ifPresent(text -> classifiedAd.updateText(new ClassifiedAdText(text)));
-                command.getPrice().ifPresent(priceDto -> {
-                    var money = new Money(priceDto.getAmount(), priceDto.getCurrencyCode(),
-                        new DefaultCurrencyLookup());
-                    var price = new Price(money);
-                    classifiedAd.updatePrice(price);
-                });
+    public Try<UpdateClassifiedAdResponse> handle(UpdateClassifiedAd command) {
+        UUID classifiedAdId = command.getClassifiedAdId()
+            .orElseThrow(() -> new IllegalArgumentException("classified id is invalid"));
+        return update(classifiedAdId, classifiedAd -> {
+            command.getOwnerId().ifPresent(ownerId -> classifiedAd.updateOwner(new UserId(ownerId)));
+            command.getTitle().ifPresent(title -> classifiedAd.updateTitle(new ClassifiedAdTitle(title)));
+            command.getText().ifPresent(text -> classifiedAd.updateText(new ClassifiedAdText(text)));
+            command.getPrice().ifPresent(priceDto -> {
+                var money = new Money(priceDto.getAmount(), priceDto.getCurrencyCode(),
+                    new DefaultCurrencyLookup());
+                var price = new Price(money);
+                classifiedAd.updatePrice(price);
+            });
 
-                command.getApprovedBy().ifPresent(approver -> classifiedAd.approve(new UserId(approver)));
-
-                return aggregateStoreRepository.add(classifiedAd);
-            })
-            .map(it -> (ClassifiedAd) it)
-            .map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .result(ImmutableUpdateClassifiedAdResponse.builder()
-                    .id(classifiedAd.getId().id())
-                    .ownerId(classifiedAd.getOwnerId().id())
-                    .build())
-                .isSuccessful(true)
-                .build()
-            ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .isSuccessful(false)
-                .message("classifiedAd not found to be updated")
-                .build());
+            command.getApprovedBy().ifPresent(approver -> classifiedAd.approve(new UserId(approver)));
+            return doTryUpdates(classifiedAd);
+        });
     }
 
-    public AddPictureResponse handle(AddPictureToClassifiedAd command) {
-        return findById(new ClassifiedAdId(command.getClassifiedAdId()))
-            .flatMap(classifiedAd -> {
-                PictureSize pictureSize = new PictureSize(command.getWidth(), command.getHeight());
-                var pictureId = classifiedAd.addPicture(command.getUri(), pictureSize, 0);
-                return aggregateStoreRepository.add(classifiedAd)
-                    .map(res -> ImmutableAddPictureResponse.builder()
-                        .id(pictureId.id())
-                        .status(true)
-                        .classifiedAdId(res.getId().id())
-                        .build());
-            }).orElse(ImmutableAddPictureResponse
-                .builder()
-                .status(false)
-                .message("classifiedAd not found to be updated")
-                .build()
-            );
+    public Try<UpdateClassifiedAdResponse> handle(AddPictureToClassifiedAd command) {
+        return update(command.getClassifiedAdId(), classifiedAd -> {
+            PictureSize pictureSize = new PictureSize(command.getWidth(), command.getHeight());
+            classifiedAd.addPicture(command.getUri(), pictureSize, 0);
+            return doTryUpdates(classifiedAd);
+        });
     }
 
-    public ResizePictureResponse handle(ResizeClassifiedAdPicture command) {
-        return findById(new ClassifiedAdId(command.getClassifiedAdId()))
-            .flatMap(classifiedAd -> {
-                PictureSize pictureSize = new PictureSize(command.getWidth(), command.getHeight());
-                var pictureId = classifiedAd.resizePicture(new PictureId(command.getId()), pictureSize);
-                return aggregateStoreRepository.add(classifiedAd)
-                    .map(res -> ImmutableResizePictureResponse.builder()
-                        .classifiedAdId(res.getId().id())
-                        .id(pictureId.id())
-                        .status(true)
-                        .build());
-
-            }).orElseGet(() -> ImmutableResizePictureResponse.builder()
-                .status(false)
-                .message("classifiedAd not found to be updated")
-                .build());
+    public Try<UpdateClassifiedAdResponse> handle(ResizeClassifiedAdPicture command) {
+        return update(command.getClassifiedAdId(), classifiedAd -> {
+            PictureSize pictureSize = new PictureSize(command.getWidth(), command.getHeight());
+            classifiedAd.resizePicture(new PictureId(command.getId()), pictureSize);
+            return doTryUpdates(classifiedAd);
+        });
     }
 
     public Optional<ClassifiedAd> findById(ClassifiedAdId classifiedAdId) {
@@ -128,163 +110,90 @@ public class ClassifiedAdService {
             .map(it -> (ClassifiedAd) it);
     }
 
-    public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdOwner command) {
-        return findById(new ClassifiedAdId(command.getId()))
-            .flatMap(classifiedAd -> {
-                if (command.getOwnerId() != null) {
-                    classifiedAd.updateOwner(new UserId(command.getOwnerId()));
-                }
-                return aggregateStoreRepository.add(classifiedAd);
-            }).map(it -> (ClassifiedAd) it)
-            .map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .result(ImmutableUpdateClassifiedAdResponse.builder()
-                    .ownerId(classifiedAd.getOwnerId().id())
-                    .id(classifiedAd.getId().id())
-                    .build())
-                .isSuccessful(true)
-                .build()
-            ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .isSuccessful(false)
-                .message("classifiedAd not found to be updated")
-                .build());
+    public Try<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdOwner command) {
+        return update(command.getClassifiedAdId(), classifiedAd -> {
+            if (command.getOwnerId() != null) {
+                classifiedAd.updateOwner(new UserId(command.getOwnerId()));
+            }
+            return doTryUpdates(classifiedAd);
+        });
     }
 
-    public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdTitle command) {
-        return findById(new ClassifiedAdId(command.getClassifiedAdId()))
-            .flatMap(classifiedAd -> {
-                if (!Strings.isNullOrEmpty(command.getTitle())) {
-                    classifiedAd.updateTitle(new ClassifiedAdTitle(command.getTitle()));
-                    return aggregateStoreRepository.add(classifiedAd);
-                }
-                // TODO - throw illegalArgumentException
-                return null;
-            })
-            .map(it -> (ClassifiedAd) it)
-            .map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .result(ImmutableUpdateClassifiedAdResponse.builder()
-                    .ownerId(classifiedAd.getOwnerId().id())
-                    .id(classifiedAd.getId().id())
-                    .build())
-                .isSuccessful(true)
-                .build()
-            ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .isSuccessful(false)
-                .message("classifiedAd not found to be updated")
-                .build());
+    public Try<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdTitle command) {
+        return update(command.getClassifiedAdId(), classifiedAd -> {
+            if (!Strings.isNullOrEmpty(command.getTitle())) {
+                classifiedAd.updateTitle(new ClassifiedAdTitle(command.getTitle()));
+            }
+            return doTryUpdates(classifiedAd);
+        });
     }
 
-    public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdText command) {
-        return findById(new ClassifiedAdId(command.getClassifiedAdId()))
-            .flatMap(classifiedAd -> {
-                if (!Strings.isNullOrEmpty(command.getText())) {
-                    classifiedAd.updateText(new ClassifiedAdText(command.getText()));
-                    return aggregateStoreRepository.add(classifiedAd);
-                } else {
-                    // TODO - throw illegalArgumentException
-                    return null;
-                }
-            })
-            .map(it -> (ClassifiedAd) it)
-            .map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .result(ImmutableUpdateClassifiedAdResponse.builder()
-                    .ownerId(classifiedAd.getOwnerId().id())
-                    .id(classifiedAd.getId().id())
-                    .build())
-                .isSuccessful(true)
-                .build()
-            ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .isSuccessful(false)
-                .message("classifiedAd not found to be updated")
-                .build());
+    public Try<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdText command) {
+        return update(command.getClassifiedAdId(), classifiedAd -> {
+            if (!Strings.isNullOrEmpty(command.getText())) {
+                classifiedAd.updateText(new ClassifiedAdText(command.getText()));
+            }
+            return doTryUpdates(classifiedAd);
+        });
     }
 
-    public CommandHandlerResult<UpdateClassifiedAdResponse> handle(ApproveClassifiedAd command) {
-        return findById(new ClassifiedAdId(command.getClassifiedAdId()))
-            .flatMap(classifiedAd -> {
-                if (command.getApproverId() != null) {
-                    classifiedAd.approve(UserId.from(command.getApproverId()));
-                    return aggregateStoreRepository.add(classifiedAd);
-                }
-                // TODO - throw illegalArgumentException
-                return null;
-            })
-            .map(it -> (ClassifiedAd) it)
-            .map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .result(ImmutableUpdateClassifiedAdResponse.builder()
-                    .ownerId(classifiedAd.getOwnerId().id())
-                    .id(classifiedAd.getId().id())
-                    .build())
-                .isSuccessful(true)
-                .build()
-            ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .isSuccessful(false)
-                .message("classifiedAd not found to be updated")
-                .build());
+    public Try<UpdateClassifiedAdResponse> handle(ApproveClassifiedAd command) {
+        return update(command.getClassifiedAdId(), classifiedAd -> {
+            if (command.getApproverId() != null) {
+                classifiedAd.approve(UserId.from(command.getApproverId()));
+            }
+            return doTryUpdates(classifiedAd);
+        });
     }
 
-    public CommandHandlerResult<UpdateClassifiedAdResponse> handle(PublishClassifiedAd command) {
-        return findById(new ClassifiedAdId(command.getClassifiedAdId()))
-            .flatMap(classifiedAd -> {
-                classifiedAd.requestToPublish();
-                return aggregateStoreRepository.add(classifiedAd);
-            })
-            .map(it -> (ClassifiedAd) it)
-            .map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .result(ImmutableUpdateClassifiedAdResponse.builder()
-                    .ownerId(classifiedAd.getOwnerId().id())
-                    .id(classifiedAd.getId().id())
-                    .build())
-                .isSuccessful(true)
-                .build()
-            ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .isSuccessful(false)
-                .message("classifiedAd not found to be updated")
-                .build());
+    public Try<UpdateClassifiedAdResponse> handle(PublishClassifiedAd command) {
+        return update(command.getClassifiedAdId(), classifiedAd -> {
+            classifiedAd.requestToPublish();
+            return doTryUpdates(classifiedAd);
+        });
     }
 
-    public CommandHandlerResult<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdPrice command) {
-        return findById(new ClassifiedAdId(command.getClassifiedAdId()))
+    private Try<UpdateClassifiedAdResponse> update(UUID classifiedAd,
+        Function<ClassifiedAd, Try<UpdateClassifiedAdResponse>> func) {
+        return loadClassifiedAd(ClassifiedAdId.from(classifiedAd))
+            .flatMap(func);
+    }
+
+    public Try<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdPrice command) {
+        return loadClassifiedAd(ClassifiedAdId.from(command.getClassifiedAdId()))
             .flatMap(classifiedAd -> {
                 Price price = new Price(new Money(command.getAmount(), command.getCurrency()));
                 classifiedAd.updatePrice(price);
-                return aggregateStoreRepository.add(classifiedAd);
-            })
-            .map(it -> (ClassifiedAd) it)
-            .map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .result(ImmutableUpdateClassifiedAdResponse.builder()
-                    .ownerId(classifiedAd.getOwnerId().id())
-                    .id(classifiedAd.getId().id())
-                    .build())
-                .isSuccessful(true)
-                .build()
-            ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .isSuccessful(false)
-                .message("classifiedAd not found to be updated")
-                .build());
-
+                return doTryUpdates(classifiedAd);
+            });
     }
 
-    public CommandHandlerResult<UpdateClassifiedAdResponse> handle(AddPicturesToClassifiedAd command) {
-        return findById(new ClassifiedAdId(command.getClassifiedAdId()))
+    public Try<UpdateClassifiedAdResponse> handle(AddPicturesToClassifiedAd command) {
+        return loadClassifiedAd(ClassifiedAdId.from(command.getClassifiedAdId()))
             .flatMap(classifiedAd -> {
                 List<PictureDto> pictures = command.getPictures();
                 pictures.forEach(pic -> {
                     var pictureSize = new PictureSize(pic.getWidth(), pic.getHeight());
                     classifiedAd.addPicture(pic.getUri(), pictureSize, 0);
                 });
-                return aggregateStoreRepository.add(classifiedAd);
-            })
-            .map(it -> (ClassifiedAd) it)
-            .map(classifiedAd -> ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .result(ImmutableUpdateClassifiedAdResponse.builder()
-                    .ownerId(classifiedAd.getOwnerId().id())
-                    .id(classifiedAd.getId().id())
-                    .build())
-                .isSuccessful(true)
-                .build()
-            ).orElse(ImmutableCommandHandlerResult.<UpdateClassifiedAdResponse>builder()
-                .isSuccessful(false)
-                .message("classifiedAd not found to be updated")
+                return doTryUpdates(classifiedAd);
+            });
+    }
+
+    private Try<UpdateClassifiedAdResponse> doTryUpdates(ClassifiedAd classifiedAd) {
+        return Try.of(() -> aggregateStoreRepository.add(classifiedAd))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(user -> ImmutableUpdateClassifiedAdResponse.builder()
+                .id(classifiedAd.getId().id())
                 .build());
     }
+
+    private Try<ClassifiedAd> loadClassifiedAd(ClassifiedAdId classifiedAdId) {
+        return Try.of(() ->
+            aggregateStoreRepository.load(classifiedAdId)
+                .map(it -> (ClassifiedAd) it)
+                .orElseThrow(() -> new NotFoundException("ClassifiedAd with id '" + classifiedAdId + "' not found")));
+    }
+
 }

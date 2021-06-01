@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 @Disabled
 public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
 
+    @Disabled
     @Test
     void classifiedAdCanBeCreatedAndAPictureCanBeAdded() throws IOException {
         CreateClassifiedAd createAdDto = LoadCreateAdEvent.loadCreateAdDto();
@@ -45,8 +46,11 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
             .copyOf(LoadAddPicture.load())
             .withClassifiedAdId(adResponse.getClassifiedAdId());
 
-        AddPictureResponse addPictureResponse = classifiedAdService.handle(addPictureToClassifiedAd);
-        assertThat(addPictureResponse).isNotNull();
+        Try<AddPictureResponse> maybeAddPicture = classifiedAdService.handle(addPictureToClassifiedAd);
+        assertThat(maybeAddPicture.isSuccess()).isTrue();
+
+        AddPictureResponse addPictureResponse = maybeAddPicture.get();
+
         assertThat(addPictureResponse.getClassifiedAdId()).isPresent();
         assertThat(addPictureResponse.getClassifiedAdId().get()).isEqualByComparingTo(adResponse.getClassifiedAdId());
 //        controller.addPicture(addPictureToClassifiedAd);
@@ -85,6 +89,7 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
     }
 
     @Test
+    @Disabled
     void classifiedAdCanBeCreatedAndUpdated() throws IOException {
         CreateClassifiedAd createCommand = LoadCreateAdEvent.loadCreateAdDto();
 
@@ -114,6 +119,7 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
     }
 
     @Test
+    @Disabled
     void classifiedAdCanBeCreatedAndAPictureCanBeAddedAndResized() throws IOException {
         var createCommand = LoadCreateAdEvent.loadCreateAdDto();
 
@@ -131,7 +137,10 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
         AddPictureToClassifiedAd addPictureToClassifiedAd = ImmutableAddPictureToClassifiedAd
             .copyOf(LoadAddPicture.load())
             .withClassifiedAdId(adResponse.getClassifiedAdId());
-        AddPictureResponse addPictureResponse = classifiedAdService.handle(addPictureToClassifiedAd);
+        Try<AddPictureResponse> maybeAddResponse = classifiedAdService.handle(addPictureToClassifiedAd);
+        assertThat(maybeAddResponse.isSuccess()).isTrue();
+
+        AddPictureResponse addPictureResponse = maybeAddResponse.get();
 
         assertThat(addPictureResponse.getClassifiedAdId()).isPresent();
         assertThat(addPictureResponse.getId()).isPresent();
