@@ -1,5 +1,6 @@
 package com.marketplace.server;
 
+import com.marketplace.server.command.ClassifiedAdCommandSparkRoutes;
 import spark.Spark;
 
 import javax.inject.Inject;
@@ -36,6 +37,11 @@ public class SparkServer {
             "/classified_ad",
             MEDIA_APPLICATION_JSON,
             classifiedAdCommandSparkRoutes.createClassifiedAdRoute());
+
+        Spark.get(
+            "/classified_ad/:classifiedAdId",
+            MEDIA_APPLICATION_JSON,
+            classifiedAdCommandSparkRoutes.getClassifiedAdRoute());
 
         Spark.put(
             "/classified_ad/:classifiedAdId",
@@ -76,11 +82,11 @@ public class SparkServer {
             "/classified_ad/:classifiedAdId/pictures",
             MEDIA_APPLICATION_JSON,
             classifiedAdCommandSparkRoutes.addPictureToClassifiedAd());
+//
+//        Spark.get("/classified_ad/list", classifiedAdQuerySparkRoutes.findAll());
 
-        Spark.get("/classified_ad/list", classifiedAdQuerySparkRoutes.findAll());
-
-        Spark.get(
-            "/classified_ad/:classifiedAdId", classifiedAdQuerySparkRoutes.findClassifiedAdById());
+//        Spark.get(
+//            "/classified_ad/:classifiedAdId", classifiedAdQuerySparkRoutes.findClassifiedAdById());
 
         Spark.get("/classified_ad/myads", classifiedAdQuerySparkRoutes.findAll());
 

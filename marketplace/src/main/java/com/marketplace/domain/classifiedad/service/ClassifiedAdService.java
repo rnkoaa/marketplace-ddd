@@ -24,10 +24,14 @@ import com.marketplace.domain.classifiedad.controller.AddPictureToClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.AddPicturesToClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.controller.ImmutableCreateAdResponse;
+import com.marketplace.domain.classifiedad.controller.ImmutableLoadClassifiedAdResponse;
 import com.marketplace.domain.classifiedad.controller.ImmutableUpdateClassifiedAdResponse;
+import com.marketplace.domain.classifiedad.controller.LoadClassifiedAdCommand;
+import com.marketplace.domain.classifiedad.controller.LoadClassifiedAdResponse;
 import com.marketplace.domain.classifiedad.controller.ResizeClassifiedAdPicture;
 import com.marketplace.domain.classifiedad.controller.UpdateClassifiedAdResponse;
 import com.marketplace.domain.shared.UserId;
+import com.marketplace.domain.userprofile.controller.LoadUserProfileResponse;
 import com.marketplace.domain.userprofile.controller.NotFoundException;
 import io.vavr.control.Try;
 import java.util.List;
@@ -197,4 +201,11 @@ public class ClassifiedAdService {
                 .orElseThrow(() -> new NotFoundException("ClassifiedAd with id '" + classifiedAdId + "' not found")));
     }
 
+    public Try<LoadClassifiedAdResponse> handle(LoadClassifiedAdCommand command) {
+        return loadClassifiedAd(ClassifiedAdId.from(command.getClassifiedAdId()))
+            .map(res -> ImmutableLoadClassifiedAdResponse.builder()
+                .classifiedAdId(res.getId().id())
+                .owner(res.getOwnerId().id())
+                .build());
+    }
 }
