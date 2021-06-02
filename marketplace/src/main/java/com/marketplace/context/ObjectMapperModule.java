@@ -1,11 +1,13 @@
 package com.marketplace.context;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.marketplace.domain.shared.UserId;
 import dagger.Module;
@@ -26,7 +28,7 @@ public abstract class ObjectMapperModule {
         objectMapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
 
         // Ignore null values when writing json.
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.setSerializationInclusion(Include.NON_DEFAULT);
         objectMapper.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
 //        objectMapper.configure(SerializationFeature., true);
 
@@ -35,6 +37,9 @@ public abstract class ObjectMapperModule {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 //        objectMapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE)
         objectMapper.registerModule(new JavaTimeModule());
+
+        // for guava lists
+        objectMapper.registerModule(new GuavaModule());
         return objectMapper;
     }
 }

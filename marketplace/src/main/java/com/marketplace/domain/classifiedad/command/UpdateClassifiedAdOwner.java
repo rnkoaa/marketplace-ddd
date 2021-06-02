@@ -12,7 +12,7 @@ import org.immutables.value.Value.Immutable;
 @JsonSerialize(as = ImmutableUpdateClassifiedAdOwner.class)
 public interface UpdateClassifiedAdOwner extends Command {
 
-  UUID getId();
+  UUID getClassifiedAdId();
 
   UUID getOwnerId();
 }

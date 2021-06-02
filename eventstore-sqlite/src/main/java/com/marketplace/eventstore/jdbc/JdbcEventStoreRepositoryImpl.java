@@ -15,6 +15,7 @@ import com.marketplace.eventstore.jdbc.tables.records.EventDataRecord;
 import io.vavr.control.Try;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 
@@ -56,8 +57,10 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
             .orderBy(EVENT_DATA.EVENT_VERSION.asc())
             .fetch();
 
-        return fetch.stream()
-            .map(eventDataRecord -> convertFromEventDataRecord(objectMapper, eventDataRecord))
+        Stream<Try<VersionedEvent>> tryStream = fetch.stream()
+            .map(eventDataRecord -> convertFromEventDataRecord(objectMapper, eventDataRecord));
+
+        return tryStream
             .filter(Try::isSuccess)
             .map(Try::get)
             .toList();
@@ -217,6 +220,9 @@ public class JdbcEventStoreRepositoryImpl implements JdbcEventStoreRepository {
 
         Try<? extends Class<?>> classResult = eventClassCache.get(eventType);
         return classResult.flatMap(clzz -> tryDeserialize(objectMapper, data, clzz))
+            .onFailure(ex -> {
+                System.out.println(ex.getMessage());
+            })
             .map(e -> (VersionedEvent) e);
     }
 

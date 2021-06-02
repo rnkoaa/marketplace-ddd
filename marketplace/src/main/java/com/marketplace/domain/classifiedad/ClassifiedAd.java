@@ -194,13 +194,6 @@ public class ClassifiedAd extends AggregateRoot<EventId, VersionedEvent> {
     return picture.orElse(pictureItem);
   }
 
-  public Picture createPicture(PictureId pictureId, PictureSize pictureSize, String uri, int order) {
-    var pictureItem = new Picture(this);
-    var result = addPicture(pictureId, uri, pictureSize, order);
-    Optional<Picture> picture = findPicture(result);
-    return picture.orElse(pictureItem);
-  }
-
   public PictureId resizePicture(PictureId pictureId, PictureSize newSize) {
     var picture = findPicture(pictureId);
     var p = picture

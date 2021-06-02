@@ -1,21 +1,24 @@
 package com.marketplace.domain.classifiedad.service;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 import com.marketplace.domain.AggregateStoreRepository;
-import com.marketplace.domain.classifiedad.*;
+import com.marketplace.domain.classifiedad.ClassifiedAd;
+import com.marketplace.domain.classifiedad.ClassifiedAdId;
+import com.marketplace.domain.classifiedad.ClassifiedAdText;
+import com.marketplace.domain.classifiedad.ClassifiedAdTitle;
+import com.marketplace.domain.classifiedad.Money;
+import com.marketplace.domain.classifiedad.Price;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAd;
 import com.marketplace.domain.shared.UserId;
-import org.assertj.core.api.AssertionsForInterfaceTypes;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class ClassifiedAdServiceTest {
@@ -64,9 +67,8 @@ class ClassifiedAdServiceTest {
 
         var handleResponse = classifiedAdService.handle(updateClassifiedAd);
         assertThat(handleResponse).isNotNull();
-        assertThat(handleResponse.getResult()).isPresent();
-        assertThat(handleResponse.isSuccessful()).isTrue();
-        AssertionsForInterfaceTypes.assertThat(expectedClassifiedAd.getChanges()).hasSize(3);
+        assertThat(handleResponse.isSuccess()).isTrue();
+        assertThat(expectedClassifiedAd.getChanges()).hasSize(3);
     }
 
     @Test
@@ -94,9 +96,8 @@ class ClassifiedAdServiceTest {
 
         var handleResponse = classifiedAdService.handle(updateClassifiedAd);
         assertThat(handleResponse).isNotNull();
-        assertThat(handleResponse.getResult()).isPresent();
-        assertThat(handleResponse.isSuccessful()).isTrue();
-        AssertionsForInterfaceTypes.assertThat(expectedClassifiedAd.getChanges()).hasSize(4);
+        assertThat(handleResponse.isSuccess()).isTrue();
+        assertThat(expectedClassifiedAd.getChanges()).hasSize(4);
     }
 
     @Test
@@ -122,9 +123,8 @@ class ClassifiedAdServiceTest {
 
         var handleResponse = classifiedAdService.handle(updateClassifiedAd);
         assertThat(handleResponse).isNotNull();
-        assertThat(handleResponse.getResult()).isPresent();
-        assertThat(handleResponse.isSuccessful()).isTrue();
-        AssertionsForInterfaceTypes.assertThat(expectedClassifiedAd.getChanges()).hasSize(2);
+        assertThat(handleResponse.isSuccess()).isTrue();
+        assertThat(expectedClassifiedAd.getChanges()).hasSize(2);
     }
 
     @Test
@@ -144,7 +144,7 @@ class ClassifiedAdServiceTest {
         assertThat(found).isPresent();
 
         ClassifiedAd foundClassifiedAd = found.get();
-        AssertionsForInterfaceTypes.assertThat(foundClassifiedAd.getChanges()).hasSize(1);
+        assertThat(foundClassifiedAd.getChanges()).hasSize(1);
         assertThat(foundClassifiedAd.getId()).isEqualTo(classifiedAdId);
         assertThat(foundClassifiedAd.getOwnerId()).isEqualTo(ownerId);
     }

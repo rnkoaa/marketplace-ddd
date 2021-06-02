@@ -37,6 +37,7 @@ public abstract class BaseRepositoryTest extends AbstractContainerInitializer {
 
     @AfterEach
     public void cleanup() {
+        dslContext.delete(Tables.EVENT_DATA).execute();
         dslContext.delete(Tables.CLASSIFIED_AD).execute();
         dslContext.delete(Tables.USER_PROFILE).execute();
     }

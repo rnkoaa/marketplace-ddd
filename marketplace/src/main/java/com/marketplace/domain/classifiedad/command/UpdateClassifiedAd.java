@@ -17,56 +17,55 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableUpdateClassifiedAd.class)
 public interface UpdateClassifiedAd extends Command {
 
-  @JsonProperty("classified_ad_id")
-  Optional<UUID> getClassifiedAdId();
+    @JsonProperty("classified_ad_id")
+    Optional<UUID> getClassifiedAdId();
 
-  Optional<String> getText();
+    Optional<String> getText();
 
-  Optional<String> getTitle();
+    Optional<String> getTitle();
 
-  Optional<PriceDto> getPrice();
+    Optional<PriceDto> getPrice();
 
-  @JsonProperty("owner")
-  Optional<UUID> getOwnerId();
+    @JsonProperty("owner")
+    Optional<UUID> getOwnerId();
 
-  @JsonProperty("approver")
-  Optional<UUID> getApprovedBy();
+    @JsonProperty("approver")
+    Optional<UUID> getApprovedBy();
 
-  Optional<List<PictureDto>> getPictures();
+    List<PictureDto> getPictures();
 
-  Optional<ClassifiedAdState> getState();
+    Optional<ClassifiedAdState> getState();
 
-  @Value.Immutable
-  @JsonSerialize(as = ImmutablePictureDto.class)
-  @JsonDeserialize(as = ImmutablePictureDto.class)
-  interface PictureDto {
+    @Value.Immutable
+    @JsonSerialize(as = ImmutablePictureDto.class)
+    @JsonDeserialize(as = ImmutablePictureDto.class)
+    interface PictureDto {
 
-    @Value.Default
-    default UUID getId() {
-      return UUID.randomUUID();
+        @Value.Default
+        default UUID getId() {
+            return UUID.randomUUID();
+        }
+
+        @Value.Default
+        default int getOrder() {
+            return 0;
+        }
+
+        String getUri();
+
+        int getWidth();
+
+        int getHeight();
     }
 
-    @Value.Default
-    default int getOrder() {
-      return 0;
+    @Value.Immutable
+    @JsonSerialize(as = ImmutablePriceDto.class)
+    @JsonDeserialize(as = ImmutablePriceDto.class)
+    interface PriceDto {
+
+        @JsonProperty("currency_code")
+        String getCurrencyCode();
+
+        BigDecimal getAmount();
     }
-
-    String getUri();
-
-    int getWidth();
-
-    int getHeight();
-  }
-
-
-  @Value.Immutable
-  @JsonSerialize(as = ImmutablePriceDto.class)
-  @JsonDeserialize(as = ImmutablePriceDto.class)
-  interface PriceDto {
-
-    @JsonProperty("currency_code")
-    String getCurrencyCode();
-
-    BigDecimal getAmount();
-  }
 }
