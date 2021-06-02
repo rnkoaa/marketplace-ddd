@@ -31,8 +31,7 @@ public class AggregateStoreRepository {
     }
 
     public boolean exists(EventId id) {
-        EventStream<VersionedEvent> eventStream = eventEventStore.load(id.getStreamId());
-        return !eventStream.isEmpty();
+        return eventEventStore.exists(id.getStreamId());
     }
 
     public Optional<AggregateRoot<EventId, VersionedEvent>> load(EventId id) {

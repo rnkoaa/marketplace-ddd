@@ -107,4 +107,9 @@ public class JdbcEventStoreImpl implements EventStore<VersionedEvent> {
     public void deleteAll() {
         eventStoreRepository.deleteAll();
     }
+
+    @Override
+    public boolean exists(String streamId) {
+        return eventStoreRepository.countEvents(streamId) > 0;
+    }
 }

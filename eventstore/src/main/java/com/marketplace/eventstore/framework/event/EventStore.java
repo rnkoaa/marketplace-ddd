@@ -27,11 +27,10 @@ public interface EventStore<T extends Event> {
      * Adds a list of events to the end of the event stream
      *
      * @param streamId        id of the stream to which the event will be appended to
-     * @param expectedVersion the last version of the stream before the event is appended. This is for concurrency check
-     *                        to ensure that same event is not appended by multiple threads
+     * @param expectedVersion the last version of the stream before the event is appended. This is for concurrency check to ensure that same
+     *                        event is not appended by multiple threads
      * @param events          the events to be appended
-     * @return a {@link Result (Success)  } if the append was successful and a {@link Result (Failure) } if the append
-     * operation failed.
+     * @return a {@link Result (Success)  } if the append was successful and a {@link Result (Failure) } if the append operation failed.
      */
     Result<Boolean> append(String streamId, int expectedVersion, List<T> events);
 
@@ -39,11 +38,10 @@ public interface EventStore<T extends Event> {
      * Adds an event to the end of the event stream
      *
      * @param streamId        id of the stream to which the event will be appended to
-     * @param expectedVersion the last version of the stream before the event is appended. This is for concurrency check
-     *                        to ensure that same event is not appended by multiple threads
+     * @param expectedVersion the last version of the stream before the event is appended. This is for concurrency check to ensure that same
+     *                        event is not appended by multiple threads
      * @param event           the events to be appended
-     * @return a {@link Result (Success)} if the append was successful and a {@link Result (Failure)} if the append
-     * operation failed.
+     * @return a {@link Result (Success)} if the append was successful and a {@link Result (Failure)} if the append operation failed.
      */
     Result<Boolean> append(String streamId, int expectedVersion, T event);
 
@@ -81,13 +79,12 @@ public interface EventStore<T extends Event> {
     Result<Boolean> publish(String streamId, T event);
 
     /**
-     * appends a list of events to the end of the event stream then publishes those events to any subscribers that may
-     * be listening for those events. If there are any errors in appending to the event stream, the events are never
-     * published
+     * appends a list of events to the end of the event stream then publishes those events to any subscribers that may be listening for
+     * those events. If there are any errors in appending to the event stream, the events are never published
      *
      * @param streamId        id of the stream to which the event will be appended to
-     * @param expectedVersion the last version of the stream before the event is appended. This is for concurrency check
-     *                        to ensure that same event is not appended by multiple threads
+     * @param expectedVersion the last version of the stream before the event is appended. This is for concurrency check to ensure that same
+     *                        event is not appended by multiple threads
      * @param events          the events to be appended
      * @return a {@link Result } if the append was successfull and a {@link Result} if the append operation failed.
      */
@@ -97,11 +94,10 @@ public interface EventStore<T extends Event> {
      * Appends an event to the end of the event stream then subsequently publishes the event to any subscriber,
      *
      * @param streamId        id of the stream to which the event will be appended to
-     * @param expectedVersion the last version of the stream before the event is appended. This is for concurrency check
-     *                        to ensure that same event is not appended by multiple threads
+     * @param expectedVersion the last version of the stream before the event is appended. This is for concurrency check to ensure that same
+     *                        event is not appended by multiple threads
      * @param event           the events to be appended
-     * @return a {@link Result (Success) } if the append was successfull and a {@link Result (Failure) } if the append
-     * operation failed.
+     * @return a {@link Result (Success) } if the append was successfull and a {@link Result (Failure) } if the append operation failed.
      */
     Result<Boolean> publish(String streamId, int expectedVersion, T event);
 
@@ -109,4 +105,12 @@ public interface EventStore<T extends Event> {
      *
      */
     void deleteAll();
+
+    /**
+     * Checks if an aggregate exists
+     *
+     * @param streamId the id of the aggregateRoot to check
+     * @return true if events exist for the aggregate
+     */
+    boolean exists(String streamId);
 }

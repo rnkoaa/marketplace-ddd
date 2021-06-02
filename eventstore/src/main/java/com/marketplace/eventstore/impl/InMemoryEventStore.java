@@ -2,11 +2,17 @@ package com.marketplace.eventstore.impl;
 
 import com.marketplace.cqrs.event.Event;
 import com.marketplace.eventstore.framework.Result;
-import com.marketplace.eventstore.framework.event.*;
-
-import java.util.*;
+import com.marketplace.eventstore.framework.event.EventPublisher;
+import com.marketplace.eventstore.framework.event.EventRecord;
+import com.marketplace.eventstore.framework.event.EventStore;
+import com.marketplace.eventstore.framework.event.EventStream;
+import com.marketplace.eventstore.framework.event.EventStreamImpl;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import reactor.core.publisher.Mono;
 
 public class InMemoryEventStore implements EventStore<Event> {
 
@@ -35,7 +41,7 @@ public class InMemoryEventStore implements EventStore<Event> {
     }
 
     @Override
-    public EventStream load(String streamId, int fromVersion) {
+    public EventStream<Event> load(String streamId, int fromVersion) {
         List<EventRecord> eventStream = entityStore.get(streamId);
         if (eventStream == null || eventStream.size() == 0) {
             return new EventStreamImpl(streamId, "", 0, List.of());
@@ -99,7 +105,7 @@ public class InMemoryEventStore implements EventStore<Event> {
 
     @Override
     public Long streamSize(String streamId) {
-        EventStream eventStream = load(streamId);
+        EventStream<Event> eventStream = load(streamId);
         return (long) eventStream.size();
     }
 
@@ -159,5 +165,11 @@ public class InMemoryEventStore implements EventStore<Event> {
     @Override
     public void deleteAll() {
         entityStore.clear();
+    }
+
+    @Override
+    public boolean exists(String streamId) {
+        List<EventRecord> eventRecords = entityStore.getOrDefault(streamId, List.of());
+        return eventRecords.size() > 0;
     }
 }
