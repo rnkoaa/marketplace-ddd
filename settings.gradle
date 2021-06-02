@@ -1,4 +1,4 @@
-rootProject.name = 'marketplace'
+rootProject.name = 'marketplace-ddd'
 //include 'annotations'
 //include 'annotations-compiler'
 include ':libs:config'
