@@ -1,14 +1,17 @@
 package com.marketplace.server.command;
 
 import static com.google.common.base.Predicates.instanceOf;
+import static com.marketplace.server.SparkServer.MEDIA_APPLICATION_JSON;
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.Patterns.$Failure;
 import static io.vavr.Patterns.$Success;
+import static java.lang.String.format;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.cqrs.command.CommandHandlerResult;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
+import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
@@ -35,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+import spark.Spark;
 
 @Singleton
 @Named
@@ -76,6 +80,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
             );
         });
     }
+
     public Route createClassifiedAdRoute() {
         return (request, response) -> {
             byte[] body = request.bodyAsBytes();
@@ -86,7 +91,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
             return API.Match(createAdResponse).of(
                 Case($Success($()), value -> {
                     response.status(201);
-                    response.header("Location", String.format("/classified_ad/%s", value.getClassifiedAdId()));
+                    response.header("Location", format("/classified_ad/%s", value.getClassifiedAdId()));
                     return NO_CONTENT;
                 }),
                 Case($Failure($(instanceOf(DuplicateDisplayNameException.class))), ex -> {
@@ -186,6 +191,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
                 .handle(ImmutableUpdateClassifiedAd
                     .builder()
                     .classifiedAdId(UUID.fromString(classifiedAdId))
+                    .state(ClassifiedAdState.PENDING_REVIEW)
                     .build());
             return processResponse(res, commandResult);
         };
@@ -198,7 +204,7 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
                 res.status(200);
                 Map<String, Object> resMessage = Map.of(
                     "status", true,
-                    "message", "Successfully updated user",
+                    "message", "Successfully updated ClassifiedAd",
                     "classified_ad_id", value.getId()
                 );
                 return serializeResponse(resMessage);
@@ -215,21 +221,13 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
 
     public Route addPictureToClassifiedAd() {
         return (req, res) -> {
-//      String classifiedAdId = getClassifiedIdFromRequest(req);
-//      var updateClassifiedAd = read(classifiedAdId, req);
-//      return updateClassifiedAd.getPictures()
-//          .map(pictureDtos -> {
-//            var commandResult = classifiedAdController.addPictures(UUID.fromString(classifiedAdId), pictureDtos);
-//            return processResponse(res, commandResult);
-//          }).orElseGet(() -> {
-//            Map<String, Object> resMessage = Map.of(
-//                "status", false,
-//                "message", "at least add a picture to be added to classifiedAd"
-//            );
-//            res.status(404);
-//            return serializeResponse(resMessage);
-//          });
-            return null;
+            String classifiedAdId = getClassifiedIdFromRequest(req);
+            var updateClassifiedAdResponseTry = deserialize(req.bodyAsBytes(), UpdateClassifiedAd.class)
+                .map(it -> ImmutableUpdateClassifiedAd.copyOf(it)
+                    .withClassifiedAdId(UUID.fromString(classifiedAdId)))
+                .flatMap(classifiedAdService::handle);
+
+            return processResponse(res, updateClassifiedAdResponseTry);
         };
     }
 
@@ -239,4 +237,27 @@ public class ClassifiedAdCommandSparkRoutes extends ClassifiedAdBaseRoutes {
             .getOrElse("");
     }
 
+    public void register(String endpoint) {
+        String endpointWithId = format("%s/:classifiedAdId", endpoint);
+        Spark.post(
+            endpoint, MEDIA_APPLICATION_JSON, createClassifiedAdRoute());
+
+        Spark.get(endpointWithId, MEDIA_APPLICATION_JSON, getClassifiedAdRoute());
+
+        Spark.put(endpointWithId, MEDIA_APPLICATION_JSON, updateClassifiedAd());
+
+        Spark.put(format("%s/title", endpointWithId), MEDIA_APPLICATION_JSON, updateClassifiedAdTitle());
+
+        Spark.put(format("%s/owner", endpointWithId), MEDIA_APPLICATION_JSON, updateClassifiedAdOwner());
+
+        Spark.put(format("%s/text", endpointWithId), MEDIA_APPLICATION_JSON, updateClassifiedAdText());
+
+        Spark.put(format("%s/price", endpointWithId), MEDIA_APPLICATION_JSON, updateClassifiedAdPrice());
+
+        Spark.put(format("%s/approve", endpointWithId), MEDIA_APPLICATION_JSON, approveClassifiedAd());
+
+        Spark.put(format("%s/publish", endpointWithId), MEDIA_APPLICATION_JSON, publishClassifiedAd());
+
+        Spark.put(format("%s/pictures", endpointWithId), MEDIA_APPLICATION_JSON, addPictureToClassifiedAd());
+    }
 }

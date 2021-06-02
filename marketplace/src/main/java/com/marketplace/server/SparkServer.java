@@ -1,10 +1,9 @@
 package com.marketplace.server;
 
 import com.marketplace.server.command.ClassifiedAdCommandSparkRoutes;
-import spark.Spark;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+import spark.Spark;
 
 public class SparkServer {
 
@@ -33,55 +32,7 @@ public class SparkServer {
     public void run() {
         Spark.get("/health", (req, res) -> "ok");
 
-        Spark.post(
-            "/classified_ad",
-            MEDIA_APPLICATION_JSON,
-            classifiedAdCommandSparkRoutes.createClassifiedAdRoute());
-
-        Spark.get(
-            "/classified_ad/:classifiedAdId",
-            MEDIA_APPLICATION_JSON,
-            classifiedAdCommandSparkRoutes.getClassifiedAdRoute());
-
-        Spark.put(
-            "/classified_ad/:classifiedAdId",
-            MEDIA_APPLICATION_JSON,
-            classifiedAdCommandSparkRoutes.updateClassifiedAd());
-
-        Spark.put(
-            "/classified_ad/:classifiedAdId/title",
-            MEDIA_APPLICATION_JSON,
-            classifiedAdCommandSparkRoutes.updateClassifiedAdTitle());
-
-        Spark.put(
-            "/classified_ad/:classifiedAdId/owner",
-            MEDIA_APPLICATION_JSON,
-            classifiedAdCommandSparkRoutes.updateClassifiedAdOwner());
-
-        Spark.put(
-            "/classified_ad/:classifiedAdId/text",
-            MEDIA_APPLICATION_JSON,
-            classifiedAdCommandSparkRoutes.updateClassifiedAdText());
-
-        Spark.put(
-            "/classified_ad/:classifiedAdId/price",
-            MEDIA_APPLICATION_JSON,
-            classifiedAdCommandSparkRoutes.updateClassifiedAdPrice());
-
-        Spark.put(
-            "/classified_ad/:classifiedAdId/approve",
-            MEDIA_APPLICATION_JSON,
-            classifiedAdCommandSparkRoutes.approveClassifiedAd());
-
-        Spark.put(
-            "/classified_ad/:classifiedAdId/publish",
-            MEDIA_APPLICATION_JSON,
-            classifiedAdCommandSparkRoutes.publishClassifiedAd());
-
-        Spark.put(
-            "/classified_ad/:classifiedAdId/pictures",
-            MEDIA_APPLICATION_JSON,
-            classifiedAdCommandSparkRoutes.addPictureToClassifiedAd());
+        classifiedAdCommandSparkRoutes.register("/classified_ad");
 //
 //        Spark.get("/classified_ad/list", classifiedAdQuerySparkRoutes.findAll());
 

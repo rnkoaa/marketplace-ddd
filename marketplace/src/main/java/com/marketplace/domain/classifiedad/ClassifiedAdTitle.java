@@ -31,7 +31,8 @@ public record ClassifiedAdTitle(String value) {
         return new ClassifiedAdTitle("");
     }
 
-    private boolean isValid(String value) {
+    public boolean isValid(String value) {
         return value != null && !value.isEmpty() && !(value.length() > 100);
     }
+
 }

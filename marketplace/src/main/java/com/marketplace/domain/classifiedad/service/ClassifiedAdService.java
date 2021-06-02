@@ -6,6 +6,7 @@ import com.marketplace.domain.PictureId;
 import com.marketplace.domain.PictureSize;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
+import com.marketplace.domain.classifiedad.ClassifiedAdState;
 import com.marketplace.domain.classifiedad.ClassifiedAdText;
 import com.marketplace.domain.classifiedad.ClassifiedAdTitle;
 import com.marketplace.domain.classifiedad.DefaultCurrencyLookup;
@@ -13,9 +14,12 @@ import com.marketplace.domain.classifiedad.Money;
 import com.marketplace.domain.classifiedad.Price;
 import com.marketplace.domain.classifiedad.command.ApproveClassifiedAd;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
+import com.marketplace.domain.classifiedad.command.ImmutablePictureDto;
+import com.marketplace.domain.classifiedad.command.ImmutablePriceDto;
 import com.marketplace.domain.classifiedad.command.PublishClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PictureDto;
+import com.marketplace.domain.classifiedad.command.UpdateClassifiedAd.PriceDto;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdOwner;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdPrice;
 import com.marketplace.domain.classifiedad.command.UpdateClassifiedAdText;
@@ -25,6 +29,7 @@ import com.marketplace.domain.classifiedad.controller.AddPicturesToClassifiedAd;
 import com.marketplace.domain.classifiedad.controller.CreateAdResponse;
 import com.marketplace.domain.classifiedad.controller.ImmutableCreateAdResponse;
 import com.marketplace.domain.classifiedad.controller.ImmutableLoadClassifiedAdResponse;
+import com.marketplace.domain.classifiedad.controller.ImmutableLoadClassifiedAdResponse.Builder;
 import com.marketplace.domain.classifiedad.controller.ImmutableUpdateClassifiedAdResponse;
 import com.marketplace.domain.classifiedad.controller.LoadClassifiedAdCommand;
 import com.marketplace.domain.classifiedad.controller.LoadClassifiedAdResponse;
@@ -88,7 +93,25 @@ public class ClassifiedAdService {
                 classifiedAd.updatePrice(price);
             });
 
-            command.getApprovedBy().ifPresent(approver -> classifiedAd.approve(new UserId(approver)));
+            if (command.getPictures() != null) {
+                command.getPictures()
+                    .forEach(pictureDto -> classifiedAd.addPicture(
+                        pictureDto.getUri(),
+                        new PictureSize(pictureDto.getWidth(), pictureDto.getHeight()),
+                        pictureDto.getOrder()
+                        )
+                    );
+            }
+
+            command.getApprovedBy().ifPresent(approver -> {
+                classifiedAd.approve(new UserId(approver));
+            });
+
+            // if state is marked as PENDING_REVIEW, this classifiedAd is about to be published
+            command.getState()
+                .filter(classifiedAdState -> classifiedAdState == ClassifiedAdState.PENDING_REVIEW)
+                .ifPresent(res -> classifiedAd.requestToPublish());
+
             return doTryUpdates(classifiedAd);
         });
     }
@@ -203,9 +226,38 @@ public class ClassifiedAdService {
 
     public Try<LoadClassifiedAdResponse> handle(LoadClassifiedAdCommand command) {
         return loadClassifiedAd(ClassifiedAdId.from(command.getClassifiedAdId()))
-            .map(res -> ImmutableLoadClassifiedAdResponse.builder()
-                .classifiedAdId(res.getId().id())
-                .owner(res.getOwnerId().id())
-                .build());
+            .map(res -> {
+                Builder builder = ImmutableLoadClassifiedAdResponse.builder()
+                    .classifiedAdId(res.getId().id())
+                    .owner(res.getOwnerId().id())
+                    .state(res.getState());
+                if (res.getTitle() != null) {
+                    builder.title(res.getTitle().toString());
+                }
+                if (res.getText() != null) {
+                    builder.text(res.getText().toString());
+                }
+
+                if (res.getPrice() != null) {
+                    builder.price(ImmutablePriceDto.builder()
+                        .amount(res.getPrice().money().amount())
+                        .currencyCode(res.getPrice().money().currencyCode())
+                        .build());
+                }
+
+                if (res.getPictures() != null) {
+                    List<ImmutablePictureDto> pictures = res.getPictures().stream()
+                        .map(picture -> ImmutablePictureDto.builder()
+                            .id(picture.getId().id())
+                            .height(picture.getSize().height())
+                            .width(picture.getSize().width())
+                            .uri(picture.getUri())
+                            .build())
+                        .toList();
+                    builder.pictures(pictures);
+                }
+
+                return builder.build();
+            });
     }
 }

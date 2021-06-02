@@ -56,9 +56,6 @@ dependencies {
     implementation project(":libs:cqrs-domain")
     implementation project(":eventstore")
 
-//    implementation "io.projectreactor:reactor-core:${projectReactorVersion}"
-
-//    jooqRuntime "org.jooq:jooq-meta-extensions:$jooqVersion"
     jooqGenerator "org.xerial:sqlite-jdbc:$sqliteVersion"
     jooqGenerator "org.jooq:jooq-meta-extensions:$jooqVersion"
 
@@ -74,9 +71,7 @@ dependencies {
     // some functional implementations
     implementation("io.vavr:vavr:${vavrVersion}")
 
-
-    implementation("org.slf4j:slf4j-api:1.7.30")
-    implementation("org.slf4j:slf4j-log4j12:1.7.30")
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.9.0")
 
     implementation "org.xerial:sqlite-jdbc:$sqliteVersion"
 
