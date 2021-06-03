@@ -80,6 +80,7 @@ public class ClassifiedAdService {
     public Try<UpdateClassifiedAdResponse> handle(UpdateClassifiedAd command) {
         UUID classifiedAdId = command.getClassifiedAdId()
             .orElseThrow(() -> new IllegalArgumentException("classified id is invalid"));
+
         return update(classifiedAdId, classifiedAd -> {
             command.getOwnerId().ifPresent(ownerId -> classifiedAd.updateOwner(new UserId(ownerId)));
             command.getTitle().ifPresent(title -> classifiedAd.updateTitle(new ClassifiedAdTitle(title)));
@@ -180,12 +181,16 @@ public class ClassifiedAdService {
 
     private Try<UpdateClassifiedAdResponse> update(UUID classifiedAd,
         Function<ClassifiedAd, Try<UpdateClassifiedAdResponse>> func) {
-        return loadClassifiedAd(ClassifiedAdId.from(classifiedAd))
+        var classifiedAdId = ClassifiedAdId.from(classifiedAd);
+        return aggregateStoreRepository.exists(classifiedAdId)
+            .flatMap(classifiedAdExists -> loadClassifiedAd(classifiedAdId))
             .flatMap(func);
     }
 
     public Try<UpdateClassifiedAdResponse> handle(UpdateClassifiedAdPrice command) {
-        return loadClassifiedAd(ClassifiedAdId.from(command.getClassifiedAdId()))
+        var classifiedAdId = ClassifiedAdId.from(command.getClassifiedAdId());
+        return aggregateStoreRepository.exists(classifiedAdId)
+            .flatMap(classifiedAdExists -> loadClassifiedAd(classifiedAdId))
             .flatMap(classifiedAd -> {
                 Price price = new Price(new Money(command.getAmount(), command.getCurrency()));
                 classifiedAd.updatePrice(price);
@@ -194,7 +199,9 @@ public class ClassifiedAdService {
     }
 
     public Try<UpdateClassifiedAdResponse> handle(AddPicturesToClassifiedAd command) {
-        return loadClassifiedAd(ClassifiedAdId.from(command.getClassifiedAdId()))
+        var classifiedAdId = ClassifiedAdId.from(command.getClassifiedAdId());
+        return aggregateStoreRepository.exists(classifiedAdId)
+            .flatMap(classifiedAdExists -> loadClassifiedAd(classifiedAdId))
             .flatMap(classifiedAd -> {
                 List<PictureDto> pictures = command.getPictures();
                 pictures.forEach(pic -> {

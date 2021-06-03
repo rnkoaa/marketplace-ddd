@@ -11,6 +11,7 @@ import com.marketplace.domain.classifiedad.Money;
 import com.marketplace.domain.classifiedad.Price;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAd;
 import com.marketplace.domain.shared.UserId;
+import io.vavr.control.Try;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,6 +56,8 @@ class ClassifiedAdServiceTest {
         expectedClassifiedAd.updateText(new ClassifiedAdText("test text"));
         expectedClassifiedAd.updateTitle(new ClassifiedAdTitle("test title"));
 
+        Mockito.when(aggregateStoreRepository.exists(new ClassifiedAdId(UUID.fromString(uuidString))))
+            .thenReturn(Try.of(() -> true));
         Mockito.when(aggregateStoreRepository.load(new ClassifiedAdId(UUID.fromString(uuidString))))
             .thenReturn(Optional.of(classifiedAd));
         Mockito.when(aggregateStoreRepository.add(classifiedAd)).thenReturn(Optional.of(expectedClassifiedAd));
@@ -84,6 +87,8 @@ class ClassifiedAdServiceTest {
         expectedClassifiedAd.updateTitle(new ClassifiedAdTitle("test title"));
         expectedClassifiedAd.updatePrice(new Price(Money.fromDecimal(10.0, "USD")));
 
+        Mockito.when(aggregateStoreRepository.exists(new ClassifiedAdId(UUID.fromString(uuidString))))
+            .thenReturn(Try.of(() -> true));
         Mockito.when(aggregateStoreRepository.load(new ClassifiedAdId(UUID.fromString(uuidString))))
             .thenReturn(Optional.of(classifiedAd));
         Mockito.when(aggregateStoreRepository.add(classifiedAd)).thenReturn(Optional.of(expectedClassifiedAd));
@@ -111,6 +116,8 @@ class ClassifiedAdServiceTest {
         var expectedClassifiedAd = new ClassifiedAd(classifiedAdId, ownerId);
         expectedClassifiedAd.updateText(new ClassifiedAdText("test text"));
 
+        Mockito.when(aggregateStoreRepository.exists(new ClassifiedAdId(UUID.fromString(uuidString))))
+            .thenReturn(Try.of(() -> true));
         Mockito.when(aggregateStoreRepository.load(new ClassifiedAdId(UUID.fromString(uuidString))))
             .thenReturn(Optional.of(classifiedAd));
         Mockito.when(aggregateStoreRepository.add(classifiedAd)).thenReturn(Optional.of(expectedClassifiedAd));
