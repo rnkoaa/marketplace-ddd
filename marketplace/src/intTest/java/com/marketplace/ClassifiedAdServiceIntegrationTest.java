@@ -1,7 +1,9 @@
 package com.marketplace;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+import com.marketplace.domain.PictureId;
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
@@ -21,13 +23,12 @@ import com.marketplace.fixtures.LoadUpdateAdEvent;
 import io.vavr.control.Try;
 import java.io.IOException;
 import java.util.Optional;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled
 public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
 
-    @Disabled
     @Test
     void classifiedAdCanBeCreatedAndAPictureCanBeAdded() throws IOException {
         CreateClassifiedAd createAdDto = LoadCreateAdEvent.loadCreateAdDto();
@@ -54,14 +55,15 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
 
         assertThat(addPictureResponse.getId()).isNotNull();
         assertThat(addPictureResponse.getId()).isEqualByComparingTo(adResponse.getClassifiedAdId());
-//        controller.addPicture(addPictureToClassifiedAd);
-//
 //        assert repository != null;
         Optional<ClassifiedAd> found = classifiedAdService.findById(new ClassifiedAdId(adResponse.getClassifiedAdId()));
         assertThat(found).isPresent();
 //
         ClassifiedAd classifiedAd = found.get();
-        assertThat(classifiedAd.getChanges()).isNotNull().hasSize(4);
+        assertThat(createAdDto.getText()).isPresent();
+        assertThat(createAdDto.getTitle()).isPresent();
+        assertThat(classifiedAd.getTitle().toString()).isEqualTo(createAdDto.getTitle().get());
+        assertThat(classifiedAd.getText().toString()).isEqualTo(createAdDto.getText().get());
         assertThat(classifiedAd.getPictures()).hasSize(1);
 
     }
@@ -78,7 +80,6 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
 
         CreateAdResponse adResponse = mayBeAd.get();
 
-//    assertThat(ad.getResult()).isPresent();
         assertThat(adResponse.getClassifiedAdId()).isNotNull();
         assertThat(adResponse.getOwnerId()).isNotNull().isEqualByComparingTo(createCommand.getOwnerId());
 
@@ -86,11 +87,14 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
         assertThat(load).isPresent();
 
         ClassifiedAd classifiedAd = load.get();
-        assertThat(classifiedAd.getChanges()).isNotNull().hasSize(3);
+        assertThat(createCommand.getText()).isPresent();
+        assertThat(createCommand.getTitle()).isPresent();
+        assertThat(classifiedAd.getTitle().toString()).isEqualTo(createCommand.getTitle().get());
+        assertThat(classifiedAd.getText().toString()).isEqualTo(createCommand.getText().get());
     }
 
     @Test
-    @Disabled
+//    @Disabled
     void classifiedAdCanBeCreatedAndUpdated() throws IOException {
         CreateClassifiedAd createCommand = LoadCreateAdEvent.loadCreateAdDto();
 
@@ -100,8 +104,6 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
         var mayBeAd = classifiedAdService.handle(createCommand);
         assertThat(mayBeAd.isSuccess()).isTrue();
         CreateAdResponse adResponse = mayBeAd.get();
-
-//    assertThat(ad.getResult()).isPresent();
 
         UpdateClassifiedAd updateCommand = ImmutableUpdateClassifiedAd.copyOf(LoadUpdateAdEvent.load())
             .withClassifiedAdId(adResponse.getClassifiedAdId());
@@ -113,14 +115,11 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
         assertThat(found).isPresent();
 
         ClassifiedAd classifiedAd = found.get();
-        assertThat(classifiedAd.getChanges()).isNotNull().hasSize(3);
-
         assertThat(classifiedAd.getText().toString()).startsWith("update");
         assertThat(classifiedAd.getTitle().toString()).startsWith("update");
     }
 
     @Test
-    @Disabled
     void classifiedAdCanBeCreatedAndAPictureCanBeAddedAndResized() throws IOException {
         var createCommand = LoadCreateAdEvent.loadCreateAdDto();
 
@@ -141,23 +140,33 @@ public class ClassifiedAdServiceIntegrationTest extends BaseRepositoryTest {
         Try<UpdateClassifiedAdResponse> maybeAddResponse = classifiedAdService.handle(addPictureToClassifiedAd);
         assertThat(maybeAddResponse.isSuccess()).isTrue();
 
+        Optional<ClassifiedAd> maybeClassifiedAd = classifiedAdService
+            .findById(ClassifiedAdId.from(adResponse.getClassifiedAdId()));
+        assertThat(maybeClassifiedAd).isPresent();
+
+        ClassifiedAd classifiedAd = maybeClassifiedAd.get();
+        assertThat(classifiedAd.getPictures()).hasSize(1);
+        assertThat(classifiedAd.getPictures().get(0).getSize().width()).isEqualTo(800);
+        assertThat(classifiedAd.getPictures().get(0).getSize().height()).isEqualTo(600);
+
         UpdateClassifiedAdResponse addPictureResponse = maybeAddResponse.get();
 
         assertThat(addPictureResponse.getId()).isNotNull();
 
+        PictureId pictureId = classifiedAd.getPictures().get(0).getId();
+
         ResizeClassifiedAdPicture resizePictureCommand = ImmutableResizeClassifiedAdPicture
             .copyOf(LoadResizePicture.load())
-            .withClassifiedAdId(adResponse.getClassifiedAdId())
-            .withId(addPictureResponse.getId());
+            .withId(pictureId.id())
+            .withClassifiedAdId(adResponse.getClassifiedAdId());
         classifiedAdService.handle(resizePictureCommand);
 
         Optional<ClassifiedAd> load = classifiedAdService.findById(new ClassifiedAdId(adResponse.getClassifiedAdId()));
         assertThat(load).isPresent();
 
-        ClassifiedAd classifiedAd = load.get();
-        assertThat(classifiedAd.getChanges()).isNotNull().hasSize(4);
-        assertThat(classifiedAd.getPictures()).hasSize(1);
-        assertThat(classifiedAd.getPictures().get(0).getSize().width()).isEqualTo(900);
-        assertThat(classifiedAd.getPictures().get(0).getSize().height()).isEqualTo(700);
+        ClassifiedAd classifiedAd2 = load.get();
+        assertThat(classifiedAd2.getPictures()).hasSize(1);
+        assertThat(classifiedAd2.getPictures().get(0).getSize().width()).isEqualTo(900);
+        assertThat(classifiedAd2.getPictures().get(0).getSize().height()).isEqualTo(700);
     }
 }

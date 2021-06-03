@@ -14,6 +14,7 @@ import com.marketplace.domain.userprofile.UserProfile;
 import com.marketplace.domain.userprofile.controller.command.CreateUserProfileCommand;
 import com.marketplace.domain.userprofile.controller.command.UpdateUserProfileCommand;
 import com.marketplace.fixtures.UserProfileFixture;
+import io.vavr.control.Try;
 import java.io.IOException;
 import java.util.Optional;
 import org.jooq.DSLContext;
@@ -140,8 +141,9 @@ public class UserProfileCommandRepositoryTest extends AbstractContainerInitializ
         var addedUserProfile = aggregateStoreRepository.add(userProfile);
         assertThat(addedUserProfile).isPresent();
 
-        boolean exists = aggregateStoreRepository.exists(addedUserProfile.get().getId());
-        assertThat(exists).isTrue();
+        Try<Boolean> exists = aggregateStoreRepository.exists(addedUserProfile.get().getId());
+        assertThat(exists.isSuccess()).isTrue();
+        assertThat(exists.get()).isTrue();
     }
 
     @Test

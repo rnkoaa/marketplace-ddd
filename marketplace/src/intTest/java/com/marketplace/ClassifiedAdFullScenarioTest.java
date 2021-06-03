@@ -1,5 +1,7 @@
 package com.marketplace;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 import com.marketplace.domain.classifiedad.ClassifiedAd;
 import com.marketplace.domain.classifiedad.ClassifiedAdId;
 import com.marketplace.domain.classifiedad.ClassifiedAdState;
@@ -10,17 +12,12 @@ import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAdPr
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAdText;
 import com.marketplace.domain.classifiedad.command.ImmutableUpdateClassifiedAdTitle;
 import com.marketplace.domain.shared.UserId;
-
 import java.math.BigDecimal;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
 import java.util.Optional;
 import java.util.UUID;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 @Disabled
 public class ClassifiedAdFullScenarioTest extends BaseRepositoryTest {

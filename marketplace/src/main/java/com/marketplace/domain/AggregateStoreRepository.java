@@ -4,6 +4,7 @@ import com.marketplace.cqrs.event.EventId;
 import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.cqrs.framework.AggregateRoot;
 import com.marketplace.domain.repository.Repository;
+import com.marketplace.domain.userprofile.controller.NotFoundException;
 import com.marketplace.eventstore.framework.Result;
 import com.marketplace.eventstore.framework.event.EventStore;
 import com.marketplace.eventstore.framework.event.EventStream;
@@ -30,9 +31,9 @@ public class AggregateStoreRepository {
         this.aggregateTypeMapper = EventClassCache.getInstance(dslContext);
     }
 
-    public boolean exists(EventId id) {
-        return eventEventStore.exists(id.getStreamId());
-    }
+//    public boolean exists(EventId id) {
+//        return eventEventStore.exists(id.getStreamId());
+//    }
 
     public Optional<AggregateRoot<EventId, VersionedEvent>> load(EventId id) {
         EventStream<VersionedEvent> eventStream = eventEventStore.load(id.getStreamId());
@@ -64,6 +65,13 @@ public class AggregateStoreRepository {
                 aggregateRoot.clearChanges();
                 return aggregateRoot;
             });
+    }
+
+    public Try<Boolean> exists(EventId id) {
+        if (eventEventStore.exists(id.getStreamId())) {
+            return Try.of(() -> true);
+        }
+        return Try.failure(new NotFoundException("aggregate with event Id '" + id.toString() + "' does not exist"));
     }
 
     public void deleteAll() {

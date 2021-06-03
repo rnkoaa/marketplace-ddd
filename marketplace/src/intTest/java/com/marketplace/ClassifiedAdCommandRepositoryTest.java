@@ -5,6 +5,7 @@ import com.marketplace.domain.classifiedad.*;
 import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.fixtures.LoadCreateAdEvent;
+import io.vavr.control.Try;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -54,5 +55,34 @@ public class ClassifiedAdCommandRepositoryTest extends BaseRepositoryTest {
         assertThat(found.getPrice()).isEqualTo(new Price(Money.fromDecimal(4.59, "USD")));
         assertThat(found.getPictures()).hasSize(1);
         assertThat(found.getChanges()).hasSameSizeAs(classifiedAd.getChanges());
+    }
+
+    @Test
+    void testWhenClassifiedAdExists() {
+        Try<Boolean> exists = aggregateStoreRepository.exists(ClassifiedAdId.newClassifiedAdId());
+        assertThat(exists.isSuccess()).isFalse();
+    }
+
+    @Test
+    void testWhenClassifiedAdExistsReturnsTrue() throws IOException {
+        CreateClassifiedAd createAdDto = LoadCreateAdEvent.loadCreateAdDto();
+
+        assertThat(createAdDto).isNotNull();
+        assertThat(createAdDto.getOwnerId()).isNotNull();
+        var classifiedAd = new ClassifiedAd(createAdDto);
+        classifiedAd.updateTitle(new ClassifiedAdTitle("Snow Blower for sale"));
+        classifiedAd.updateText(new ClassifiedAdText("Snow Blower for sale for Cheap"));
+        classifiedAd.updatePrice(new Price(Money.fromDecimal(4.59, "USD")));
+        classifiedAd.addPicture("uri", new PictureSize(800, 600), 0);
+        classifiedAd.setState(ClassifiedAdState.ACTIVE);
+
+        Optional<ClassifiedAd> savedClassifiedAd = aggregateStoreRepository.add(classifiedAd)
+            .map(it -> (ClassifiedAd) it);
+
+        assertThat(savedClassifiedAd).isPresent();
+
+        Try<Boolean> exists = aggregateStoreRepository.exists(savedClassifiedAd.get().getId());
+        assertThat(exists.isSuccess()).isTrue();
+        assertThat(exists.get()).isTrue();
     }
 }
