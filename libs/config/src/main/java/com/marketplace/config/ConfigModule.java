@@ -15,6 +15,7 @@ public class ConfigModule {
 
     }
 
+
     public static ObjectMapper objectMapper() {
         if (instance == null) {
             synchronized (ConfigModule.class) {

@@ -13,7 +13,7 @@ public interface ClassifiedAdQueryEntity {
 
   UUID getId();
 
-  UUID getOwnerId();
+  UUID getOwner();
 
   Optional<UUID> getApprover();
 
@@ -27,5 +27,6 @@ public interface ClassifiedAdQueryEntity {
 
   ClassifiedAdState getState();
 
+  Optional<String> getRejectionMessage();
 
 }

@@ -18,7 +18,7 @@ public class ClassifiedAdQueryEntityMapper {
 
     public static ClassifiedAdRecord convert(ClassifiedAdQueryEntity entity) {
         ClassifiedAdRecord classifiedAdRecord = new ClassifiedAdRecord()
-            .setOwner(entity.getOwnerId().toString())
+            .setOwner(entity.getOwner().toString())
             .setId(entity.getId().toString())
             .setStatus(entity.getState().name());
 
@@ -38,7 +38,7 @@ public class ClassifiedAdQueryEntityMapper {
     public static ClassifiedAdQueryEntity convert(ClassifiedAdRecord classifiedAdRecord) {
         ImmutableClassifiedAdQueryEntity.Builder builder = ImmutableClassifiedAdQueryEntity.builder()
             .id(UUID.fromString(classifiedAdRecord.getId()))
-            .ownerId(UUID.fromString(classifiedAdRecord.getOwner()))
+            .owner(UUID.fromString(classifiedAdRecord.getOwner()))
             .state(ClassifiedAdState.fromString(classifiedAdRecord.getStatus()));
 
         if (!isNullOrEmpty(classifiedAdRecord.getApprover())) {

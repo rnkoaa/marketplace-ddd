@@ -6,7 +6,6 @@ import com.marketplace.domain.classifiedad.command.CreateClassifiedAd;
 import com.marketplace.domain.shared.UserId;
 import com.marketplace.fixtures.LoadCreateAdEvent;
 import io.vavr.control.Try;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -43,12 +42,12 @@ public class ClassifiedAdCommandRepositoryTest extends BaseRepositoryTest {
         assertThat(actual.getId().id()).isNotNull()
             .isEqualByComparingTo(UUID.fromString(insertId));
 
-        Optional<ClassifiedAd> load = aggregateStoreRepository.load(ClassifiedAdId.fromString(insertId))
+        Optional<ClassifiedAd> load = aggregateStoreRepository.load(ClassifiedAdId.from(insertId))
             .map(it -> (ClassifiedAd) it);
 
         assertThat(load).isPresent();
         ClassifiedAd found = load.get();
-        assertThat(found.getId()).isEqualTo(ClassifiedAdId.fromString(insertId));
+        assertThat(found.getId()).isEqualTo(ClassifiedAdId.from(insertId));
         assertThat(found.getOwnerId()).isEqualTo(new UserId(createAdDto.getOwnerId()));
         assertThat(found.getText()).isEqualTo(new ClassifiedAdText("Snow Blower for sale for Cheap"));
         assertThat(found.getTitle()).isEqualTo(new ClassifiedAdTitle("Snow Blower for sale"));

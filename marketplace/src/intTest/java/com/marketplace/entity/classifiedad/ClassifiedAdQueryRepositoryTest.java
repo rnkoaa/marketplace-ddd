@@ -101,7 +101,7 @@ public class ClassifiedAdQueryRepositoryTest extends BaseRepositoryTest {
             .get()
             .isEqualTo(UUID.fromString(classifiedAdRecord.getApprover()));
 
-        assertThat(classifiedAdQueryEntity.getOwnerId())
+        assertThat(classifiedAdQueryEntity.getOwner())
             .isEqualTo(UUID.fromString(classifiedAdRecord.getOwner()));
     }
 
@@ -137,14 +137,14 @@ public class ClassifiedAdQueryRepositoryTest extends BaseRepositoryTest {
             .get()
             .isEqualTo(UUID.fromString(classifiedAdRecord.getApprover()));
 
-        assertThat(classifiedAdQueryEntity.getOwnerId())
+        assertThat(classifiedAdQueryEntity.getOwner())
             .isEqualTo(UUID.fromString(classifiedAdRecord.getOwner()));
     }
 
     public ClassifiedAdQueryEntity createQueryEntity(String id, String owner) {
         return ImmutableClassifiedAdQueryEntity.builder()
             .id(UUID.fromString(id))
-            .ownerId(UUID.fromString(owner))
+            .owner(UUID.fromString(owner))
             .title("new ad for iphone")
             .text("iphone in mint condition")
             .price(ImmutablePriceDto.builder()

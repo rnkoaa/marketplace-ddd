@@ -1,14 +1,20 @@
 package com.marketplace.domain.classifiedad;
 
-public record ClassifiedAdText( String value) {
+import java.util.Objects;
+
+public record ClassifiedAdText(String value) {
+    static ClassifiedAdText DEFAULT = new ClassifiedAdText("");
+
     public ClassifiedAdText {
-        if (value == null || value.isEmpty()) {
-            throw new IllegalArgumentException("value cannot be empty or null");
-        }
+        Objects.requireNonNull(value, "classifiedAd text cannot be null");
     }
 
-    public static ClassifiedAdText fromString(String value) {
+    public static ClassifiedAdText from(String value) {
         return new ClassifiedAdText(value);
+    }
+
+    boolean isValid() {
+        return !value.isEmpty();
     }
 
     @Override

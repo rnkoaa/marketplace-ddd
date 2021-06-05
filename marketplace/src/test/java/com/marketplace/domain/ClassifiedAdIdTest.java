@@ -12,14 +12,26 @@ class ClassifiedAdIdTest {
 
     @Test
     void testClassifiedIdToString() {
-        var classifiedAdId = ClassifiedAdId.fromString(testUuid);
+        var classifiedAdId = ClassifiedAdId.from(testUuid);
 
         assertThat(classifiedAdId.toString()).isEqualTo(testUuid);
     }
 
+
+    @Test
+    void classifiedAdIdFromUUIDIsValid() {
+        assertThat(ClassifiedAdId.newClassifiedAdId().isValid()).isTrue();
+    }
+
+    @Test
+    void emptyClassifiedAdIdIsInvalid() {
+        assertThat(ClassifiedAdId.EMPTY_VALUE.isValid()).isFalse();
+    }
+
+
     @Test
     void testUuidGenerated() {
-        var classifiedAdId = ClassifiedAdId.fromString(testUuid);
+        var classifiedAdId = ClassifiedAdId.from(testUuid);
 
         assertThat(classifiedAdId).isNotNull()
                 .isEqualTo(new ClassifiedAdId(UUID.fromString(testUuid)));

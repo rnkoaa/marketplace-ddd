@@ -25,7 +25,7 @@ public abstract class JooqModule {
             config.enableLoadExtension(true);
             config.enforceForeignKeys(true);
             //displayName
-            conn = DriverManager.getConnection(applicationConfig.getDb().getUrl());
+            conn = DriverManager.getConnection(applicationConfig.getDb().getDbUrl());
 
             // we always need a foreign key support
 //            enableForeignKeySupport(conn);

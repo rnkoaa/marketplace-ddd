@@ -54,3 +54,9 @@ subprojects {
         mavenCentral()
     }
 }
+
+tasks.register('printProps') {
+    doLast {
+        println sqliteURL
+    }
+}

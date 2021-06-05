@@ -1,11 +1,13 @@
 package com.marketplace.domain.classifiedad;
 
+import java.util.Objects;
+
 public record ClassifiedAdTitle(String value) {
 
+    static ClassifiedAdTitle DEFAULT = new ClassifiedAdTitle("");
+
     public ClassifiedAdTitle {
-        if (!isValid(value)) {
-            throw new IllegalArgumentException("value cannot be null, empty or greater than 100 chars");
-        }
+        Objects.requireNonNull(value, "classifiedAd title cannot be null");
     }
 
     public static ClassifiedAdTitle fromString(String title) {
@@ -29,6 +31,10 @@ public record ClassifiedAdTitle(String value) {
 //
 //        if (value == null || value.isEmpty() || value.length() > 100) {
         return new ClassifiedAdTitle("");
+    }
+
+    boolean isValid() {
+        return !value.isEmpty();
     }
 
     public boolean isValid(String value) {

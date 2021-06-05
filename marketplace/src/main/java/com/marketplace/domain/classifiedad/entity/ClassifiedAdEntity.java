@@ -158,7 +158,7 @@ public class ClassifiedAdEntity {
         builder
             .id(id)
             .text(text).title(title)
-            .ownerId(owner)
+            .owner(owner)
             .state(state);
 
         if (price != null) {

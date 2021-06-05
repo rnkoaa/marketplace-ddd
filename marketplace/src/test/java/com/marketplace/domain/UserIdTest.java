@@ -58,4 +58,17 @@ public class UserIdTest {
         assertThat(res.username).isEqualTo(user.username);
         assertThat(res.userId).isEqualTo(user.userId);
     }
+
+
+    @Test
+    void userIdFromUUIDIsValid() {
+        var userId = UserId.newUserId();
+        assertThat(userId.isValid()).isTrue();
+    }
+
+    @Test
+    void emptyUserIdIsNotValid() {
+        var userId = UserId.EMPTY_VALUE;
+        assertThat(userId.isValid()).isFalse();
+    }
 }

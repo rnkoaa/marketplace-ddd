@@ -36,7 +36,7 @@ public class UserProfileCommandService {
     }
 
     public Try<CreateUserProfileResult> handle(CreateUserProfileCommand command) {
-        var userId = UserId.newId();
+        var userId = UserId.newUserId();
 
         Optional<UserProfileEntity> existingUserProfile = userProfileQueryRepository
             .findByDisplayName(command.getDisplayName());

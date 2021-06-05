@@ -3,9 +3,10 @@ package com.marketplace.domain.classifiedad;
 public enum ClassifiedAdState {
   PENDING_REVIEW,
   ACTIVE,
+  APPROVED,
   INACTIVE,
   MARKED_AS_SOLD,
-  APPROVED;
+  REJECTED;
 
   public static ClassifiedAdState fromString(String name) {
 
