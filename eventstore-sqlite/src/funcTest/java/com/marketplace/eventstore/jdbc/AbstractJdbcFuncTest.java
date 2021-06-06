@@ -22,7 +22,7 @@ public abstract class AbstractJdbcFuncTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractJdbcFuncTest.class);
 
-    private final static String CONNECTION_STRING = "jdbc:sqlite:src/funcTest/resources/db/eventstore.db";
+    private final static String CONNECTION_STRING = "jdbc:sqlite:src/funcTest/resources/db/marketplace.db";
     protected DSLContext dslContext;
     private final Connection connection;
 

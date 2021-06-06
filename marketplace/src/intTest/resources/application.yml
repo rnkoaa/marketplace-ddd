@@ -1,0 +1,3 @@
+db:
+  name: marketplace.db
+  db_path: '/tmp/marketplace/func-test'

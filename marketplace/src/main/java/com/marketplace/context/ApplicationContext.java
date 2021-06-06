@@ -2,6 +2,7 @@ package com.marketplace.context;
 
 import com.google.common.eventbus.EventBus;
 import com.marketplace.config.ApplicationConfig;
+import com.marketplace.config.DbConfig;
 import com.marketplace.context.server.SparkServerModule;
 import com.marketplace.cqrs.event.VersionedEvent;
 import com.marketplace.domain.AggregateStoreRepository;
@@ -47,6 +48,8 @@ public interface ApplicationContext {
     UserProfileEventListener getUserProfileEventListener();
 
     UserProfileCommandService getUsProfileCommandService();
+
+    ApplicationConfig getConfig();
 
     @Component.Builder
     interface Builder {

@@ -1,4 +1,4 @@
-create table event_data
+create table IF NOT EXISTS event_data
 (
     id             TEXT PRIMARY KEY,
     stream_id      TEXT NOT NULL,
@@ -13,19 +13,19 @@ create table event_data
 );
 
 CREATE
-    INDEX idx_event_data_aggregate_id
+    INDEX IF NOT EXISTS idx_event_data_aggregate_id
     ON event_data (aggregate_id);
 
 CREATE
-    INDEX idx_event_data_stream_id
+    INDEX IF NOT EXISTS idx_event_data_stream_id
     ON event_data (stream_id);
 
 CREATE
-    INDEX idx_event_data_aggregate_name
+    INDEX IF NOT EXISTS idx_event_data_aggregate_name
     ON event_data (aggregate_name);
 
 CREATE
-    INDEX idx_event_data_stream_id_version
+    INDEX IF NOT EXISTS idx_event_data_stream_id_version
     ON event_data (stream_id, event_version);
 
 create table IF NOT EXISTS class_cache
@@ -34,7 +34,7 @@ create table IF NOT EXISTS class_cache
     class_name      TEXT NOT NULL
 );
 
-create table user_profile
+create table IF NOT EXISTS user_profile
 (
     id              TEXT PRIMARY KEY,
     first_name      TEXT NOT NULl,                 -- uuid
@@ -47,10 +47,10 @@ create table user_profile
 );
 
 CREATE
-    UNIQUE INDEX idx_user_profile_displayName
+    UNIQUE INDEX IF NOT EXISTS idx_user_profile_displayName
     ON user_profile (display_name);
 
-create table classified_ad
+create table IF NOT EXISTS classified_ad
 (
     id               TEXT PRIMARY KEY,
     approver         TEXT,
@@ -67,9 +67,9 @@ create table classified_ad
 );
 
 CREATE
-    INDEX idx_classified_ad_owner_id
+    INDEX IF NOT EXISTS idx_classified_ad_owner_id
     ON classified_ad (owner);
 
 CREATE
-    INDEX idx_classified_ad_approver_id
+    INDEX IF NOT EXISTS idx_classified_ad_approver_id
     ON classified_ad (approver);

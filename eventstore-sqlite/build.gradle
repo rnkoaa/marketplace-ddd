@@ -30,6 +30,12 @@ repositories {
     mavenCentral()
 }
 
+jar {
+    processResources {
+        exclude("**/migration/*")
+    }
+}
+
 
 configurations {
     compileOnly {
@@ -141,6 +147,13 @@ jooq {
                 }
             }
         }
+    }
+}
+
+// after generating jooq configs, do not bring them here.
+generateJooq {
+    doLast {
+        delete("src/main/resources/db/marketplace.db")
     }
 }
 

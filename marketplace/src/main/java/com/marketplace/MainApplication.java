@@ -28,8 +28,10 @@ public class MainApplication {
             .config(config)
             .build();
 
-        context.getEventBus().register(context.getUserProfileEventListener());
+        context.getConfig().getDb().postSetup();
 
+        context.getEventBus().register(context.getUserProfileEventListener());
+//
         context.getServer()
             .run();
     }

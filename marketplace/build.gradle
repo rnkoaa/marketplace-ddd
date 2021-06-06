@@ -146,9 +146,8 @@ flyway {
     locations = ["filesystem:${projectDir}/src/main/resources/db/migration"]
 }
 
-task copyDb(type: Copy) {
-    from "${projectDir}/src/main/resources/db/marketplace.db"
-    into "~/marketplace/db/"
+task deleteDb(type: Copy) {
+    delete("src/main/resources/db/marketplace.db")
 }
 
 jooq {
@@ -189,6 +188,12 @@ jooq {
     }
 }
 
+// after generating jooq configs, do not bring them here.
+generateJooq {
+    doLast {
+        delete("src/main/resources/db/marketplace.db")
+    }
+}
 generateJooq.dependsOn(flywayMigrate)
 
-copyDb.dependsOn(generateJooq)
+deleteDb.dependsOn(generateJooq)

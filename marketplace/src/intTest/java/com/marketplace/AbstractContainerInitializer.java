@@ -22,6 +22,7 @@ public class AbstractContainerInitializer {
             builder()
             .config(config)
             .build();
+        context.getConfig().getDb().postSetup();
 
         dslContext = context.getDSLContext();
     }

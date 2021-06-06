@@ -35,7 +35,7 @@ public class DaggerTest {
         assertThat(dbPath).isPresent();
 //        assertThat(d)
         String path = dbPath.get();
-        assertThat(path).isEqualTo("~/marketplace");
+        assertThat(path).isEqualTo("/tmp/marketplace");
         System.out.println(path);
     }
 
