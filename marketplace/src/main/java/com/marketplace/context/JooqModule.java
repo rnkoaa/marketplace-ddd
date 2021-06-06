@@ -20,10 +20,10 @@ public abstract class JooqModule {
     public static DSLContext provideDSLContext(ApplicationConfig applicationConfig) {
         Connection conn = null;
         try {
-            SQLiteConfig config = new SQLiteConfig();
-            config.setSharedCache(true);
-            config.enableLoadExtension(true);
-            config.enforceForeignKeys(true);
+//            SQLiteConfig config = new SQLiteConfig();
+//            config.setSharedCache(true);
+//            config.enableLoadExtension(true);
+//            config.enforceForeignKeys(true);
             //displayName
             conn = DriverManager.getConnection(applicationConfig.getDb().getDbUrl());
 

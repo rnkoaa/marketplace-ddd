@@ -141,13 +141,14 @@ processIntTestResources {
 // https://flywaydb.org/documentation/usage/gradle/migrate
 flyway {
     driver = 'org.sqlite.JDBC'
+//    url = "jdbc:sqlite:~/markketplace/db/marketplace.db"
     url = "jdbc:sqlite:${projectDir}/src/main/resources/db/marketplace.db"
     locations = ["filesystem:${projectDir}/src/main/resources/db/migration"]
 }
 
 task copyDb(type: Copy) {
     from "${projectDir}/src/main/resources/db/marketplace.db"
-    into "${rootProject.rootDir}/db"
+    into "~/marketplace/db/"
 }
 
 jooq {
